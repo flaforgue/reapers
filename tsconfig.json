@@ -1,0 +1,25 @@
+{
+  "strict": true,
+  "noUnusedLocals": true,
+  "forceConsitentCasingInFileNames": true,
+  "noImplicitReturns": true,
+  "noImplicitAny": true,
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "lib": ["es5", "es6"],
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "declaration": true,
+    "strict": true,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
