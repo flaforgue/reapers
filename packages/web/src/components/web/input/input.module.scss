@@ -1,0 +1,31 @@
+@import '../../../assets/styles/variables.scss';
+
+.web {
+  width: calc(100% - 2rem);
+  padding: 0.5rem 1rem;
+  background-color: $color-background;
+  border: 1px solid $color-grey-light;
+  border-radius: $default-border-radius;
+
+  &:active,
+  &:focus {
+    border-color: $color-grey;
+  }
+}
+
+.chat {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+  border: none;
+  border-top: 1px solid rgba($color-black, $default-ui-opacity);
+  background-color: $color-transparent;
+  color: $color-grey-light;
+
+  &:focus {
+    background-color: rgba($color-black, $default-ui-opacity);
+  }
+}

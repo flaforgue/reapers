@@ -1,0 +1,25 @@
+{
+  "name": "@reapers/game-shared",
+  "version": "0.0.1",
+  "author": "flaforgue <florian.laforgue@gmail.com>",
+  "homepage": "https://bitbucket.org/FloLfg/reapers/packages/game/shared#readme",
+  "license": "ISC",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/FloLfg/reapers.git"
+  },
+  "scripts": {
+    "build": "rm -Rf ./dist && tsc",
+    "lint": "tsc --noEmit && eslint \"**/*.ts\" --quiet --fix",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "class-transformer": "^0.4.0",
+    "reflect-metadata": "^0.1.13"
+  }
+}

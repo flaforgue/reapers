@@ -1,0 +1,40 @@
+@import 'variables.scss';
+@import 'fonts.scss';
+
+body {
+  margin: 0;
+  background-color: $color-background;
+
+  * {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    outline: none !important;
+  }
+}
+
+.App {
+  min-height: 100vh;
+}
+
+.margin {
+  margin: 1rem;
+}
+
+// .app-main-nav {
+//   height: $main-nav-height;
+//   display: flex;
+//   justify-content: flex-end;
+//   background-color: $color-blue;
+
+//   a {
+//     color: $color-white;
+//     text-decoration: none;
+//     padding: 1rem;
+//     background-color: rgba($color-white, 0);
+//   }
+
+//   a:hover,
+//   .menu-item.is-active {
+//     transition: background-color $default-transition;
+//     background-color: rgba($color-white, 0.1);
+//   }
+// }

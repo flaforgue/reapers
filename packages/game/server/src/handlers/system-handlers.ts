@@ -1,13 +1,11 @@
-import { plainToClass } from 'class-transformer';
 import { Socket } from 'socket.io';
-import { PlayerEvent, SocketEvent } from '../constants';
-import { Player } from '../core';
-import { PlayerSerializer } from '../serializers';
+import { PlayerEvent, PlayerDTO, SystemEvent, plainToClass } from '@reapers/game-shared';
+import { Game, Player } from '../core';
 
-export default (socket: Socket, player: Player): void => {
-  socket.on(SocketEvent.Disconnected, (reason) => {
+export default (socket: Socket, player: Player, game: Game): void => {
+  socket.on(SystemEvent.Disconnect, (reason) => {
     console.info(`Player disconnected: ${reason}`);
-    player.game.removePlayer(player.id);
-    socket.broadcast.emit(PlayerEvent.Deleted, plainToClass(PlayerSerializer, player));
+    game.removePlayer(player.id);
+    socket.broadcast.emit(PlayerEvent.Deleted, plainToClass(PlayerDTO, player));
   });
 };

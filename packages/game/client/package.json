@@ -19,8 +19,11 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "react": "^17.0.1",
+    "@reapers/game-shared": "^0.0.1",
     "socket.io-client": "^3.1.1"
+  },
+  "peerDependencies": {
+    "react": "^17.0.1"
   },
   "devDependencies": {
     "@types/react": "^17.0.1",

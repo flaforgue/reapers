@@ -11,8 +11,6 @@ export const registerChatHandlers = (io: Server, socket: Socket, playerName: str
   });
 
   socket.on(ChatEvent.Message.Created, (room: ChatRoom, content = '') => {
-    console.log(`${playerName} said ${content} in ${room}`);
-
     io.to(room).emit(ChatEvent.Message.Created, {
       sender: playerName,
       content,

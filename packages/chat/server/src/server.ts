@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import SocketIO from 'socket.io';
 import * as http from 'http';
 import express from 'express';
@@ -11,7 +10,7 @@ const app = express();
 const httpServer = http.createServer(app);
 const io = new SocketIO.Server(httpServer, {
   cors: {
-    origin: config.client.url,
+    origin: config.web.url,
     methods: ['GET', 'POST'],
   },
 });

@@ -23,9 +23,7 @@
   },
   "dependencies": {
     "@reapers/chat-shared": "^0.0.1",
-    "class-transformer": "^0.4.0",
     "express": "^4.17.1",
-    "reflect-metadata": "^0.1.13",
     "socket.io": "^3.1.1",
     "uuid": "^8.3.2"
   },
