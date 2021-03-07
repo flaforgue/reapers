@@ -1,0 +1,47 @@
+{
+  "name": "@reapers/web",
+  "version": "0.0.1",
+  "author": "flaforgue <florian.laforgue@gmail.com>",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/FloLfg/reapers.git"
+  },
+  "scripts": {
+    "watch": "react-scripts start",
+    "build": "react-scripts build",
+    "lint": "tsc --noEmit && eslint \"**/*.{ts,tsx}\" --quiet --fix"
+  },
+  "dependencies": {
+    "@reapers/chat-client": "^0.0.1",
+    "@reapers/game-client": "^0.0.1",
+    "@babylonjs/core": "^4.2.0",
+    "@babylonjs/loaders": "^4.2.0",
+    "easy-peasy": "^4.0.1",
+    "node-sass": "^5.0.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-hot-loader": "^4.13.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.1",
+    "@types/react-dom": "^17.0.1",
+    "@types/react-router-dom": "^5.1.7",
+    "sass": "^1.32.7",
+    "sass-loader": "^11.0.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

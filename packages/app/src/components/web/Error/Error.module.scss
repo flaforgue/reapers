@@ -1,0 +1,8 @@
+.error {
+  color: var(--color-red-dark);
+  padding: 1rem;
+  margin: 1rem 0;
+  width: calc(100% - 2rem);
+  background-color: var(--color-red-light);
+  border-radius: var(--default-border-radius);
+}

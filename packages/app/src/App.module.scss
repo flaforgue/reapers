@@ -1,0 +1,43 @@
+:root {
+  --color-blue-pale: #3e4c5e;
+
+  --main-nav-height: 50px;
+
+  --color-blue-pale: #3e4c5e;
+  --color-blue: #2c3d55;
+  --color-orange: #cd533b;
+  --color-red-light: #e9aba8;
+  --color-red-dark: #9e2b25;
+  --color-yellow: #e3d081;
+  --color-background: #f2f6fc;
+  --color-white: #ffffff;
+  --color-grey-light: #eeeeee;
+  --color-grey: #cccccc;
+  --color-grey-dark: #666666;
+  --color-black: #000000;
+  --color-black-rgb: 0, 0, 0;
+  --color-transparent: rgba(0, 0, 0, 0);
+
+  --default-border-radius: 4px;
+  --default-transition: 0.2s;
+  --default-ui-opacity: 0.6;
+
+  --game-z-index: 0;
+  --chat-z-index: 1;
+}
+
+:global {
+  body {
+    margin: 0;
+    background-color: var(--color-background);
+
+    * {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      outline: none !important;
+    }
+  }
+}
+
+.appContainer {
+  min-height: 100vh;
+}

@@ -1,5 +1,5 @@
 {
   "version": "0.0.1",
   "npmClient": "yarn",
-  "packages": ["packages/web", "packages/chat/*", "packages/game/*"]
+  "packages": ["packages/app", "packages/chat/*", "packages/game/*"]
 }

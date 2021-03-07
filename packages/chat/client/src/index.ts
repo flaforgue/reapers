@@ -1,4 +1,4 @@
-import { ChatEvent, ChatMessage, ChatRoom } from '@reapers/chat-shared';
+import { ChatEvents, ChatMessage, ChatRoom } from '@reapers/chat-shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import socketIOClient from 'socket.io-client';
 
@@ -16,7 +16,7 @@ const useChat = (serverUrl: string): UseChatHook => {
 
   useEffect(() => {
     socketRef.current = socketIOClient(serverUrl);
-    socketRef.current.on(ChatEvent.Message.Created, (message: ChatMessage) => {
+    socketRef.current.on(ChatEvents.Message.Created, (message: ChatMessage) => {
       setMessages((messages: ChatMessage[]) => [...messages.slice(nbMaxMessages), message]);
     });
 
@@ -26,12 +26,12 @@ const useChat = (serverUrl: string): UseChatHook => {
   }, []);
 
   const sendMessage = (room: ChatRoom, content: string): void => {
-    socketRef.current?.emit(ChatEvent.Message.Created, room, content);
+    socketRef.current?.emit(ChatEvents.Message.Created, room, content);
   };
 
   const joinChat = useCallback(
     (name: string): void => {
-      socketRef.current?.emit(ChatEvent.Member.Created, name);
+      socketRef.current?.emit(ChatEvents.Member.Created, name);
     },
     [socketRef.current],
   );

@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@reapers/game-shared": "^0.0.1",
+    "babylonjs": "^4.2.0",
     "express": "^4.17.1",
     "socket.io": "^3.1.1",
     "uuid": "^8.3.2"

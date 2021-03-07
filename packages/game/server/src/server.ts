@@ -1,10 +1,10 @@
 import SocketIO from 'socket.io';
 import * as http from 'http';
 import express from 'express';
-import Game from './core/game';
-import { registerSystemHandlers } from './handlers';
+import { registerPlayerHandlers, registerSystemHandlers } from './handlers';
 import config from './config';
-import { GameDTO, GameEvent, plainToClass, PlayerEvent, SystemEvent } from '@reapers/game-shared';
+import { GameDTO, GameEvents, plainToClass } from '@reapers/game-shared';
+import { GameEntity } from './entities';
 
 const port = config.port;
 const app = express();
@@ -15,18 +15,24 @@ const io = new SocketIO.Server(httpServer, {
     methods: ['GET', 'POST'],
   },
 });
-const game = new Game(io.sockets);
+const game = new GameEntity(io.sockets);
 console.info('New game created', game.id);
 
-io.on(SystemEvent.Connection, (socket: SocketIO.Socket) => {
-  if (io.sockets.sockets.size < config.nbMaxPlayers && game.players.length < config.nbMaxPlayers) {
+io.on(GameEvents.System.Connection, (socket: SocketIO.Socket) => {
+  if (
+    io.sockets.sockets.size < config.nbMaxPlayers &&
+    game.players.length < config.nbMaxPlayers
+  ) {
     console.info(`New connection: ${socket.id} (now ${io.sockets.sockets.size})`);
 
-    socket.once(PlayerEvent.Joined, (name: string) => {
+    socket.once(GameEvents.Player.Joined, (name: string) => {
       try {
         const player = game.addPlayer(socket.id, name);
+
         registerSystemHandlers(socket, player, game);
-        socket.emit(GameEvent.Created, plainToClass(GameDTO, game));
+        registerPlayerHandlers(socket, player);
+
+        socket.emit(GameEvents.Game.Created, plainToClass(GameDTO, game));
       } catch (e) {
         console.error(e);
       }

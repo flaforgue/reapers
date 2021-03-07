@@ -12,7 +12,7 @@ enum MemberEvent {
   Created = 'MemberEvent.Created',
 }
 
-const ChatEvent = {
+const ChatEvents = {
   Message: MessageEvent,
   Member: MemberEvent,
   System: SystemEvent,
@@ -28,4 +28,4 @@ type ChatMessage = {
   sender: string;
 };
 
-export { ChatEvent, ChatRoom, ChatMessage };
+export { ChatEvents, ChatRoom, ChatMessage };

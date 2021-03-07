@@ -1,0 +1,36 @@
+.chat {
+  --input-height: 30px;
+
+  position: absolute;
+  z-index: var(--chat-z-index);
+  font-size: 1rem;
+  bottom: 0;
+  left: 0;
+  width: 400px;
+  height: 200px;
+  color: var(--color-grey);
+  background-color: rgba(var(--color-black-rgb), var(--default-ui-opacity));
+  border-top-right-radius: var(--default-border-radius);
+
+  .messagesContainer {
+    height: calc(100% - var(--input-height));
+    overflow: scroll;
+
+    .message {
+      margin: 2px 4px;
+
+      .sender {
+        font-weight: bold;
+      }
+
+      .content {
+        text-decoration: dashed;
+      }
+    }
+  }
+
+  .inputContainer {
+    height: var(--input-height);
+    width: calc(100% - 8px);
+  }
+}

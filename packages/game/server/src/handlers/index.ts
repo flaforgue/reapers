@@ -1,3 +1,4 @@
-import registerSystemHandlers from './system-handlers';
+import registerPlayerHandlers from './player';
+import registerSystemHandlers from './system';
 
-export { registerSystemHandlers };
+export { registerPlayerHandlers, registerSystemHandlers };

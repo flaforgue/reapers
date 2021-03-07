@@ -1,25 +1,15 @@
 import 'reflect-metadata';
+
 import { plainToClass } from 'class-transformer';
-import PlayerDTO from './dtos/player';
-import GameDTO from './dtos/game';
-import WorldDTO from './dtos/world';
+import { PlayerDTO, GameDTO, WorldDTO } from './dtos';
+import { GameEvents, MoveDirection, RotationDirection } from './types';
 
-// Reserved names, do not change
-enum SystemEvent {
-  Connection = 'connection',
-  Disconnect = 'disconnect',
-}
-
-enum PlayerEvent {
-  Created = 'PlayerEvent.Created',
-  Deleted = 'PlayerEvent.Deleted',
-  Joined = 'PlayerEvent.Joined',
-}
-
-enum GameEvent {
-  Created = 'GameEvent.Created',
-  Updated = 'GameEvent.Updated',
-  Stopped = 'GameEvent.Stopped',
-}
-
-export { plainToClass, GameDTO, GameEvent, PlayerDTO, PlayerEvent, SystemEvent, WorldDTO };
+export {
+  GameDTO,
+  GameEvents,
+  MoveDirection,
+  PlayerDTO,
+  RotationDirection,
+  WorldDTO,
+  plainToClass,
+};

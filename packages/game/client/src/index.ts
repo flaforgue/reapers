@@ -1,4 +1,11 @@
-import { GameDTO, GameEvent, PlayerDTO, PlayerEvent, WorldDTO } from '@reapers/game-shared';
+import {
+  GameDTO,
+  GameEvents,
+  MoveDirection,
+  PlayerDTO,
+  RotationDirection,
+  WorldDTO,
+} from '@reapers/game-shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import socketIOClient from 'socket.io-client';
 
@@ -6,6 +13,8 @@ type UseGameHook = {
   world: WorldDTO;
   player: PlayerDTO;
   joinGame: (name: string) => void;
+  updateMoveDirection: (direction: MoveDirection) => void;
+  updateRotationDirection: (direction: RotationDirection) => void;
 };
 
 const useGame = (serverUrl: string): UseGameHook => {
@@ -15,8 +24,7 @@ const useGame = (serverUrl: string): UseGameHook => {
 
   useEffect(() => {
     socketRef.current = socketIOClient(serverUrl);
-    socketRef.current.on(GameEvent.Created, (game: GameDTO) => {
-      console.log('game created', game);
+    socketRef.current.on(GameEvents.Game.Updated, (game: GameDTO) => {
       setWorld(game.world);
       // todo adapt for multiplayer
       setPlayer(game.players[0]);
@@ -29,12 +37,34 @@ const useGame = (serverUrl: string): UseGameHook => {
 
   const joinGame = useCallback(
     (name: string): void => {
-      socketRef.current?.emit(PlayerEvent.Joined, name);
+      socketRef.current?.emit(GameEvents.Player.Joined, name);
     },
     [socketRef.current],
   );
 
-  return { joinGame, player, world };
+  const updateMoveDirection = useCallback(
+    (direction: MoveDirection): void => {
+      socketRef.current?.emit(GameEvents.Player.MoveDirectionUpdated, direction);
+    },
+    [socketRef.current],
+  );
+
+  const updateRotationDirection = useCallback(
+    (direction: RotationDirection): void => {
+      socketRef.current?.emit(GameEvents.Player.RotationDirectionUpdated, direction);
+    },
+    [socketRef.current],
+  );
+
+  return { joinGame, player, updateMoveDirection, updateRotationDirection, world };
 };
 
-export { useGame, PlayerDTO, GameDTO, GameEvent, WorldDTO };
+export {
+  useGame,
+  PlayerDTO,
+  GameDTO,
+  GameEvents,
+  WorldDTO,
+  MoveDirection,
+  RotationDirection,
+};

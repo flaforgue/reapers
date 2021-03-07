@@ -3,7 +3,7 @@ import * as http from 'http';
 import express from 'express';
 import { registerChatHandlers } from './handlers';
 import config from './config';
-import { ChatEvent } from '@reapers/chat-shared';
+import { ChatEvents } from '@reapers/chat-shared';
 
 const port = config.port;
 const app = express();
@@ -15,11 +15,11 @@ const io = new SocketIO.Server(httpServer, {
   },
 });
 
-io.on(ChatEvent.System.Connection, (socket: SocketIO.Socket) => {
+io.on(ChatEvents.System.Connection, (socket: SocketIO.Socket) => {
   if (io.sockets.sockets.size < config.nbMaxPlayers) {
     console.info(`New connection: ${socket.id} (now ${io.sockets.sockets.size})`);
 
-    socket.once(ChatEvent.Member.Created, (name: string) => {
+    socket.once(ChatEvents.Member.Created, (name: string) => {
       console.info(`Member ${name} created`);
       registerChatHandlers(io, socket, name);
     });
