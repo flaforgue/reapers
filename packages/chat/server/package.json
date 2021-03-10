@@ -17,7 +17,7 @@
     "build": "rm -Rf ./dist && tsc",
     "lint": "tsc --noEmit && eslint \"**/*.ts\" --quiet --fix",
     "start": "yarn build && node dist/server.js",
-    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn watch-ts\" \"yarn watch-node\"",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn watch-ts\" \"yarn watch-node\"",
     "watch-node": "nodemon dist/server.js",
     "watch-ts": "tsc -w"
   },

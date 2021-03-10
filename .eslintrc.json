@@ -6,7 +6,11 @@
     "es6": true
   },
   "parser": "@typescript-eslint/parser",
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+  ],
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module"
@@ -79,6 +83,7 @@
     "no-throw-literal": ["error"],
     "no-useless-call": ["error"],
     "no-useless-concat": ["error"],
+    "no-var": "error",
     "no-void": ["error"],
     "prefer-regex-literals": ["error"],
     "radix": ["error"],

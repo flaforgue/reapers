@@ -12,10 +12,7 @@ enum GameState {
   Stopped,
 }
 
-const removeFromArrayById = (
-  arr: Identifiable[],
-  id: string,
-): Identifiable | undefined => {
+const removeFromArrayById = (arr: Identifiable[], id: string): Identifiable | void => {
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].id === id) {
       return arr.splice(i, 1)[0];
@@ -34,6 +31,7 @@ export default class GameEntity implements Identifiable {
   private _world: WorldEntity;
   private _players: PlayerEntity[] = [];
   private readonly _tickInterval = 1000 / config.fps;
+  private _frameIndex = 0;
   private _timeoutReference: NodeJS.Timeout | null = null;
   private _immediateReference: NodeJS.Immediate | null = null;
   private readonly _engine: BABYLON.Engine;
@@ -61,19 +59,20 @@ export default class GameEntity implements Identifiable {
     return this._state;
   }
 
+  public get frameIndex(): number {
+    return this._frameIndex;
+  }
+
   public get isFull(): boolean {
     return this._players.length >= config.nbMaxPlayers;
   }
 
   private _update(): void {
-    for (let i = 0; i < this._players.length; i++) {
-      this._players[i].update();
-    }
-  }
+    this._frameIndex = (this._frameIndex + 1) % config.fps;
+    const gameDto = plainToClass(GameDTO, this);
 
-  private _broadcastGameUpdated(): void {
-    if (this._state === GameState.Started) {
-      this._namespace.volatile.emit(GameEvents.Game.Updated, plainToClass(GameDTO, this));
+    for (let i = 0; i < this._players.length; i++) {
+      this._players[i].updateAndEmitGameState(gameDto);
     }
   }
 
@@ -88,7 +87,6 @@ export default class GameEntity implements Identifiable {
   private _loop(): void {
     const start = hrtimeMs();
     this._update();
-    this._broadcastGameUpdated();
     const duration = hrtimeMs() - start;
 
     if (duration < this._tickInterval) {
@@ -119,12 +117,12 @@ export default class GameEntity implements Identifiable {
     }
   }
 
-  public addPlayer(socketId: string, name: string): PlayerEntity {
+  public addPlayer(socket: SocketIO.Socket, name: string): PlayerEntity {
     if (this.isFull) {
       throw new Error('Game is full');
     }
 
-    const player = new PlayerEntity(socketId, this._scene, name);
+    const player = new PlayerEntity(socket, this._scene, name);
     this._players.push(player);
     console.info(
       `Player ${name} - ${player.id} created (${this._players.length}/${config.nbMaxPlayers})`,

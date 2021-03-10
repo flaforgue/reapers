@@ -3,4 +3,4 @@
 ## Local setup
 
 - `yarn bootstrap`
-- `yarn watch`
+- `yarn dev`

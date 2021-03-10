@@ -16,7 +16,7 @@
   "scripts": {
     "build": "rm -Rf ./dist && tsc",
     "lint": "tsc --noEmit && eslint \"**/*.ts\" --quiet --fix",
-    "watch": "tsc -w"
+    "dev": "tsc -w"
   },
   "dependencies": {
     "class-transformer": "^0.4.0",

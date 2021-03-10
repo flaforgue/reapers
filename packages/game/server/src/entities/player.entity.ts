@@ -1,6 +1,12 @@
+import SocketIO from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import * as BABYLON from 'babylonjs';
-import { MoveDirection, RotationDirection } from '@reapers/game-shared';
+import {
+  GameDTO,
+  GameEvents,
+  MoveDirection,
+  RotationDirection,
+} from '@reapers/game-shared';
 import { Identifiable } from '../types';
 import config from '../config';
 
@@ -10,11 +16,11 @@ export default class PlayerEntity implements Identifiable {
   public moveDirection: MoveDirection = MoveDirection.None;
   public rotationDirection: RotationDirection = RotationDirection.None;
 
-  private readonly _socketId: string;
+  private readonly _socket: SocketIO.Socket;
   private readonly _mesh: BABYLON.Mesh;
 
-  public constructor(socketId: string, scene: BABYLON.Scene, name: string) {
-    this._socketId = socketId;
+  public constructor(socket: SocketIO.Socket, scene: BABYLON.Scene, name: string) {
+    this._socket = socket;
     this.name = name;
     this._mesh = BABYLON.MeshBuilder.CreateSphere(
       'player',
@@ -33,7 +39,8 @@ export default class PlayerEntity implements Identifiable {
     return this._mesh.rotation.asArray();
   }
 
-  public update(): void {
+  public updateAndEmitGameState(gameDto: GameDTO): void {
+    this._socket.volatile.emit(GameEvents.Game.Updated, gameDto);
     this._updatePosition();
     this._updateRotation();
   }

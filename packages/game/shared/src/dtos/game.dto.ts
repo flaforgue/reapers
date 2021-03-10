@@ -13,5 +13,5 @@ export default class GameDTO {
   public world: WorldDTO = new WorldDTO();
 
   @Expose()
-  public maxPlayers = 0;
+  public frameIndex = 0;
 }

@@ -10,24 +10,33 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import socketIOClient from 'socket.io-client';
 
 type UseGameHook = {
-  world: WorldDTO;
-  player: PlayerDTO;
+  activePlayerId: string;
+  frameIndex: number;
+  players: PlayerDTO[];
   joinGame: (name: string) => void;
   updateMoveDirection: (direction: MoveDirection) => void;
   updateRotationDirection: (direction: RotationDirection) => void;
+  world: WorldDTO;
 };
 
 const useGame = (serverUrl: string): UseGameHook => {
   const socketRef = useRef<SocketIOClient.Socket>();
+  const [activePlayerId, setActivePlayerId] = useState<string>('');
   const [world, setWorld] = useState<WorldDTO>(new WorldDTO());
-  const [player, setPlayer] = useState<PlayerDTO>(new PlayerDTO());
+  const [players, setPlayers] = useState<PlayerDTO[]>([]);
+  const [frameIndex, setFrameIndex] = useState<number>(0);
 
   useEffect(() => {
     socketRef.current = socketIOClient(serverUrl);
+
+    socketRef.current.on(GameEvents.Player.Created, (player: PlayerDTO) => {
+      setActivePlayerId(player.id as string);
+    });
+
     socketRef.current.on(GameEvents.Game.Updated, (game: GameDTO) => {
       setWorld(game.world);
-      // todo adapt for multiplayer
-      setPlayer(game.players[0]);
+      setPlayers(game.players);
+      setFrameIndex(game.frameIndex);
     });
 
     return (): void => {
@@ -56,7 +65,15 @@ const useGame = (serverUrl: string): UseGameHook => {
     [socketRef.current],
   );
 
-  return { joinGame, player, updateMoveDirection, updateRotationDirection, world };
+  return {
+    activePlayerId,
+    frameIndex,
+    joinGame,
+    players,
+    updateMoveDirection,
+    updateRotationDirection,
+    world,
+  };
 };
 
 export {

@@ -1,5 +1,10 @@
 {
   "version": "0.0.1",
   "npmClient": "yarn",
-  "packages": ["packages/app", "packages/chat/*", "packages/game/*"]
+  "packages": [
+    "packages/app",
+    "packages/app-svelte",
+    "packages/chat/*",
+    "packages/game/*"
+  ]
 }

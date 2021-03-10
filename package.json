@@ -6,7 +6,7 @@
     "bootstrap": "npx lerna bootstrap",
     "build": "npx lerna run build",
     "clean": "npx lerna clean --yes",
-    "watch": "npx lerna run --parallel watch"
+    "dev": "npx lerna run --parallel dev"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
     "eslint-plugin-import": "^2.22.1",
     "lerna": "^3.22.1",
     "nodemon": "^2.0.7",
+    "prettier-plugin-svelte": "^2.2.0",
     "typescript": "^4.1.5"
   }
 }

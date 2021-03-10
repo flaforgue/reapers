@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { EffectCallback, useCallback, useEffect, useState } from 'react';
 import * as BABYLON from '@babylonjs/core';
-import { MoveDirection, PlayerDTO, RotationDirection } from '@reapers/game-client';
-import { Key } from '../../../configs/keycodes.config';
+import { PlayerDTO } from '@reapers/game-client';
 
 enum AnimationKey {
   Defeat = 0,
@@ -17,30 +16,17 @@ enum AnimationKey {
   WalkCarry = 10,
 }
 
-const isRotationDirection = (value: string): boolean => {
-  return ([Key.d, Key.q] as string[]).indexOf(value) != -1;
-};
-
-const isMoveDirection = (value: string): boolean => {
-  return ([Key.z, Key.s, Key.a, Key.e] as string[]).indexOf(value) != -1;
-};
-
 type PlayerProps = {
-  scene: BABYLON.Scene | undefined;
-  camera: BABYLON.FollowCamera | undefined;
+  camera?: BABYLON.FollowCamera;
   player: PlayerDTO;
-  updateMoveDirection: (direction: MoveDirection) => void;
-  updateRotationDirection: (direction: RotationDirection) => void;
+  scene: BABYLON.Scene | undefined;
+  frameIndex: number;
 };
 
 const Player: React.FC<PlayerProps> = (props) => {
-  const [meshes, setMeshes] = useState<BABYLON.AbstractMesh[]>([]);
-  const [animations, setAnimations] = useState<
-    Record<AnimationKey, BABYLON.AnimationGroup>
-  >();
+  const [assets, setAssets] = useState<BABYLON.AssetContainer>();
   const [currentAnimation, setCurrentAnimation] = useState<BABYLON.AnimationGroup>();
-
-  useEffect(() => {
+  const loadAssets = useCallback((): void => {
     if (props.scene) {
       BABYLON.SceneLoader.LoadAssetContainerAsync(
         '/models/',
@@ -49,117 +35,63 @@ const Player: React.FC<PlayerProps> = (props) => {
         result.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
         result.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
         result.animationGroups[AnimationKey.Walk].speedRatio = 2;
-        setAnimations({
-          [AnimationKey.Defeat]: result.animationGroups[AnimationKey.Defeat],
-          [AnimationKey.Idle]: result.animationGroups[AnimationKey.Idle],
-          [AnimationKey.Pickup]: result.animationGroups[AnimationKey.Pickup],
-          [AnimationKey.Punch]: result.animationGroups[AnimationKey.Punch],
-          [AnimationKey.ReceiveHit]: result.animationGroups[AnimationKey.ReceiveHit],
-          [AnimationKey.Shoot]: result.animationGroups[AnimationKey.Shoot],
-          [AnimationKey.SitDown]: result.animationGroups[AnimationKey.SitDown],
-          [AnimationKey.StandUp]: result.animationGroups[AnimationKey.StandUp],
-          [AnimationKey.Victory]: result.animationGroups[AnimationKey.Victory],
-          [AnimationKey.Walk]: result.animationGroups[AnimationKey.Walk],
-          [AnimationKey.WalkCarry]: result.animationGroups[AnimationKey.WalkCarry],
-        });
+
+        for (let i = 0; i < result.animationGroups.length; i++) {
+          result.animationGroups[i].reset().stop();
+        }
 
         result.addAllToScene();
-
-        setMeshes(result.meshes);
+        setAssets(result);
       });
     }
   }, [props.scene]);
+  useEffect(loadAssets, [loadAssets]);
 
-  useEffect(() => {
-    if (meshes[0] && props.player) {
-      meshes[0].setAbsolutePosition(new BABYLON.Vector3(...props.player.position));
-      meshes[0].rotation = new BABYLON.Vector3(...props.player.rotation);
-
-      if (props.player.moveDirection) {
-        switchAnimation(currentAnimation, AnimationKey.Walk);
-      } else {
-        switchAnimation(currentAnimation, AnimationKey.Idle);
-      }
-    }
-  });
-
-  // currentAnimation is a parameter for optimization purpose
   const switchAnimation = useCallback(
-    (
-      currentAnimation: BABYLON.AnimationGroup | undefined,
-      animationKey: AnimationKey,
-    ): void => {
-      if (animations) {
-        const animation = animations[animationKey];
+    (animationKey: AnimationKey): void => {
+      if (assets?.animationGroups) {
+        const newAnimation = assets.animationGroups[animationKey];
 
-        if (currentAnimation !== animation) {
+        if (currentAnimation !== newAnimation) {
           currentAnimation?.stop();
-          setCurrentAnimation(animation);
-          animation?.play(true);
+          setCurrentAnimation(newAnimation);
+          newAnimation?.play(true);
         }
       }
     },
-    [animations, setCurrentAnimation],
+    [currentAnimation, setCurrentAnimation, assets?.animationGroups],
   );
 
-  const keyboardEventHandler = useCallback(
-    ({ type, event }: BABYLON.KeyboardInfo) => {
-      if (type === BABYLON.KeyboardEventTypes.KEYDOWN) {
-        switch (event.key) {
-          case Key.z:
-            props.updateMoveDirection(MoveDirection.Forward);
-            break;
-          case Key.s:
-            props.updateMoveDirection(MoveDirection.Backward);
-            break;
-          case Key.a:
-            props.updateMoveDirection(MoveDirection.Left);
-            break;
-          case Key.e:
-            props.updateMoveDirection(MoveDirection.Right);
-            break;
-          case Key.d:
-            props.updateRotationDirection(RotationDirection.Right);
-            break;
-          case Key.q:
-            props.updateRotationDirection(RotationDirection.Left);
-            break;
-          default:
-            break;
-        }
-      } else {
-        if (isMoveDirection(event.key)) {
-          props.updateMoveDirection(MoveDirection.None);
-        } else if (isRotationDirection(event.key)) {
-          props.updateRotationDirection(RotationDirection.None);
+  const updatePlayer = useCallback((): void => {
+    if (props.camera) {
+      if (assets?.meshes[0] && props.player) {
+        assets.meshes[0].position = new BABYLON.Vector3(...props.player.position);
+        assets.meshes[0].rotation = new BABYLON.Vector3(...props.player.rotation);
+
+        if (props.player.moveDirection) {
+          switchAnimation(AnimationKey.Walk);
+        } else {
+          switchAnimation(AnimationKey.Idle);
         }
       }
+    }
+  }, [props.frameIndex]);
+  useEffect(updatePlayer, [updatePlayer]);
+
+  const attachCamera = useCallback(() => {
+    if (props.camera && assets?.meshes[0]) {
+      props.camera.lockedTarget = assets?.meshes[0];
+    }
+  }, [props.camera, assets?.meshes]);
+  useEffect(attachCamera, [attachCamera]);
+
+  const disposeAssetsOnUnmount = useCallback(
+    (): ReturnType<EffectCallback> => (): void => {
+      assets?.dispose();
     },
-    [
-      props.scene,
-      props.updateMoveDirection,
-      props.updateRotationDirection,
-      switchAnimation,
-    ],
+    [assets],
   );
-
-  useEffect(() => {
-    if (props.scene) {
-      const keyboardEventObserver = props.scene.onKeyboardObservable.add(
-        keyboardEventHandler,
-      );
-
-      return (): void => {
-        props?.scene?.onKeyboardObservable?.remove(keyboardEventObserver);
-      };
-    }
-  }, [keyboardEventHandler]);
-
-  useEffect(() => {
-    if (props.camera && meshes[0]) {
-      props.camera.lockedTarget = meshes[0];
-    }
-  }, [props.camera, meshes]);
+  useEffect(disposeAssetsOnUnmount, [disposeAssetsOnUnmount]);
 
   return null;
 };

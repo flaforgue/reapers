@@ -1,5 +1,4 @@
 import ReactDOM from 'react-dom';
-// import '@babylonjs/loaders';
 import { GLTFFileLoader, GLTFLoaderAnimationStartMode } from '@babylonjs/loaders';
 import * as BABYLON from '@babylonjs/core';
 import App from './App';
