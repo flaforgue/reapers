@@ -4,7 +4,7 @@ import { MoveDirection, RotationDirection } from '..';
 @Exclude()
 export default class PlayerDTO {
   @Expose()
-  public id: string | null = null;
+  public id: string = '';
 
   @Expose()
   public name = '';

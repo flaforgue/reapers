@@ -1,47 +1,43 @@
 {
   "name": "@reapers/app",
   "version": "0.0.1",
-  "author": "flaforgue <florian.laforgue@gmail.com>",
+  "description": "> TODO: description",
+  "author": "flaforgue <florian.laforgue@neoxia.com>",
+  "homepage": "https://bitbucket.org/FloLfg/reapers/packages/app#readme",
   "license": "ISC",
+  "scripts": {
+    "dev": "snowpack dev --reload",
+    "build": "snowpack build"
+  },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/FloLfg/reapers.git"
+    "url": "git+https://github.com/flaforgue/io-game-starter.git"
   },
-  "scripts": {
-    "dev": "react-scripts start",
-    "build": "react-scripts build",
-    "lint": "tsc --noEmit && eslint \"**/*.{ts,tsx}\" --quiet --fix"
+  "bugs": {
+    "url": "https://github.com/flaforgue/io-game-starter/issues"
   },
   "dependencies": {
-    "@reapers/chat-client": "^0.0.1",
-    "@reapers/game-client": "^0.0.1",
     "@babylonjs/core": "^4.2.0",
     "@babylonjs/loaders": "^4.2.0",
-    "easy-peasy": "^4.0.1",
-    "node-sass": "^5.0.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-hot-loader": "^4.13.0",
-    "react-router-dom": "^5.2.0",
-    "react-scripts": "^4.0.2"
+    "@reapers/chat-client": "^0.0.1",
+    "@reapers/game-client": "^0.0.1",
+    "svelte": "^3.24.0",
+    "svelte-spa-router": "^3.1.0"
   },
   "devDependencies": {
-    "@types/react": "^17.0.1",
-    "@types/react-dom": "^17.0.1",
-    "@types/react-router-dom": "^5.1.7",
-    "sass": "^1.32.7",
-    "sass-loader": "^11.0.1"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "@snowpack/plugin-dotenv": "^2.0.5",
+    "@snowpack/plugin-svelte": "^3.5.0",
+    "@snowpack/plugin-typescript": "^1.2.0",
+    "@types/chai": "^4.2.13",
+    "@types/mocha": "^8.2.0",
+    "@types/snowpack-env": "^2.3.2",
+    "add": "^2.0.6",
+    "chai": "^4.2.0",
+    "node-sass": "^5.0.0",
+    "prettier-plugin-svelte": "^2.2.0",
+    "snowpack": "^3.0.1",
+    "svelte-preprocess": "^4.0.8",
+    "typescript": "^4.0.0",
+    "yarn": "^1.22.10"
   }
 }

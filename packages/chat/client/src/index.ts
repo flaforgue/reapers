@@ -1,42 +1,41 @@
-import { ChatEvents, ChatMessage, ChatRoom } from '@reapers/chat-shared';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import socketIOClient from 'socket.io-client';
+import { ChatEvents, ChatMessage, ChatRoom } from '@reapers/chat-shared';
+import { writable } from 'svelte/store';
 
 const nbMaxMessages = 100 * -1; // negative to be used in slice()
+const messages = writable<ChatMessage[]>([]);
 
-type UseChatHook = {
-  messages: ChatMessage[];
-  sendMessage: (room: ChatRoom, content: string) => void;
-  joinChat: (name: string) => void;
-};
+let socket: SocketIOClient.Socket | undefined;
 
-const useChat = (serverUrl: string): UseChatHook => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const socketRef = useRef<SocketIOClient.Socket>();
+function joinChat(userName: string) {
+  socket?.emit(ChatEvents.Member.Created, userName);
+}
 
-  useEffect(() => {
-    socketRef.current = socketIOClient(serverUrl);
-    socketRef.current.on(ChatEvents.Message.Created, (message: ChatMessage) => {
-      setMessages((messages: ChatMessage[]) => [...messages.slice(nbMaxMessages), message]);
+function leaveChat() {
+  socket?.disconnect();
+}
+
+function sendMessage(room: ChatRoom, content: string) {
+  socket?.emit(ChatEvents.Message.Created, room, content);
+}
+
+function useChat(serverUrl: string) {
+  if (socket?.io?.uri != serverUrl) {
+    socket?.disconnect();
+    socket = socketIOClient(serverUrl);
+    socket?.on(ChatEvents.Message.Created, (message: ChatMessage) => {
+      messages.update((messages: ChatMessage[]) => [
+        ...messages.slice(nbMaxMessages),
+        message,
+      ]);
     });
+  }
 
-    return (): void => {
-      socketRef.current?.disconnect();
-    };
-  }, []);
-
-  const sendMessage = (room: ChatRoom, content: string): void => {
-    socketRef.current?.emit(ChatEvents.Message.Created, room, content);
+  return {
+    joinChat,
+    leaveChat,
+    sendMessage,
   };
+}
 
-  const joinChat = useCallback(
-    (name: string): void => {
-      socketRef.current?.emit(ChatEvents.Member.Created, name);
-    },
-    [socketRef.current],
-  );
-
-  return { joinChat, messages, sendMessage };
-};
-
-export { useChat, ChatRoom };
+export { ChatRoom, useChat, messages };

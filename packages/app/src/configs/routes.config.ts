@@ -1,31 +1,14 @@
-import React from 'react';
-import { Home, Play } from '../components/pages';
+import type { SvelteComponent } from 'svelte';
+import Home from '../pages/Home.svelte';
+import Play from '../pages/Play.svelte';
+import NotFound from '../pages/NotFound.svelte';
 
-type Route = 'home' | 'play';
+type RouteName = '/' | '/play' | '*';
 
-type AppRouteProps = {
-  path: string;
-  label: string;
-  component: React.FC;
-  exact?: boolean;
-  isHidden?: boolean;
+const routes: Record<RouteName, typeof SvelteComponent> = {
+  '/': Home,
+  '/play': Play,
+  '*': NotFound,
 };
 
-export const routes: Record<Route, AppRouteProps> = {
-  home: {
-    path: '/',
-    label: 'Home',
-    component: Home,
-    exact: true,
-  },
-
-  play: {
-    path: '/play',
-    label: 'Play',
-    component: Play,
-    exact: true,
-    isHidden: true,
-  },
-};
-
-export const visibleRoutes = Object.values(routes).filter(({ isHidden }) => !isHidden);
+export default routes;

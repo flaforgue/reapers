@@ -2,7 +2,10 @@
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist"
-  },
-  "references": [{ "path": "../server" }]
+    "outDir": "./dist",
+    "lib": ["dom"],
+    "module": "esnext",
+    "target": "esnext",
+    "sourceMap": true
+  }
 }

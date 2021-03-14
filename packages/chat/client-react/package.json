@@ -1,0 +1,32 @@
+{
+  "name": "@reapers/chat-client-react",
+  "version": "0.0.1",
+  "author": "flaforgue <florian.laforgue@neoxia.com>",
+  "homepage": "https://bitbucket.org/FloLfg/reapers/packages/chat-client-reacts#readme",
+  "license": "ISC",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/FloLfg/reapers.git"
+  },
+  "scripts": {
+    "build": "rm -Rf ./dist && tsc",
+    "lint": "tsc --noEmit && eslint \"**/*.ts\" --quiet --fix",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "@reapers/chat-shared": "^0.0.1",
+    "socket.io-client": "^3.1.1"
+  },
+  "peerDependencies": {
+    "react": "^17.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.1",
+    "@types/socket.io-client": "^1.4.35"
+  }
+}

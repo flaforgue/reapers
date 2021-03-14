@@ -1,4 +1,9 @@
-import PlayerStore from './player.store';
-import FocusStore from './focus.store';
+import { writable } from 'svelte/store';
 
-export { PlayerStore, FocusStore };
+export enum FocusElement {
+  Chat,
+  Game,
+}
+
+export const focusElement = writable(FocusElement.Game);
+export const playerName = writable('disterflo');
