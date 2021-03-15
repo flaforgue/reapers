@@ -36,7 +36,7 @@ const Input: React.FC<InputProps> = (props) => {
         className={styles[props.type || 'web']}
         placeholder={props.placeholder}
         value={props.value}
-        onChange={(e): void => props.onChange(e.target.value)}
+        onChange={(e) => props.onChange(e.target.value)}
         onFocus={props.onFocus}
         onBlur={props.onBlur}
       />

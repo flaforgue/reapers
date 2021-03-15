@@ -1,6 +1,6 @@
 import React, { EffectCallback, useCallback, useEffect, useState } from 'react';
 import * as BABYLON from '@babylonjs/core';
-import { PlayerDTO } from '@reapers/game-client';
+import { PlayerDTO } from '@reapers/game-client-react';
 
 enum AnimationKey {
   Defeat = 0,
@@ -26,7 +26,7 @@ type PlayerProps = {
 const Player: React.FC<PlayerProps> = (props) => {
   const [assets, setAssets] = useState<BABYLON.AssetContainer>();
   const [currentAnimation, setCurrentAnimation] = useState<BABYLON.AnimationGroup>();
-  const loadAssets = useCallback((): void => {
+  const loadAssets = useCallback(() => {
     if (props.scene) {
       BABYLON.SceneLoader.LoadAssetContainerAsync(
         '/models/',
@@ -48,7 +48,7 @@ const Player: React.FC<PlayerProps> = (props) => {
   useEffect(loadAssets, [loadAssets]);
 
   const switchAnimation = useCallback(
-    (animationKey: AnimationKey): void => {
+    (animationKey: AnimationKey) => {
       if (assets?.animationGroups) {
         const newAnimation = assets.animationGroups[animationKey];
 
@@ -62,7 +62,7 @@ const Player: React.FC<PlayerProps> = (props) => {
     [currentAnimation, setCurrentAnimation, assets?.animationGroups],
   );
 
-  const updatePlayer = useCallback((): void => {
+  const updatePlayer = useCallback(() => {
     if (props.camera) {
       if (assets?.meshes[0] && props.player) {
         assets.meshes[0].position = new BABYLON.Vector3(...props.player.position);
@@ -86,7 +86,7 @@ const Player: React.FC<PlayerProps> = (props) => {
   useEffect(attachCamera, [attachCamera]);
 
   const disposeAssetsOnUnmount = useCallback(
-    (): ReturnType<EffectCallback> => (): void => {
+    (): ReturnType<EffectCallback> => () => {
       assets?.dispose();
     },
     [assets],

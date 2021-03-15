@@ -9,7 +9,7 @@ type FocusStore = {
 
 const FocusStore = createContextStore<FocusStore>({
   focusElement: FocusElement.Game,
-  setFocusElement: action<FocusStore, FocusElement>((state, focusElement): void => {
+  setFocusElement: action<FocusStore, FocusElement>((state, focusElement) => {
     if (state.focusElement !== focusElement) {
       state.focusElement = focusElement;
     }

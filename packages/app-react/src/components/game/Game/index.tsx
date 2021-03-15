@@ -53,7 +53,7 @@ const Game: React.FC<GameProps> = (props) => {
   } = useGame(servers.game.url);
   const focusElement = FocusStore.useStoreState((state) => state.focusElement);
 
-  useEffect((): void => {
+  useEffect(() => {
     joinGame(props.playerName);
   }, [joinGame, props.playerName]);
 
@@ -71,7 +71,7 @@ const Game: React.FC<GameProps> = (props) => {
       scene.autoClear = false;
       scene.autoClearDepthAndStencil = false;
       const camera = createCamera(scene);
-      const handleResize = (): void => engine.resize();
+      const handleResize = () => engine.resize();
 
       engine.runRenderLoop(function () {
         scene.render();
@@ -82,7 +82,7 @@ const Game: React.FC<GameProps> = (props) => {
 
       window.addEventListener('resize', handleResize);
 
-      return (): void => {
+      return () => {
         window.removeEventListener('resize', handleResize);
       };
     }

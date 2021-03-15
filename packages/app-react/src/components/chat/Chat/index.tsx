@@ -26,11 +26,11 @@ const Chat: React.FC<ChatProps> = (props) => {
     }
   }, [messagesContainerEl.current, messages]);
 
-  useEffect((): void => {
+  useEffect(() => {
     joinChat(props.playerName);
   }, [joinChat, props.playerName]);
 
-  const handleInputEnter = (): void => {
+  const handleInputEnter = () => {
     if (newMessage.length) {
       sendMessage(currentRoom, newMessage);
       setNewMessage('');

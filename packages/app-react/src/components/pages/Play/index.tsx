@@ -11,14 +11,16 @@ import { FocusElement } from '../../../types';
 const Play: React.FC = () => {
   const player = PlayerStore.useStoreState((state) => state);
   const focusElement = FocusStore.useStoreState((state) => state.focusElement);
-  const setFocusElement = FocusStore.useStoreActions((actions) => actions.setFocusElement);
+  const setFocusElement = FocusStore.useStoreActions(
+    (actions) => actions.setFocusElement,
+  );
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
   }, [document]);
 
   useEffect(() => {
-    const focusChatOnEnter = (e: KeyboardEvent): void => {
+    const focusChatOnEnter = (e: KeyboardEvent) => {
       if (e.key === Key.Enter && focusElement !== FocusElement.Chat) {
         setFocusElement(FocusElement.Chat);
       }
@@ -26,7 +28,7 @@ const Play: React.FC = () => {
 
     window.addEventListener('keyup', focusChatOnEnter);
 
-    return (): void => {
+    return () => {
       window.removeEventListener('keyup', focusChatOnEnter);
     };
   }, [window, focusElement, setFocusElement]);

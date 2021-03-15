@@ -12,12 +12,12 @@ const Home: React.FC = () => {
   const [localName, setLocalName] = useState(player.name);
   const [error, setError] = useState('');
 
-  const handleNameChange = (value: string): void => {
+  const handleNameChange = (value: string) => {
     setLocalName(value);
     setError('');
   };
 
-  const handleSubmit = (): void => {
+  const handleSubmit = () => {
     if (String(localName).length > 0) {
       setPlayerName(localName);
       history.push(routes.play.path);

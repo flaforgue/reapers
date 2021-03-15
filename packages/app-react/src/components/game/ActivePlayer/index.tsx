@@ -64,7 +64,7 @@ const ActivePlayer: React.FC<ActivePlayerProps> = (props) => {
         keyboardEventHandler,
       );
 
-      return (): void => {
+      return () => {
         props?.scene?.onKeyboardObservable?.remove(keyboardEventObserver);
       };
     }

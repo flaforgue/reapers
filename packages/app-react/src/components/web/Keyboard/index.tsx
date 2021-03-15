@@ -10,7 +10,7 @@ type KeyBoardProps = {
 const KeyboardHandler: React.FC<KeyBoardProps> = (props) => {
   const divEl = useRef<HTMLDivElement>(null);
   const handleKeyUp = useCallback(
-    (e: KeyboardEvent): void => {
+    (e: KeyboardEvent) => {
       e.stopPropagation();
       switch (e.key) {
         case Key.Enter:
