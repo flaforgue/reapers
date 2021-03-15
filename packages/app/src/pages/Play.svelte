@@ -4,7 +4,7 @@
   import { FocusElement, focusElement, playerName } from '../stores';
   import { Key } from '../configs/keycodes.config';
   import Chat from '../components/Chat/Chat.svelte';
-  import Game from '../components/gamez/Game/Game.svelte';
+  import Game from '../components/Game/Game.svelte';
 
   if (!String($playerName).length) {
     push('#/');
