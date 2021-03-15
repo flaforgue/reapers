@@ -4,35 +4,13 @@
   import { useGame, game } from '@reapers/game-client';
   import { FocusElement, focusElement, playerName } from '../../stores';
   import { servers } from '../../configs/servers.config';
-  import World from './World.svelte';
+  import World from '../World/World.svelte';
+  import { createCamera, createEngine, createScene } from './game.utils';
 
   let canvas: HTMLCanvasElement | undefined;
   let engine: BABYLON.Engine | undefined;
   let scene: BABYLON.Scene | undefined;
   let camera: BABYLON.FollowCamera | undefined;
-
-  function createCamera(scene: BABYLON.Scene): BABYLON.FollowCamera {
-    const camera = new BABYLON.FollowCamera(
-      'playerCamera',
-      new BABYLON.Vector3(0, 2, -2),
-      scene,
-    );
-
-    camera.cameraAcceleration = 0.5;
-    camera.lowerRadiusLimit = 2;
-    camera.radius = 5;
-    camera.upperRadiusLimit = 5;
-
-    camera.lowerHeightOffsetLimit = 1;
-    camera.heightOffset = 3;
-    camera.upperHeightOffsetLimit = 4;
-
-    camera.rotationOffset = 0;
-
-    camera.attachControl(true);
-
-    return camera;
-  }
 
   const { joinGame, leaveGame, updateMoveDirection, updateRotationDirection } = useGame(
     servers.game.url,
@@ -41,23 +19,14 @@
   onMount(() => {
     joinGame($playerName);
 
-    engine = new BABYLON.Engine(canvas as HTMLCanvasElement, false, {
-      useHighPrecisionFloats: false,
-      doNotHandleContextLost: true,
-    });
-    scene = new BABYLON.Scene(engine, {
-      useGeometryUniqueIdsMap: true,
-      useMaterialMeshMap: true,
-      useClonedMeshMap: true,
-    });
-    scene.autoClear = false;
-    scene.autoClearDepthAndStencil = false;
+    engine = createEngine(canvas as HTMLCanvasElement);
+    scene = createScene(engine);
     camera = createCamera(scene);
     engine.runRenderLoop(function () {
       scene?.render();
     });
 
-    const handleResize = (): void => engine?.resize();
+    const handleResize = () => engine?.resize();
     window.addEventListener('resize', handleResize);
 
     return () => {

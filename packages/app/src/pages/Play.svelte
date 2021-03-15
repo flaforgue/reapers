@@ -3,8 +3,8 @@
   import { onMount } from 'svelte';
   import { FocusElement, focusElement, playerName } from '../stores';
   import { Key } from '../configs/keycodes.config';
-  import Chat from '../components/chat/Chat.svelte';
-  import Game from '../components/game/Game.svelte';
+  import Chat from '../components/Chat/Chat.svelte';
+  import Game from '../components/gamez/Game/Game.svelte';
 
   if (!String($playerName).length) {
     push('#/');
@@ -12,7 +12,7 @@
 
   onMount(() => {
     document.body.style.overflow = 'hidden';
-    function focusChatOnEnter(e: KeyboardEvent): void {
+    function focusChatOnEnter(e: KeyboardEvent) {
       if (e.key === Key.Enter && $focusElement !== FocusElement.Chat) {
         $focusElement = FocusElement.Chat;
       }

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { push } from 'svelte-spa-router';
   import { playerName } from '../stores';
-  import Input from '../components/Input.svelte';
+  import Input from '../components/Input/Input.svelte';
 
   let error = '';
 

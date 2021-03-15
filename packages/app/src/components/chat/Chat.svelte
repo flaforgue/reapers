@@ -23,7 +23,7 @@
     }
   });
 
-  function handleInputEnter(): void {
+  function handleInputEnter() {
     if (newMessage.length) {
       sendMessage(currentRoom, newMessage);
       newMessage = '';
