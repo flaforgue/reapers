@@ -1,23 +1,24 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
-  import { PlayerDTO } from '@reapers/game-client';
+  import { MoveDirection, PlayerDTO } from '@reapers/game-client';
   import { onDestroy } from 'svelte';
   import { AnimationKey } from './player.utils';
 
-  export let player: PlayerDTO | undefined;
-  export let camera: BABYLON.FollowCamera | undefined;
+  export let player: PlayerDTO = new PlayerDTO();
   export let scene: BABYLON.Scene | undefined;
+  export let camera: BABYLON.FollowCamera | undefined = undefined;
 
   let assets: BABYLON.AssetContainer | undefined;
+  let mainMesh: BABYLON.AbstractMesh | undefined;
   let currentAnimation: BABYLON.AnimationGroup | undefined;
 
   function loadAssets() {
-    console.log('loading assets');
     BABYLON.SceneLoader.LoadAssetContainerAsync('/models/', 'characters/player.glb').then(
       (result) => {
         assets = result;
-        assets.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
-        assets.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
+        mainMesh = assets.meshes[0];
+        mainMesh.scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
+        mainMesh.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
         assets.animationGroups[AnimationKey.Walk].speedRatio = 2;
 
         for (let i = 0; i < assets.animationGroups.length; i++) {
@@ -40,12 +41,23 @@
     }
   }
 
-  function updatePlayer(player: PlayerDTO, mesh: BABYLON.AbstractMesh) {
-    console.log('updatePlayer');
-    mesh.position = new BABYLON.Vector3(...player.position);
-    mesh.rotation = new BABYLON.Vector3(...player.rotation);
+  function updatePlayerPosition(x = 0, y = 0, z = 0) {
+    console.log('updatePlayerPosition');
+    if (mainMesh) {
+      mainMesh.position = new BABYLON.Vector3(x, y, z);
+    }
+  }
 
-    if (player.moveDirection) {
+  function updatePlayerRotation(x = 0, y = 0, z = 0) {
+    console.log('updatePlayerRotation');
+    if (mainMesh) {
+      mainMesh.rotation = new BABYLON.Vector3(x, y, z);
+    }
+  }
+
+  function updatePlayerMoveDirection(direction: MoveDirection) {
+    console.log('updatePlayerMoveDirection');
+    if (mainMesh && direction) {
       switchAnimation(AnimationKey.Walk);
     } else {
       switchAnimation(AnimationKey.Idle);
@@ -53,15 +65,39 @@
   }
 
   $: {
-    console.log('try to load assets');
     if (scene) {
-      await loadAssets();
+      loadAssets();
     }
   }
 
+  $: mainMeshId = mainMesh?.id;
+
   $: {
-    if (player && assets?.meshes[0]) {
-      updatePlayer(player, assets.meshes[0]);
+    if (camera && mainMesh) {
+      camera.lockedTarget = mainMesh;
+    }
+  }
+
+  $: position = player.position;
+  $: [posX, posY, posZ] = position;
+  $: {
+    if (mainMeshId) {
+      updatePlayerPosition(posX, posY, posZ);
+    }
+  }
+
+  $: rotation = player.rotation;
+  $: [rotX, rotY, rotZ] = rotation;
+  $: {
+    if (mainMeshId) {
+      updatePlayerRotation(rotX, rotY, rotZ);
+    }
+  }
+
+  $: moveDirection = player.moveDirection;
+  $: {
+    if (mainMeshId) {
+      updatePlayerMoveDirection(moveDirection);
     }
   }
 

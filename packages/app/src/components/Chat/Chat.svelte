@@ -3,7 +3,7 @@
   import { servers } from '../../configs/servers.config';
   import { afterUpdate, onDestroy, onMount } from 'svelte';
   import { FocusElement, focusElement, playerName } from '../../stores';
-  import Input from '../Input.svelte';
+  import Input from '../Input/Input.svelte';
 
   let newMessage = '';
   let div: HTMLDivElement;

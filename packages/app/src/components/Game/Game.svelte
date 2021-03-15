@@ -5,6 +5,7 @@
   import { FocusElement, focusElement, playerName } from '../../stores';
   import { servers } from '../../configs/servers.config';
   import World from '../World/World.svelte';
+  import Player from '../Player/Player.svelte';
   import { createCamera, createEngine, createScene } from './game.utils';
 
   let canvas: HTMLCanvasElement | undefined;
@@ -50,6 +51,10 @@
   </div>
   <canvas bind:this={canvas} />
   <World world={$game.world} {scene} />
+
+  {#each $game.players as player}
+    <Player {scene} {player} {camera} />
+  {/each}
   <!-- {players.map((player) =>
     player.id === activePlayerId ? (
       <ActivePlayer
