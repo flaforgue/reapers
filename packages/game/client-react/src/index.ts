@@ -39,27 +39,27 @@ const useGame = (serverUrl: string): UseGameHook => {
       setFrameIndex(game.frameIndex);
     });
 
-    return (): void => {
+    return () => {
       socketRef.current?.disconnect();
     };
   }, []);
 
   const joinGame = useCallback(
-    (name: string): void => {
+    (name: string) => {
       socketRef.current?.emit(GameEvents.Player.Joined, name);
     },
     [socketRef.current],
   );
 
   const updateMoveDirection = useCallback(
-    (direction: MoveDirection): void => {
+    (direction: MoveDirection) => {
       socketRef.current?.emit(GameEvents.Player.MoveDirectionUpdated, direction);
     },
     [socketRef.current],
   );
 
   const updateRotationDirection = useCallback(
-    (direction: RotationDirection): void => {
+    (direction: RotationDirection) => {
       socketRef.current?.emit(GameEvents.Player.RotationDirectionUpdated, direction);
     },
     [socketRef.current],

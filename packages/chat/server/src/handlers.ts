@@ -1,11 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { ChatEvents, ChatRoom } from '@reapers/chat-shared';
 
-export const registerChatHandlers = (
-  io: Server,
-  socket: Socket,
-  playerName: string,
-): void => {
+export const registerChatHandlers = (io: Server, socket: Socket, playerName: string) => {
   for (const room of Object.values(ChatRoom)) {
     socket.join(room);
   }

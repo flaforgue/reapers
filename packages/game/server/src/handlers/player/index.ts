@@ -8,7 +8,7 @@ const isValidMoveDirection = (direction: unknown): boolean =>
 const isValidRotationDirection = (direction: unknown): boolean =>
   Boolean(RotationDirection[Number(direction)]);
 
-export default (socket: Socket, player: PlayerEntity): void => {
+export default (socket: Socket, player: PlayerEntity) => {
   socket.on(GameEvents.Player.MoveDirectionUpdated, (direction: MoveDirection) => {
     if (isValidMoveDirection(direction)) {
       player.moveDirection = direction;

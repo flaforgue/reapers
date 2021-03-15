@@ -67,7 +67,7 @@ export default class GameEntity implements Identifiable {
     return this._players.length >= config.nbMaxPlayers;
   }
 
-  private _update(): void {
+  private _update() {
     this._frameIndex = (this._frameIndex + 1) % config.fps;
     const gameDto = plainToClass(GameDTO, this);
 
@@ -76,7 +76,7 @@ export default class GameEntity implements Identifiable {
     }
   }
 
-  public _startGameLoop(): void {
+  public _startGameLoop() {
     if (this._state === GameState.Stopped) {
       this._state = GameState.Started;
       this._loop();
@@ -84,7 +84,7 @@ export default class GameEntity implements Identifiable {
     }
   }
 
-  private _loop(): void {
+  private _loop() {
     const start = hrtimeMs();
     this._update();
     const duration = hrtimeMs() - start;
@@ -101,7 +101,7 @@ export default class GameEntity implements Identifiable {
     }
   }
 
-  public stopGameLoop(): void {
+  public stopGameLoop() {
     if (this._state === GameState.Started) {
       if (this._immediateReference) {
         clearImmediate(this._immediateReference);
@@ -131,7 +131,7 @@ export default class GameEntity implements Identifiable {
     return player;
   }
 
-  public removePlayer(playerId: string): void {
+  public removePlayer(playerId: string) {
     console.info(
       `Player ${playerId} left (${this._players.length}/${config.nbMaxPlayers})`,
     );

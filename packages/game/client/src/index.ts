@@ -22,11 +22,11 @@ function leaveGame() {
   socket?.disconnect();
 }
 
-function updateMoveDirection(direction: MoveDirection): void {
+function updateMoveDirection(direction: MoveDirection) {
   socket?.emit(GameEvents.Player.MoveDirectionUpdated, direction);
 }
 
-function updateRotationDirection(direction: RotationDirection): void {
+function updateRotationDirection(direction: RotationDirection) {
   socket?.emit(GameEvents.Player.RotationDirectionUpdated, direction);
 }
 

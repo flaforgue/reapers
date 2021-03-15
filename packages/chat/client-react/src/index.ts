@@ -23,17 +23,17 @@ const useChat = (serverUrl: string): UseChatHook => {
       ]);
     });
 
-    return (): void => {
+    return () => {
       socketRef.current?.disconnect();
     };
   }, []);
 
-  const sendMessage = (room: ChatRoom, content: string): void => {
+  const sendMessage = (room: ChatRoom, content: string) => {
     socketRef.current?.emit(ChatEvents.Message.Created, room, content);
   };
 
   const joinChat = useCallback(
-    (name: string): void => {
+    (name: string) => {
       socketRef.current?.emit(ChatEvents.Member.Created, name);
     },
     [socketRef.current],

@@ -39,13 +39,13 @@ export default class PlayerEntity implements Identifiable {
     return this._mesh.rotation.asArray();
   }
 
-  public updateAndEmitGameState(gameDto: GameDTO): void {
+  public updateAndEmitGameState(gameDto: GameDTO) {
     this._socket.volatile.emit(GameEvents.Game.Updated, gameDto);
     this._updatePosition();
     this._updateRotation();
   }
 
-  private _updatePosition(): void {
+  private _updatePosition() {
     switch (this.moveDirection) {
       case MoveDirection.Forward:
         this._mesh.movePOV(0, 0, config.player.moveStep);
@@ -64,7 +64,7 @@ export default class PlayerEntity implements Identifiable {
     }
   }
 
-  private _updateRotation(): void {
+  private _updateRotation() {
     let rotationAmount = 0;
 
     if (this.rotationDirection === RotationDirection.Left) {
