@@ -20,7 +20,7 @@ export function createScene(engine: BABYLON.Engine) {
   return scene;
 }
 
-export function createCamera(scene: BABYLON.Scene): BABYLON.FollowCamera {
+export function createCamera(scene: BABYLON.Scene) {
   const camera = new BABYLON.FollowCamera(
     'playerCamera',
     new BABYLON.Vector3(0, 2, -2),

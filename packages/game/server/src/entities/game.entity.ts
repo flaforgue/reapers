@@ -6,30 +6,41 @@ import config from '../config';
 import { Identifiable } from '../types';
 import PlayerEntity from './player.entity';
 import WorldEntity from './world.entity';
+import MonsterEntity from './monster.entity';
+import SpiderEntity from './spider.entity';
 
 enum GameState {
   Started,
   Stopped,
 }
 
-const removeFromArrayById = (arr: Identifiable[], id: string): Identifiable | void => {
+function removeFromArrayById(arr: Identifiable[], id: string) {
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].id === id) {
       return arr.splice(i, 1)[0];
     }
   }
-};
+}
 
-const hrtimeMs = (): number => {
+function hrtimeMs() {
   const time = process.hrtime();
   return time[0] * 1000 + time[1] / 1000000;
-};
+}
+
+function getRandomVector3(origin = [0, 0, 0], distances = [0, 0, 0]) {
+  return [
+    Math.floor(Math.random() * distances[0] * 2 - distances[0]) + origin[0],
+    Math.floor(Math.random() * distances[1] * 2 - distances[1]) + origin[1],
+    Math.floor(Math.random() * distances[2] * 2 - distances[2]) + origin[2],
+  ];
+}
 
 export default class GameEntity implements Identifiable {
   private _namespace: SocketIO.Namespace;
   private _state = GameState.Stopped;
   private _world: WorldEntity;
   private _players: PlayerEntity[] = [];
+  private _monsters: MonsterEntity[] = [];
   private readonly _tickInterval = 1000 / config.fps;
   private _frameIndex = 0;
   private _timeoutReference: NodeJS.Timeout | null = null;
@@ -45,25 +56,41 @@ export default class GameEntity implements Identifiable {
     this._namespace = namespace;
     this._world = new WorldEntity(50, 50);
     this._startGameLoop();
+
+    // todo remove
+    const nbMonsters = 10;
+    for (let i = 0; i < nbMonsters; i++) {
+      this._monsters.push(
+        new SpiderEntity(
+          this._scene,
+          getRandomVector3([0, 0, 0], [5, 0, 5]),
+          getRandomVector3([0, 0, 0], [0, 5, 0]),
+        ),
+      );
+    }
   }
 
-  public get players(): PlayerEntity[] {
+  public get players() {
     return this._players;
   }
 
-  public get world(): WorldEntity {
+  public get monsters() {
+    return this._monsters;
+  }
+
+  public get world() {
     return this._world;
   }
 
-  public get state(): GameState {
+  public get state() {
     return this._state;
   }
 
-  public get frameIndex(): number {
+  public get frameIndex() {
     return this._frameIndex;
   }
 
-  public get isFull(): boolean {
+  public get isFull() {
     return this._players.length >= config.nbMaxPlayers;
   }
 
@@ -117,7 +144,7 @@ export default class GameEntity implements Identifiable {
     }
   }
 
-  public addPlayer(socket: SocketIO.Socket, name: string): PlayerEntity {
+  public addPlayer(socket: SocketIO.Socket, name: string) {
     if (this.isFull) {
       throw new Error('Game is full');
     }

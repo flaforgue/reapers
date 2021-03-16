@@ -9,8 +9,6 @@ export default {
   },
   nbMaxPlayers: 100,
   fps,
-  player: {
-    moveStep: 0.05 * speed,
-    rotationStep: 2 * speed,
-  },
+  moveStep: 0.07 * speed,
+  rotationStep: 2 * speed,
 };

@@ -1,17 +1,52 @@
 <script lang="ts">
   import * as BABYLON from '@babylonjs/core';
   import { onMount } from 'svelte';
-  import { useGame, game } from '@reapers/game-client';
+  import { useGame, game, activePlayerId } from '@reapers/game-client';
   import { FocusElement, focusElement, playerName } from '../../stores';
   import { servers } from '../../configs/servers.config';
   import World from '../World/World.svelte';
-  import Player from '../Player/Player.svelte';
+  import PlayerController from '../PlayerController/PlayerController.svelte';
   import { createCamera, createEngine, createScene } from './game.utils';
+  import Character from '../Character/Character.svelte';
 
   let canvas: HTMLCanvasElement | undefined;
   let engine: BABYLON.Engine | undefined;
   let scene: BABYLON.Scene | undefined;
   let camera: BABYLON.FollowCamera | undefined;
+  let playerAssetContainer: BABYLON.AssetContainer | undefined;
+  let monsterAssetContainer: BABYLON.AssetContainer | undefined;
+
+  function loadAssets() {
+    BABYLON.SceneLoader.LoadAssetContainer(
+      '/models/',
+      'characters/player.glb',
+      scene,
+      (result) => {
+        result.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
+        result.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
+        for (let i = 0; i < result.animationGroups.length; i++) {
+          result.animationGroups[i].reset().stop();
+        }
+
+        playerAssetContainer = result;
+      },
+    );
+
+    BABYLON.SceneLoader.LoadAssetContainer(
+      '/models/',
+      'monsters/spider.glb',
+      scene,
+      (result) => {
+        result.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
+        result.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
+        for (let i = 0; i < result.animationGroups.length; i++) {
+          result.animationGroups[i].reset().stop();
+        }
+
+        monsterAssetContainer = result;
+      },
+    );
+  }
 
   const { joinGame, leaveGame, updateMoveDirection, updateRotationDirection } = useGame(
     servers.game.url,
@@ -23,15 +58,25 @@
     engine = createEngine(canvas as HTMLCanvasElement);
     scene = createScene(engine);
     camera = createCamera(scene);
+    loadAssets();
     engine.runRenderLoop(function () {
-      scene?.render();
+      try {
+        scene?.render();
+      } catch (err) {
+        console.error(err);
+      }
     });
 
-    const handleResize = () => engine?.resize();
+    function handleResize() {
+      return engine?.resize();
+    }
+
     window.addEventListener('resize', handleResize);
 
     return () => {
       leaveGame();
+      playerAssetContainer?.removeAllFromScene();
+      monsterAssetContainer?.removeAllFromScene();
       window.removeEventListener('resize', handleResize);
     };
   });
@@ -51,25 +96,19 @@
   </div>
   <canvas bind:this={canvas} />
   <World world={$game.world} {scene} />
+  <PlayerController {scene} {updateMoveDirection} {updateRotationDirection} />
 
   {#each $game.players as player}
-    <Player {scene} {player} {camera} />
+    <Character
+      assetContainer={playerAssetContainer}
+      character={player}
+      camera={player.id === $activePlayerId ? camera : undefined}
+    />
   {/each}
-  <!-- {players.map((player) =>
-    player.id === activePlayerId ? (
-      <ActivePlayer
-        frameIndex={frameIndex}
-        key={player.id}
-        scene={scene}
-        player={player}
-        updateMoveDirection={updateMoveDirection}
-        updateRotationDirection={updateRotationDirection}
-        camera={camera}
-      />
-    ) : (
-      <Player frameIndex={frameIndex} key={player.id} scene={scene} player={player} />
-    ),
-  )} -->
+
+  {#each $game.monsters as monster}
+    <Character assetContainer={monsterAssetContainer} character={monster} />
+  {/each}
 </div>
 
 <style>

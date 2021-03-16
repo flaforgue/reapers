@@ -1,8 +1,11 @@
 import socketIOClient from 'socket.io-client';
 import { writable } from 'svelte/store';
 import {
+  CharacterKind,
+  CharacterDTO,
   GameDTO,
   GameEvents,
+  MonsterDTO,
   MoveDirection,
   PlayerDTO,
   RotationDirection,
@@ -55,6 +58,9 @@ export {
   activePlayerId,
   game,
   useGame,
+  CharacterKind,
+  CharacterDTO,
+  MonsterDTO,
   PlayerDTO,
   GameDTO,
   WorldDTO,
