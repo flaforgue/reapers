@@ -1,15 +1,16 @@
 import SocketIO from 'socket.io';
 import * as BABYLON from 'babylonjs';
-import { CharacterKind, GameDTO, GameEvents } from '@reapers/game-shared';
-import CharacterEntity from './character.entity';
+import { EntityKind, GameDTO, GameEvents } from '@reapers/game-shared';
+import MovableEntity from './shared/movable.entity';
 
-export default class PlayerEntity extends CharacterEntity {
+export default class PlayerEntity extends MovableEntity {
   public readonly name: string;
 
   private readonly _socket: SocketIO.Socket;
 
   public constructor(socket: SocketIO.Socket, scene: BABYLON.Scene, name: string) {
-    super(scene, CharacterKind.Player);
+    super(scene);
+    this._kind = EntityKind.Player;
     this._socket = socket;
     this.name = name;
   }

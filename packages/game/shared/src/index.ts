@@ -1,12 +1,13 @@
 import 'reflect-metadata';
 
 import { plainToClass } from 'class-transformer';
-import { CharacterDTO, MonsterDTO, PlayerDTO, GameDTO, WorldDTO } from './dtos';
-import { CharacterKind, GameEvents, MoveDirection, RotationDirection } from './types';
+import { MovableDTO, MonsterDTO, NestDTO, PlayerDTO, GameDTO, WorldDTO } from './dtos';
+import { EntityKind, GameEvents, MoveDirection, RotationDirection } from './types';
 
 export {
-  CharacterKind,
-  CharacterDTO,
+  EntityKind,
+  MovableDTO,
+  NestDTO,
   GameDTO,
   GameEvents,
   MoveDirection,

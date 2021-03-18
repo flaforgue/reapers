@@ -1,4 +1,10 @@
-import { CharacterKind } from '@reapers/game-client';
+import { EntityKind } from '@reapers/game-client';
+
+enum UnknownAnimationKey {}
+
+enum NestAnimationKey {
+  Idle = 1,
+}
 
 enum PlayerAnimationKey {
   Defeat = 0,
@@ -21,11 +27,17 @@ enum SpiderAnimationKey {
   Walk = 3,
 }
 
-type AnyAnimationKey = typeof PlayerAnimationKey | typeof SpiderAnimationKey;
+type AnyAnimationKey =
+  | typeof PlayerAnimationKey
+  | typeof SpiderAnimationKey
+  | typeof UnknownAnimationKey
+  | typeof NestAnimationKey;
 
-const animationKeys: Record<CharacterKind, AnyAnimationKey> = {
-  [CharacterKind.Player]: PlayerAnimationKey,
-  [CharacterKind.Spider]: SpiderAnimationKey,
+const animationKeys: Record<EntityKind, AnyAnimationKey> = {
+  [EntityKind.Unknown]: UnknownAnimationKey,
+  [EntityKind.Nest]: NestAnimationKey,
+  [EntityKind.Player]: PlayerAnimationKey,
+  [EntityKind.Spider]: SpiderAnimationKey,
 };
 
 export { animationKeys };

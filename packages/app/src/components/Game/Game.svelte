@@ -106,8 +106,10 @@
     />
   {/each}
 
-  {#each $game.monsters as monster}
-    <Character assetContainer={monsterAssetContainer} character={monster} />
+  {#each $game.nests as nest}
+    {#each nest.monsters as monster}
+      <Character assetContainer={monsterAssetContainer} character={monster} />
+    {/each}
   {/each}
 </div>
 

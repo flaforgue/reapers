@@ -1,8 +1,8 @@
 import { Exclude, Expose } from 'class-transformer';
-import CharacterDTO from './character.dto';
+import MovableDTO from './common/movable.dto';
 
 @Exclude()
-export default class PlayerDTO extends CharacterDTO {
+export default class PlayerDTO extends MovableDTO {
   @Expose()
   public name = '';
 }

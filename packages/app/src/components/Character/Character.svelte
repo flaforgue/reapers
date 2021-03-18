@@ -1,13 +1,13 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
-  import { MoveDirection, CharacterDTO } from '@reapers/game-client';
+  import { MoveDirection, MovableDTO } from '@reapers/game-client';
   import { disposeArray } from '../../utils';
   import { onDestroy } from 'svelte';
   import { animationKeys } from './character.utils';
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
   export let camera: BABYLON.FollowCamera | undefined = undefined;
-  export let character: CharacterDTO = new CharacterDTO();
+  export let character: MovableDTO = new MovableDTO();
 
   let rootNodes: BABYLON.TransformNode[] = [];
   let animationGroups: BABYLON.AnimationGroup[] = [];

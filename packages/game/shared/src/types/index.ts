@@ -38,7 +38,9 @@ export enum MoveDirection {
   Right,
 }
 
-export enum CharacterKind {
+export enum EntityKind {
+  Unknown = 'Unknown',
   Player = 'Player',
   Spider = 'Spider',
+  Nest = 'Nest',
 }

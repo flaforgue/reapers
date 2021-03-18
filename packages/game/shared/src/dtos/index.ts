@@ -1,7 +1,8 @@
-import CharacterDTO from './character.dto';
+import MovableDTO from './common/movable.dto';
 import GameDTO from './game.dto';
 import PlayerDTO from './player.dto';
-import MonsterDTO from './monster.dto';
+import MonsterDTO from './monsters/monster.dto';
 import WorldDTO from './world.dto';
+import NestDTO from './nest.dto';
 
-export { MonsterDTO, CharacterDTO, GameDTO, PlayerDTO, WorldDTO };
+export { MonsterDTO, NestDTO, MovableDTO, GameDTO, PlayerDTO, WorldDTO };
