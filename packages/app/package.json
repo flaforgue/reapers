@@ -11,10 +11,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/flaforgue/io-game-starter.git"
+    "url": "git+https://github.com/flaforgue/reapers.git"
   },
   "bugs": {
-    "url": "https://github.com/flaforgue/io-game-starter/issues"
+    "url": "https://github.com/flaforgue/reapers/issues"
   },
   "dependencies": {
     "@babylonjs/core": "^4.2.0",
