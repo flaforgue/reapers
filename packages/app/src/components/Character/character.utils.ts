@@ -1,9 +1,15 @@
+import * as BABYLON from '@babylonjs/core';
+import * as GUI from '@babylonjs/gui';
 import { EntityKind } from '@reapers/game-client';
 
-enum UnknownAnimationKey {}
+enum UnknownAnimationKey {
+  Idle = 0,
+  Walk = 1,
+}
 
 enum NestAnimationKey {
-  Idle = 1,
+  Idle = 0,
+  Walk = 1,
 }
 
 enum PlayerAnimationKey {
@@ -40,4 +46,34 @@ const animationKeys: Record<EntityKind, AnyAnimationKey> = {
   [EntityKind.Spider]: SpiderAnimationKey,
 };
 
-export { animationKeys };
+function createLabel(parent: BABYLON.TransformNode, name: string) {
+  const yOffset = -90;
+  const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI');
+  // const rect = new GUI.Rectangle();
+  const label = new GUI.TextBlock('', name);
+
+  advancedTexture.useInvalidateRectOptimization = true;
+
+  label.useBitmapCache = true;
+  label.paddingTop = '2px';
+  label.width = '120px';
+  label.height = '40px';
+  label.color = 'black';
+  label.fontSize = 25;
+  // label.thickness = 0;
+  // label.addControl(label);
+  advancedTexture.addControl(label);
+
+  label.linkOffsetY = yOffset;
+  label.linkWithMesh(parent);
+
+  // label.text = name;
+
+  parent.getScene().onAfterRenderObservable.add(() => {
+    const distance = parent.getDistanceToCamera();
+    label.linkOffsetY = -400 / Math.sqrt(distance);
+    // label.alpha = Math.max(0, (30 - distance) / 30);
+  });
+}
+
+export { animationKeys, createLabel };

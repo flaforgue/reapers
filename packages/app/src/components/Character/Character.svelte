@@ -3,7 +3,8 @@
   import { MoveDirection, MovableDTO } from '@reapers/game-client';
   import { disposeArray } from '../../utils';
   import { onDestroy } from 'svelte';
-  import { animationKeys } from './character.utils';
+  import { animationKeys, createLabel } from './character.utils';
+  import { AbstractMesh, Scene } from '@babylonjs/core';
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
   export let camera: BABYLON.FollowCamera | undefined = undefined;
@@ -53,8 +54,6 @@
     animationGroups[animationKeys[character.kind].Walk].speedRatio = 2;
   }
 
-  $: rootNodeId = rootNodes[0]?.id;
-
   $: {
     if (assetContainer) {
       loadAssetContainer();
@@ -62,26 +61,39 @@
   }
 
   $: {
-    if (camera && rootNodes[0]) {
-      camera.lockedTarget = rootNodes[0] as BABYLON.AbstractMesh;
+    if (camera && rootNodes[0] && !camera.lockedTarget) {
+      camera.lockedTarget = rootNodes[0] as AbstractMesh;
+    }
+  }
+
+  $: name = character.name;
+  $: {
+    if (rootNodes[0]) {
+      createLabel(rootNodes[0], name);
     }
   }
 
   $: position = character.position;
   $: [posX, posY, posZ] = position;
   $: {
-    updatePosition(posX, posY, posZ);
+    if (assetContainer) {
+      updatePosition(posX, posY, posZ);
+    }
   }
 
   $: rotation = character.rotation;
   $: [rotX, rotY, rotZ] = rotation;
   $: {
-    updateRotation(rotX, rotY, rotZ);
+    if (assetContainer) {
+      updateRotation(rotX, rotY, rotZ);
+    }
   }
 
   $: moveDirection = character.moveDirection;
   $: {
-    updateMoveDirection(moveDirection);
+    if (assetContainer) {
+      updateMoveDirection(moveDirection);
+    }
   }
 
   onDestroy(() => {

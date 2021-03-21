@@ -4,11 +4,18 @@ import config from '../../config';
 import PositionableEntity from './positionable.entity';
 
 export default class MovableEntity extends PositionableEntity {
+  public readonly name: string;
   public moveDirection: MoveDirection = MoveDirection.None;
   public rotationDirection: RotationDirection = RotationDirection.None;
 
-  public constructor(scene: BABYLON.Scene, position = [0, 0, 0], rotation = [0, 0, 0]) {
+  public constructor(
+    scene: BABYLON.Scene,
+    name: string,
+    position = [0, 0, 0],
+    rotation = [0, 0, 0],
+  ) {
     super(scene, position, rotation);
+    this.name = name;
   }
 
   public update() {

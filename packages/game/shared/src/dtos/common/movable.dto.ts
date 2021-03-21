@@ -5,6 +5,9 @@ import PositionableDTO from './positionable.dto';
 @Exclude()
 export default class MovableDTO extends PositionableDTO {
   @Expose()
+  public name = '';
+
+  @Expose()
   public moveDirection: MoveDirection = MoveDirection.None;
 
   @Expose()

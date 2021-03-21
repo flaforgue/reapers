@@ -55,7 +55,7 @@ export default class GameEntity extends BaseEntity {
         nestRadius: 5,
         instanceClass: SpiderEntity,
         maxNbInstances: 10,
-        instantiationInterval: 5,
+        instantiationInterval: 0,
       }),
     ];
   }

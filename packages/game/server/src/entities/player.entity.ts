@@ -4,15 +4,12 @@ import { EntityKind, GameDTO, GameEvents } from '@reapers/game-shared';
 import MovableEntity from './shared/movable.entity';
 
 export default class PlayerEntity extends MovableEntity {
-  public readonly name: string;
-
   private readonly _socket: SocketIO.Socket;
 
   public constructor(socket: SocketIO.Socket, scene: BABYLON.Scene, name: string) {
-    super(scene);
+    super(scene, name);
     this._kind = EntityKind.Player;
     this._socket = socket;
-    this.name = name;
   }
 
   public updateAndEmitGameState(gameDto: GameDTO) {

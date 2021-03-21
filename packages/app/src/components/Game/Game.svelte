@@ -77,6 +77,9 @@
       leaveGame();
       playerAssetContainer?.removeAllFromScene();
       monsterAssetContainer?.removeAllFromScene();
+      camera?.dispose();
+      scene?.dispose();
+      engine?.dispose();
       window.removeEventListener('resize', handleResize);
     };
   });
@@ -96,7 +99,7 @@
   </div>
   <canvas bind:this={canvas} />
   <World world={$game.world} {scene} />
-  <PlayerController {scene} {updateMoveDirection} {updateRotationDirection} />
+  <PlayerController {camera} {scene} {updateMoveDirection} {updateRotationDirection} />
 
   {#each $game.players as player}
     <Character
