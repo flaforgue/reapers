@@ -1,5 +1,6 @@
 import SocketIO from 'socket.io';
 import * as BABYLON from 'babylonjs';
+import * as cannon from 'cannon';
 import { GameDTO, GameEvents, plainToClass } from '@reapers/game-shared';
 import config from '../config';
 import PlayerEntity from './player.entity';
@@ -42,14 +43,15 @@ export default class GameEntity extends BaseEntity {
 
   public constructor(namespace: SocketIO.Namespace) {
     super();
+    this._namespace = namespace;
     this._engine = new BABYLON.NullEngine();
     this._scene = new BABYLON.Scene(this._engine);
-    this._scene.enablePhysics(null);
+    this._scene.enablePhysics(
+      new BABYLON.Vector3(0, -9.81, 0),
+      new BABYLON.CannonJSPlugin(true, 10, cannon),
+    );
 
-    this._namespace = namespace;
-    this._world = new WorldEntity(50, 50);
-    this._startGameLoop();
-
+    this._world = new WorldEntity(this._scene, 50, 50);
     this._nests = [
       new NestEntity<SpiderEntity>(this._scene, {
         nestRadius: 5,
@@ -58,6 +60,8 @@ export default class GameEntity extends BaseEntity {
         instantiationInterval: 0,
       }),
     ];
+
+    this._startGameLoop();
   }
 
   public get players() {
@@ -143,7 +147,7 @@ export default class GameEntity extends BaseEntity {
       throw new Error('Game is full');
     }
 
-    const player = new PlayerEntity(socket, this._scene, name);
+    const player = new PlayerEntity(socket, this._scene, name, [0, 3, 0]);
     this._players.push(player);
     console.info(
       `Player ${name} - ${player.id} created (${this._players.length}/${config.nbMaxPlayers})`,
