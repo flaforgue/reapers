@@ -1,7 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
 import { EntityKind } from '@reapers/game-client';
-import { dimensions } from '../../configs/characters';
+import { labelPositions } from '../../configs/characters';
 
 enum UnknownAnimationKey {
   Idle = 0,
@@ -42,6 +42,7 @@ type AnyAnimationKey =
 
 const animationKeys: Record<EntityKind, AnyAnimationKey> = {
   [EntityKind.Unknown]: UnknownAnimationKey,
+  [EntityKind.World]: UnknownAnimationKey,
   [EntityKind.Nest]: NestAnimationKey,
   [EntityKind.Player]: PlayerAnimationKey,
   [EntityKind.Spider]: SpiderAnimationKey,
@@ -70,7 +71,7 @@ function createLabel(
 ) {
   const scene = parent.getScene();
   const engine = scene.getEngine();
-  const height = dimensions[kind];
+  const height = labelPositions[kind];
   const label = new GUI.TextBlock('label', name);
 
   label.color = '#ccc';
