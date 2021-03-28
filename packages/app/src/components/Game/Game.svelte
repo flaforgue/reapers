@@ -103,7 +103,6 @@
   }
 
   function handleLightChanged(details: CustomEvent<BABYLON.DirectionalLight>) {
-    console.log('handleLightChanged');
     shadowGenerator?.dispose();
     shadowGenerator = new BABYLON.ShadowGenerator(4096, details.detail);
     shadowGenerator.usePercentageCloserFiltering = true;

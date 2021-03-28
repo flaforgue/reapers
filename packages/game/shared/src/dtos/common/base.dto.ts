@@ -7,5 +7,5 @@ export default class BaseDTO {
   public id: string = '';
 
   @Expose()
-  public kind: EntityKind = EntityKind.Player;
+  public kind: EntityKind = EntityKind.Unknown;
 }

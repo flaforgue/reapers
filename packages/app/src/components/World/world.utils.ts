@@ -4,7 +4,6 @@ export function createLight(scene: BABYLON.Scene) {
   const light = new BABYLON.DirectionalLight(
     'DirectionalLight',
     new BABYLON.Vector3(0, -1, 0),
-    // new BABYLON.Vector3(0.3, -0.3, 0),
     scene,
   );
   light.position = new BABYLON.Vector3(0, 100, 0);
@@ -42,8 +41,8 @@ export function createGround(width: number, depth: number, scene: BABYLON.Scene)
     scene,
   );
   const texture = new BABYLON.Texture('/textures/grass.jpeg', scene);
-  texture.uScale = 10;
-  texture.vScale = 10;
+  texture.uScale = 20;
+  texture.vScale = 20;
   const groundMat = new BABYLON.StandardMaterial('groundMat', scene);
   groundMat.backFaceCulling = false;
   groundMat.diffuseTexture = texture;

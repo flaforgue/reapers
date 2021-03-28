@@ -9,16 +9,15 @@ export function createEngine(canvas: HTMLCanvasElement) {
 }
 
 export function createScene(engine: BABYLON.Engine) {
-  const gameScene = new BABYLON.Scene(engine, {
+  const scene = new BABYLON.Scene(engine, {
     useGeometryUniqueIdsMap: true,
     useMaterialMeshMap: true,
     useClonedMeshMap: true,
   });
+  scene.autoClear = false;
+  scene.autoClearDepthAndStencil = false;
 
-  gameScene.autoClear = false;
-  gameScene.autoClearDepthAndStencil = false;
-
-  return gameScene;
+  return scene;
 }
 
 export function createCamera(scene: BABYLON.Scene) {

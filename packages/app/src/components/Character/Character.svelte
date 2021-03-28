@@ -60,7 +60,6 @@
     rootNodes = entries?.rootNodes ?? [];
     animationGroups = entries?.animationGroups ?? [];
     animationGroups[animationKeys[character.kind].Walk].speedRatio = 2;
-
     shadowGenerator?.addShadowCaster(rootNodes[0] as AbstractMesh);
   }
 
