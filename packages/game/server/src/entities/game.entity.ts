@@ -1,6 +1,5 @@
 import SocketIO from 'socket.io';
 import * as BABYLON from 'babylonjs';
-import cannon from 'cannon';
 import { GameDTO, GameEvents, plainToClass } from '@reapers/game-shared';
 import config from '../config';
 import PlayerEntity from './player.entity';
@@ -34,13 +33,9 @@ export default class GameEntity extends BaseEntity {
   private _world: WorldEntity;
   private _players: PlayerEntity[] = [];
   private _nests: NestEntity<MonsterEntity>[] = [];
-  private readonly _tickInterval = 1000 / config.fps;
   private _frameIndex = 0;
-  private _timeoutReference: NodeJS.Timeout | null = null;
-  private _immediateReference: NodeJS.Immediate | null = null;
   private readonly _engine: BABYLON.Engine;
   private readonly _scene: BABYLON.Scene;
-  private readonly _physicsEngine: BABYLON.CannonJSPlugin;
 
   public constructor(namespace: SocketIO.Namespace) {
     super();
@@ -53,9 +48,15 @@ export default class GameEntity extends BaseEntity {
       textureSize: 512,
     });
     this._scene = new BABYLON.Scene(this._engine);
-    this._physicsEngine = new BABYLON.CannonJSPlugin(false, undefined, cannon);
-    this._scene.enablePhysics(null, new BABYLON.CannonJSPlugin(false, undefined, cannon));
-    this._physicsEngine.setTimeStep(1 / config.fps);
+    this._scene.collisionsEnabled = true;
+    new BABYLON.ArcRotateCamera(
+      'Camera',
+      0,
+      0.8,
+      100,
+      BABYLON.Vector3.Zero(),
+      this._scene,
+    );
 
     this._world = new WorldEntity(this._scene, 50, 50);
     this._nests = [
@@ -67,7 +68,20 @@ export default class GameEntity extends BaseEntity {
       }),
     ];
 
-    this._startGameLoop();
+    this._scene.executeWhenReady(() => {
+      this._engine.runRenderLoop(() => {
+        try {
+          if (this._state === GameState.Started) {
+            this._update();
+            this._scene.render();
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      });
+
+      this._state = GameState.Started;
+    });
   }
 
   public get players() {
@@ -107,44 +121,10 @@ export default class GameEntity extends BaseEntity {
     }
   }
 
-  public _startGameLoop() {
-    if (this._state === GameState.Stopped) {
-      this._state = GameState.Started;
-      this._loop();
-      console.info('Game loop started');
-    }
-  }
-
-  private _loop() {
-    const start = hrtimeMs();
-    this._update();
-    const duration = hrtimeMs() - start;
-
-    if (duration < this._tickInterval) {
-      this._timeoutReference = setTimeout(
-        () => this._loop(),
-        this._tickInterval - duration,
-      );
-      this._immediateReference = null;
-    } else {
-      this._immediateReference = setImmediate(() => this._loop());
-      this._timeoutReference = null;
-    }
-  }
-
   public stopGameLoop() {
     if (this._state === GameState.Started) {
-      if (this._immediateReference) {
-        clearImmediate(this._immediateReference);
-      }
-
-      if (this._timeoutReference) {
-        clearTimeout(this._timeoutReference);
-      }
-
       this._state = GameState.Stopped;
       this._namespace.emit(GameEvents.Game.Stopped);
-      console.info('Game loop stopped');
     }
   }
 
@@ -153,7 +133,7 @@ export default class GameEntity extends BaseEntity {
       throw new Error('Game is full');
     }
 
-    const player = new PlayerEntity(socket, this._scene, name, [0, 2, 0]);
+    const player = new PlayerEntity(socket, this._scene, name, [0, 0, 0]);
     this._players.push(player);
     console.info(
       `Player ${name} - ${player.id} created (${this._players.length}/${config.nbMaxPlayers})`,

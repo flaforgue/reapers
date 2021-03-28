@@ -74,5 +74,9 @@ export default class NestEntity<T extends MonsterEntity> extends PositionableEnt
         this._instantiationProgress = 0;
       }
     }
+
+    for (let i = 0; i < this._monsters.length; i++) {
+      this._monsters[i].update();
+    }
   }
 }

@@ -12,12 +12,7 @@ export default class WorldEntity extends PositionableEntity {
     );
     this.depth = depth;
     this.width = width;
-    this._mesh.physicsImpostor = new BABYLON.PhysicsImpostor(
-      this._mesh,
-      BABYLON.PhysicsImpostor.BoxImpostor,
-      { mass: 0, friction: 0.0, restitution: 0.7 },
-      scene,
-    );
+    this._mesh.checkCollisions = true;
     this._kind = EntityKind.World;
   }
 }

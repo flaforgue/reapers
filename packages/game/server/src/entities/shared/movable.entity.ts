@@ -7,6 +7,10 @@ import {
 import config from '../../config';
 import PositionableEntity from './positionable.entity';
 
+const SPEED = new BABYLON.Vector3(config.moveStep, config.moveStep, config.moveStep);
+const LOW_SPEED = SPEED.multiply(
+  new BABYLON.Vector3(Math.SQRT1_2, Math.SQRT1_2, Math.SQRT1_2),
+);
 export default class MovableEntity extends PositionableEntity {
   public readonly name: string;
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
@@ -29,34 +33,33 @@ export default class MovableEntity extends PositionableEntity {
   }
 
   private _updatePosition() {
+    const move = new BABYLON.Vector3(0, config.gravity, 0);
     let isMovingFront = true;
-    let isMovingSide = true;
-    let amountRight = 0;
-    let amountUp = 0;
-    let amountForward = 0;
 
     if (this.frontMoveDirection === FrontMoveDirection.Forward) {
-      amountForward = config.moveStep;
+      move.x -= Math.sin(this._mesh.rotation.y);
+      move.z -= Math.cos(this._mesh.rotation.y);
     } else if (this.frontMoveDirection === FrontMoveDirection.Backward) {
-      amountForward = config.moveStep * -1;
+      move.x += Math.sin(this._mesh.rotation.y);
+      move.z += Math.cos(this._mesh.rotation.y);
     } else {
       isMovingFront = false;
     }
 
+    let isMovingSide = true;
     if (this.sideMoveDirection === SideMoveDirection.Right) {
-      amountRight = config.moveStep;
+      move.x -= Math.sin(this._mesh.rotation.y + Math.PI / 2);
+      move.z -= Math.cos(this._mesh.rotation.y + Math.PI / 2);
     } else if (this.sideMoveDirection === SideMoveDirection.Left) {
-      amountRight = config.moveStep * -1;
+      move.x += Math.sin(this._mesh.rotation.y + Math.PI / 2);
+      move.z += Math.cos(this._mesh.rotation.y + Math.PI / 2);
     } else {
       isMovingSide = false;
     }
 
-    if (isMovingFront && isMovingSide) {
-      amountRight *= Math.SQRT1_2;
-      amountForward *= Math.SQRT1_2;
-    }
-
-    this._mesh.movePOV(amountRight, amountUp, amountForward);
+    this._mesh.moveWithCollisions(
+      move.multiply(isMovingFront && isMovingSide ? LOW_SPEED : SPEED),
+    );
   }
 
   private _updateRotation() {

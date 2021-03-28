@@ -1,6 +1,4 @@
-const targetFps = 60;
 const fps = 60;
-const speed = targetFps / fps;
 
 export default {
   port: process.env.PORT ?? 4001,
@@ -9,6 +7,7 @@ export default {
   },
   nbMaxPlayers: 100,
   fps,
-  moveStep: 0.07 * speed,
-  rotationStep: 2 * speed,
+  moveStep: 0.07,
+  rotationStep: 2,
+  gravity: -9.81 / fps,
 };

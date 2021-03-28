@@ -24,13 +24,11 @@
   "dependencies": {
     "@reapers/game-shared": "^0.0.1",
     "babylonjs": "^4.2.0",
-    "cannon": "^0.6.2",
     "express": "^4.17.1",
     "socket.io": "^3.1.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@types/cannon": "^0.1.5",
     "@types/express": "^4.17.11",
     "@types/node": "^14.14.27",
     "@types/socket.io": "^2.1.13",

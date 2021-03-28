@@ -1,6 +1,6 @@
 import { Exclude, Expose } from 'class-transformer';
 import BaseDTO from './base.dto';
-
+@Exclude()
 export default class PositionableDTO extends BaseDTO {
   @Expose()
   public position: number[] = [0, 0, 0];
