@@ -6,7 +6,8 @@ import {
   GameDTO,
   GameEvents,
   MonsterDTO,
-  MoveDirection,
+  FrontMoveDirection,
+  SideMoveDirection,
   PlayerDTO,
   RotationDirection,
   WorldDTO,
@@ -25,8 +26,12 @@ function leaveGame() {
   socket?.disconnect();
 }
 
-function updateMoveDirection(direction: MoveDirection) {
-  socket?.emit(GameEvents.Player.MoveDirectionUpdated, direction);
+function updateFrontMoveDirection(direction: FrontMoveDirection) {
+  socket?.emit(GameEvents.Player.FrontMoveDirectionUpdated, direction);
+}
+
+function updateSideMoveDirection(direction: SideMoveDirection) {
+  socket?.emit(GameEvents.Player.SideMoveDirectionUpdated, direction);
 }
 
 function updateRotationDirection(direction: RotationDirection) {
@@ -49,7 +54,8 @@ function useGame(serverUrl: string) {
   return {
     joinGame,
     leaveGame,
-    updateMoveDirection,
+    updateFrontMoveDirection,
+    updateSideMoveDirection,
     updateRotationDirection,
   };
 }
@@ -65,6 +71,7 @@ export {
   GameDTO,
   WorldDTO,
   GameEvents,
-  MoveDirection,
+  FrontMoveDirection,
+  SideMoveDirection,
   RotationDirection,
 };

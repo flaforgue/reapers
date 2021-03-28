@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
 import { EntityKind } from '@reapers/game-client';
+import { dimensions } from '../../configs/characters';
 
 enum UnknownAnimationKey {
   Idle = 0,
@@ -46,34 +47,50 @@ const animationKeys: Record<EntityKind, AnyAnimationKey> = {
   [EntityKind.Spider]: SpiderAnimationKey,
 };
 
-function createLabel(parent: BABYLON.TransformNode, name: string) {
-  const yOffset = -90;
-  const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI');
-  // const rect = new GUI.Rectangle();
-  const label = new GUI.TextBlock('', name);
+function worldToScreen(
+  worldPosition: BABYLON.Vector3,
+  scene: BABYLON.Scene,
+  engine: BABYLON.Engine,
+) {
+  const camera = scene.activeCamera as BABYLON.FollowCamera;
 
-  advancedTexture.useInvalidateRectOptimization = true;
+  return BABYLON.Vector3.Project(
+    worldPosition,
+    BABYLON.Matrix.Identity(),
+    scene.getTransformMatrix(),
+    camera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()),
+  );
+}
 
-  label.useBitmapCache = true;
-  label.paddingTop = '2px';
-  label.width = '120px';
-  label.height = '40px';
-  label.color = 'black';
-  label.fontSize = 25;
-  // label.thickness = 0;
-  // label.addControl(label);
-  advancedTexture.addControl(label);
+function createLabel(
+  name: string,
+  kind: EntityKind,
+  parent: BABYLON.TransformNode,
+  gui: GUI.AdvancedDynamicTexture,
+) {
+  const scene = parent.getScene();
+  const engine = scene.getEngine();
+  const height = dimensions[kind];
+  const label = new GUI.TextBlock('label', name);
 
-  label.linkOffsetY = yOffset;
-  label.linkWithMesh(parent);
+  label.color = '#ccc';
+  label.fontSize = 20;
 
-  // label.text = name;
+  gui.addControl(label);
 
-  parent.getScene().onAfterRenderObservable.add(() => {
-    const distance = parent.getDistanceToCamera();
-    label.linkOffsetY = -400 / Math.sqrt(distance);
-    // label.alpha = Math.max(0, (30 - distance) / 30);
+  scene.registerAfterRender(() => {
+    const screenWidth = engine.getRenderWidth();
+    const screenHeight = engine.getRenderHeight();
+    const screenPosition = worldToScreen(
+      parent.position.add(new BABYLON.Vector3(0, height, 0)),
+      scene,
+      engine,
+    );
+    label.left = (screenPosition.x - screenWidth / 2).toFixed(1);
+    label.top = (screenPosition.y - screenHeight / 2).toFixed(1);
   });
+
+  return label;
 }
 
 export { animationKeys, createLabel };

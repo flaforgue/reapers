@@ -8,7 +8,8 @@ enum PlayerEvent {
   Created = 'PlayerEvent.Created',
   Deleted = 'PlayerEvent.Deleted',
   Joined = 'PlayerEvent.Joined',
-  MoveDirectionUpdated = 'PlayerEvent.MoveDirectionUpdated',
+  FrontMoveDirectionUpdated = 'PlayerEvent.FrontMoveDirectionUpdated',
+  SideMoveDirectionUpdated = 'PlayerEvent.SideMoveDirectionUpdated',
   RotationDirectionUpdated = 'PlayerEvent.RotationDirectionUpdated',
 }
 
@@ -30,10 +31,14 @@ export enum RotationDirection {
   Right,
 }
 
-export enum MoveDirection {
+export enum FrontMoveDirection {
   None,
   Forward,
   Backward,
+}
+
+export enum SideMoveDirection {
+  None,
   Left,
   Right,
 }

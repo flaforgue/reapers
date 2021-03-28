@@ -1,7 +1,7 @@
 <script lang="ts">
   import { useChat, ChatRoom, messages } from '@reapers/chat-client';
   import { servers } from '../../configs/servers.config';
-  import { afterUpdate, onDestroy, onMount } from 'svelte';
+  import { afterUpdate, onMount } from 'svelte';
   import { FocusElement, focusElement, playerName } from '../../stores';
   import Input from '../Input/Input.svelte';
 

@@ -1,9 +1,18 @@
 import { Socket } from 'socket.io';
-import { GameEvents, MoveDirection, RotationDirection } from '@reapers/game-shared';
+import {
+  GameEvents,
+  SideMoveDirection,
+  FrontMoveDirection,
+  RotationDirection,
+} from '@reapers/game-shared';
 import { PlayerEntity } from '../../entities';
 
-function isValidMoveDirection(direction: unknown) {
-  return Boolean(MoveDirection[Number(direction)]);
+function isValidFrontMoveDirection(direction: unknown) {
+  return Boolean(FrontMoveDirection[Number(direction)]);
+}
+
+function isValidSideMoveDirection(direction: unknown) {
+  return Boolean(SideMoveDirection[Number(direction)]);
 }
 
 function isValidRotationDirection(direction: unknown) {
@@ -11,11 +20,23 @@ function isValidRotationDirection(direction: unknown) {
 }
 
 export default (socket: Socket, player: PlayerEntity) => {
-  socket.on(GameEvents.Player.MoveDirectionUpdated, (direction: MoveDirection) => {
-    if (isValidMoveDirection(direction)) {
-      player.moveDirection = direction;
-    }
-  });
+  socket.on(
+    GameEvents.Player.FrontMoveDirectionUpdated,
+    (direction: FrontMoveDirection) => {
+      if (isValidFrontMoveDirection(direction)) {
+        player.frontMoveDirection = direction;
+      }
+    },
+  );
+
+  socket.on(
+    GameEvents.Player.SideMoveDirectionUpdated,
+    (direction: SideMoveDirection) => {
+      if (isValidSideMoveDirection(direction)) {
+        player.sideMoveDirection = direction;
+      }
+    },
+  );
 
   socket.on(
     GameEvents.Player.RotationDirectionUpdated,

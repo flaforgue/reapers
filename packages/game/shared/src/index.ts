@@ -2,7 +2,13 @@ import 'reflect-metadata';
 
 import { plainToClass } from 'class-transformer';
 import { MovableDTO, MonsterDTO, NestDTO, PlayerDTO, GameDTO, WorldDTO } from './dtos';
-import { EntityKind, GameEvents, MoveDirection, RotationDirection } from './types';
+import {
+  EntityKind,
+  GameEvents,
+  FrontMoveDirection,
+  SideMoveDirection,
+  RotationDirection,
+} from './types';
 
 export {
   EntityKind,
@@ -10,7 +16,8 @@ export {
   NestDTO,
   GameDTO,
   GameEvents,
-  MoveDirection,
+  FrontMoveDirection,
+  SideMoveDirection,
   PlayerDTO,
   MonsterDTO,
   RotationDirection,

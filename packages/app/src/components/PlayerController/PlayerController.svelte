@@ -1,15 +1,21 @@
 <script lang="ts">
   import * as BABYLON from '@babylonjs/core';
-  import { MoveDirection, RotationDirection } from '@reapers/game-client';
+  import {
+    SideMoveDirection,
+    FrontMoveDirection,
+    RotationDirection,
+  } from '@reapers/game-client';
   import { Key } from '../../configs/keycodes.config';
   import { onDestroy } from 'svelte';
   import {
-    isMoveDirection,
+    isFrontMoveDirection,
+    isSideMoveDirection,
     isRotationDirection,
     resetCamera,
   } from './PlayerController.utils';
 
-  export let updateMoveDirection: (direction: MoveDirection) => void;
+  export let updateFrontMoveDirection: (direction: FrontMoveDirection) => void;
+  export let updateSideMoveDirection: (direction: SideMoveDirection) => void;
   export let updateRotationDirection: (direction: RotationDirection) => void;
   export let scene: BABYLON.Scene | undefined;
   export let camera: BABYLON.FollowCamera | undefined;
@@ -32,16 +38,16 @@
     if (type === BABYLON.KeyboardEventTypes.KEYDOWN) {
       switch (event.key) {
         case Key.z:
-          updateMoveDirection(MoveDirection.Forward);
+          updateFrontMoveDirection(FrontMoveDirection.Forward);
           break;
         case Key.s:
-          updateMoveDirection(MoveDirection.Backward);
+          updateFrontMoveDirection(FrontMoveDirection.Backward);
           break;
         case Key.a:
-          updateMoveDirection(MoveDirection.Left);
+          updateSideMoveDirection(SideMoveDirection.Left);
           break;
         case Key.e:
-          updateMoveDirection(MoveDirection.Right);
+          updateSideMoveDirection(SideMoveDirection.Right);
           break;
         case Key.d:
           localUpdateRotationDirection(RotationDirection.Right);
@@ -53,8 +59,10 @@
           break;
       }
     } else {
-      if (isMoveDirection(event.key)) {
-        updateMoveDirection(MoveDirection.None);
+      if (isFrontMoveDirection(event.key)) {
+        updateFrontMoveDirection(FrontMoveDirection.None);
+      } else if (isSideMoveDirection(event.key)) {
+        updateSideMoveDirection(SideMoveDirection.None);
       } else if (isRotationDirection(event.key)) {
         updateRotationDirection(RotationDirection.None);
       }

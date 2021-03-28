@@ -1,11 +1,16 @@
 import * as BABYLON from 'babylonjs';
-import { MoveDirection, RotationDirection } from '@reapers/game-shared';
+import {
+  FrontMoveDirection,
+  SideMoveDirection,
+  RotationDirection,
+} from '@reapers/game-shared';
 import config from '../../config';
 import PositionableEntity from './positionable.entity';
 
 export default class MovableEntity extends PositionableEntity {
   public readonly name: string;
-  public moveDirection: MoveDirection = MoveDirection.None;
+  public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
+  public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
   public rotationDirection: RotationDirection = RotationDirection.None;
 
   public constructor(
@@ -24,22 +29,34 @@ export default class MovableEntity extends PositionableEntity {
   }
 
   private _updatePosition() {
-    switch (this.moveDirection) {
-      case MoveDirection.Forward:
-        this._mesh.movePOV(0, 0, config.moveStep);
-        break;
-      case MoveDirection.Backward:
-        this._mesh?.movePOV(0, 0, config.moveStep * -1);
-        break;
-      case MoveDirection.Left:
-        this._mesh?.movePOV(config.moveStep * -1, 0, 0);
-        break;
-      case MoveDirection.Right:
-        this._mesh?.movePOV(config.moveStep, 0, 0);
-        break;
-      default:
-        break;
+    let isMovingFront = true;
+    let isMovingSide = true;
+    let amountRight = 0;
+    let amountUp = 0;
+    let amountForward = 0;
+
+    if (this.frontMoveDirection === FrontMoveDirection.Forward) {
+      amountForward = config.moveStep;
+    } else if (this.frontMoveDirection === FrontMoveDirection.Backward) {
+      amountForward = config.moveStep * -1;
+    } else {
+      isMovingFront = false;
     }
+
+    if (this.sideMoveDirection === SideMoveDirection.Right) {
+      amountRight = config.moveStep;
+    } else if (this.sideMoveDirection === SideMoveDirection.Left) {
+      amountRight = config.moveStep * -1;
+    } else {
+      isMovingSide = false;
+    }
+
+    if (isMovingFront && isMovingSide) {
+      amountRight *= Math.SQRT1_2;
+      amountForward *= Math.SQRT1_2;
+    }
+
+    this._mesh.movePOV(amountRight, amountUp, amountForward);
   }
 
   private _updateRotation() {

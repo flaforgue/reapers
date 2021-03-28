@@ -1,26 +1,29 @@
 <script lang="ts">
   import * as BABYLON from '@babylonjs/core';
+  import * as GUI from '@babylonjs/gui';
   import { onMount } from 'svelte';
   import { useGame, game, activePlayerId } from '@reapers/game-client';
   import { FocusElement, focusElement, playerName } from '../../stores';
   import { servers } from '../../configs/servers.config';
   import World from '../World/World.svelte';
   import PlayerController from '../PlayerController/PlayerController.svelte';
-  import { createCamera, createEngine, createScene } from './game.utils';
+  import { createCamera, createEngine, createGUI, createScene } from './game.utils';
   import Character from '../Character/Character.svelte';
 
-  let canvas: HTMLCanvasElement | undefined;
   let engine: BABYLON.Engine | undefined;
-  let scene: BABYLON.Scene | undefined;
-  let camera: BABYLON.FollowCamera | undefined;
+  let gameCamera: BABYLON.FollowCamera | undefined;
+  let gameCanvas: HTMLCanvasElement | undefined;
+  let gameScene: BABYLON.Scene | undefined;
   let playerAssetContainer: BABYLON.AssetContainer | undefined;
   let monsterAssetContainer: BABYLON.AssetContainer | undefined;
+  let gui: GUI.AdvancedDynamicTexture | undefined;
+  let shadowGenerator: BABYLON.ShadowGenerator | undefined;
 
   function loadAssets() {
     BABYLON.SceneLoader.LoadAssetContainer(
       '/models/',
       'characters/player.glb',
-      scene,
+      gameScene,
       (result) => {
         result.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
         result.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
@@ -35,7 +38,7 @@
     BABYLON.SceneLoader.LoadAssetContainer(
       '/models/',
       'monsters/spider.glb',
-      scene,
+      gameScene,
       (result) => {
         result.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
         result.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
@@ -48,20 +51,26 @@
     );
   }
 
-  const { joinGame, leaveGame, updateMoveDirection, updateRotationDirection } = useGame(
-    servers.game.url,
-  );
+  const {
+    joinGame,
+    leaveGame,
+    updateSideMoveDirection,
+    updateFrontMoveDirection,
+    updateRotationDirection,
+  } = useGame(servers.game.url);
 
   onMount(() => {
     joinGame($playerName);
+    engine = createEngine(gameCanvas as HTMLCanvasElement);
+    gameScene = createScene(engine);
+    gameCamera = createCamera(gameScene);
+    gui = createGUI();
 
-    engine = createEngine(canvas as HTMLCanvasElement);
-    scene = createScene(engine);
-    camera = createCamera(scene);
     loadAssets();
+
     engine.runRenderLoop(function () {
       try {
-        scene?.render();
+        gameScene?.render();
       } catch (err) {
         console.error(err);
       }
@@ -77,8 +86,9 @@
       leaveGame();
       playerAssetContainer?.removeAllFromScene();
       monsterAssetContainer?.removeAllFromScene();
-      camera?.dispose();
-      scene?.dispose();
+      shadowGenerator?.dispose();
+      gameCamera?.dispose();
+      gameScene?.dispose();
       engine?.dispose();
       window.removeEventListener('resize', handleResize);
     };
@@ -86,10 +96,19 @@
 
   $: {
     if ($focusElement === FocusElement.Game) {
-      canvas?.focus();
+      gameCanvas?.focus();
     } else {
-      canvas?.blur();
+      gameCanvas?.blur();
     }
+  }
+
+  function handleLightChanged(details: CustomEvent<BABYLON.DirectionalLight>) {
+    console.log('handleLightChanged');
+    shadowGenerator?.dispose();
+    shadowGenerator = new BABYLON.ShadowGenerator(4096, details.detail);
+    shadowGenerator.usePercentageCloserFiltering = true;
+    shadowGenerator.filteringQuality = BABYLON.ShadowGenerator.QUALITY_LOW;
+    shadowGenerator.setDarkness(0.6);
   }
 </script>
 
@@ -97,21 +116,34 @@
   <div class="engineInfos">
     {engine?.getFps().toFixed()}
   </div>
-  <canvas bind:this={canvas} />
-  <World world={$game.world} {scene} />
-  <PlayerController {camera} {scene} {updateMoveDirection} {updateRotationDirection} />
+  <canvas bind:this={gameCanvas} />
+  <World world={$game.world} scene={gameScene} on:lightChanged={handleLightChanged} />
+  <PlayerController
+    camera={gameCamera}
+    scene={gameScene}
+    {updateFrontMoveDirection}
+    {updateSideMoveDirection}
+    {updateRotationDirection}
+  />
 
   {#each $game.players as player}
     <Character
+      {shadowGenerator}
+      {gui}
       assetContainer={playerAssetContainer}
       character={player}
-      camera={player.id === $activePlayerId ? camera : undefined}
+      camera={player.id === $activePlayerId ? gameCamera : undefined}
     />
   {/each}
 
   {#each $game.nests as nest}
     {#each nest.monsters as monster}
-      <Character assetContainer={monsterAssetContainer} character={monster} />
+      <Character
+        {shadowGenerator}
+        {gui}
+        assetContainer={monsterAssetContainer}
+        character={monster}
+      />
     {/each}
   {/each}
 </div>
