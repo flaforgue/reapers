@@ -14,12 +14,12 @@ export default class MovableEntity extends PositionableEntity {
   public rotationDirection: RotationDirection = RotationDirection.None;
 
   public constructor(
-    scene: BABYLON.Scene,
     name: string,
-    position = [0, 0, 0],
-    rotation = [0, 0, 0],
+    mesh: BABYLON.Mesh,
+    position?: number[],
+    rotation?: number[],
   ) {
-    super(scene, position, rotation);
+    super(mesh, position, rotation);
     this.name = name;
   }
 
@@ -68,6 +68,6 @@ export default class MovableEntity extends PositionableEntity {
       rotationAmount = config.rotationStep;
     }
 
-    this._mesh?.rotatePOV(0, BABYLON.Tools.ToRadians(rotationAmount), 0);
+    this._mesh.rotatePOV(0, BABYLON.Tools.ToRadians(rotationAmount), 0);
   }
 }

@@ -38,7 +38,19 @@ export default class NestEntity<T extends MonsterEntity> extends PositionableEnt
     position = [0, 0, 0],
     rotation = [0, 0, 0],
   ) {
-    super(scene, position, rotation);
+    super(
+      BABYLON.MeshBuilder.CreateBox(
+        EntityKind.Nest,
+        {
+          height: 0,
+          width: 0,
+          depth: 0,
+        },
+        scene,
+      ),
+      position,
+      rotation,
+    );
     this._kind = EntityKind.Nest;
     this._configs = configs;
   }

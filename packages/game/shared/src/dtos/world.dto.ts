@@ -1,10 +1,8 @@
 import { Exclude, Expose } from 'class-transformer';
+import PositionableDTO from './common/positionable.dto';
 
 @Exclude()
-export default class WorldDTO {
-  @Expose()
-  public id: string | null = null;
-
+export default class WorldDTO extends PositionableDTO {
   @Expose()
   public width = 0;
 

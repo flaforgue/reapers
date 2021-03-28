@@ -3,22 +3,23 @@ import BaseEntity from './base.entity';
 
 export default class PositionableEntity extends BaseEntity {
   protected readonly _mesh: BABYLON.Mesh;
+  public readonly halfHeight: number;
 
-  public constructor(scene: BABYLON.Scene, position = [0, 0, 0], rotation = [0, 0, 0]) {
+  public constructor(mesh: BABYLON.Mesh, position = [0, 0, 0], rotation = [0, 0, 0]) {
     super();
-    this._mesh = BABYLON.MeshBuilder.CreateSphere(
-      this.id,
-      {
-        diameter: 0.1,
-      },
-      scene,
+    this._mesh = mesh;
+    this.halfHeight = this._mesh.getBoundingInfo().boundingBox.extendSize.y;
+    this._mesh.position = new BABYLON.Vector3(
+      position[0],
+      position[1] + this.halfHeight,
+      position[2],
     );
-    this._mesh.position = new BABYLON.Vector3(...position);
+
     this._mesh.rotation = new BABYLON.Vector3(...rotation);
   }
 
   public get position() {
-    return this._mesh.position.asArray();
+    return this._mesh.position.add(new BABYLON.Vector3(0, -this.halfHeight, 0)).asArray();
   }
 
   public get rotation() {

@@ -147,7 +147,7 @@ export default class GameEntity extends BaseEntity {
       throw new Error('Game is full');
     }
 
-    const player = new PlayerEntity(socket, this._scene, name, [0, 3, 0]);
+    const player = new PlayerEntity(socket, this._scene, name, [0, 2, 0]);
     this._players.push(player);
     console.info(
       `Player ${name} - ${player.id} created (${this._players.length}/${config.nbMaxPlayers})`,

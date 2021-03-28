@@ -6,8 +6,27 @@ import MovableEntity from './shared/movable.entity';
 export default class PlayerEntity extends MovableEntity {
   private readonly _socket: SocketIO.Socket;
 
-  public constructor(socket: SocketIO.Socket, scene: BABYLON.Scene, name: string) {
-    super(scene, name);
+  public constructor(
+    socket: SocketIO.Socket,
+    scene: BABYLON.Scene,
+    name: string,
+    position?: number[],
+    rotation?: number[],
+  ) {
+    super(
+      name,
+      BABYLON.MeshBuilder.CreateBox(
+        EntityKind.Player,
+        {
+          height: 1,
+          width: 0.5,
+          depth: 0.5,
+        },
+        scene,
+      ),
+      position,
+      rotation,
+    );
     this._kind = EntityKind.Player;
     this._socket = socket;
   }

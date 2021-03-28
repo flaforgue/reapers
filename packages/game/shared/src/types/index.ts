@@ -45,7 +45,8 @@ export enum SideMoveDirection {
 
 export enum EntityKind {
   Unknown = 'Unknown',
+  Nest = 'Nest',
+  World = 'World',
   Player = 'Player',
   Spider = 'Spider',
-  Nest = 'Nest',
 }
