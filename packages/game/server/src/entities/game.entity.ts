@@ -1,6 +1,6 @@
 import SocketIO from 'socket.io';
 import * as BABYLON from 'babylonjs';
-import * as cannon from 'cannon';
+import cannon from 'cannon';
 import { GameDTO, GameEvents, plainToClass } from '@reapers/game-shared';
 import config from '../config';
 import PlayerEntity from './player.entity';
@@ -40,16 +40,22 @@ export default class GameEntity extends BaseEntity {
   private _immediateReference: NodeJS.Immediate | null = null;
   private readonly _engine: BABYLON.Engine;
   private readonly _scene: BABYLON.Scene;
+  private readonly _physicsEngine: BABYLON.CannonJSPlugin;
 
   public constructor(namespace: SocketIO.Namespace) {
     super();
     this._namespace = namespace;
-    this._engine = new BABYLON.NullEngine();
+    this._engine = new BABYLON.NullEngine({
+      deterministicLockstep: true,
+      lockstepMaxSteps: 4,
+      renderHeight: 512,
+      renderWidth: 512,
+      textureSize: 512,
+    });
     this._scene = new BABYLON.Scene(this._engine);
-    this._scene.enablePhysics(
-      new BABYLON.Vector3(0, -9.81, 0),
-      new BABYLON.CannonJSPlugin(true, 10, cannon),
-    );
+    this._physicsEngine = new BABYLON.CannonJSPlugin(false, undefined, cannon);
+    this._scene.enablePhysics(null, new BABYLON.CannonJSPlugin(false, undefined, cannon));
+    this._physicsEngine.setTimeStep(1 / config.fps);
 
     this._world = new WorldEntity(this._scene, 50, 50);
     this._nests = [

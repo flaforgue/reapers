@@ -29,6 +29,12 @@ export default class PlayerEntity extends MovableEntity {
     );
     this._kind = EntityKind.Player;
     this._socket = socket;
+    this._mesh.physicsImpostor = new BABYLON.PhysicsImpostor(
+      this._mesh,
+      BABYLON.PhysicsImpostor.BoxImpostor,
+      { mass: 2, friction: 0.0, restitution: 0.0 },
+      scene,
+    );
   }
 
   public updateAndEmitGameState(gameDto: GameDTO) {
