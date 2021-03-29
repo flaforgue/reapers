@@ -1,13 +1,13 @@
 import { Exclude, Expose, Type } from 'class-transformer';
 import NestDTO from './nest.dto';
-import PlayerDTO from './player.dto';
+import CharacterDTO from './common/character.dto';
 import WorldDTO from './world.dto';
 
 @Exclude()
 export default class GameDTO {
   @Expose()
-  @Type(() => PlayerDTO)
-  public players: PlayerDTO[] = [];
+  @Type(() => CharacterDTO)
+  public players: CharacterDTO[] = [];
 
   @Expose()
   @Type(() => NestDTO)

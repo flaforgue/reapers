@@ -8,6 +8,7 @@ import MonsterEntity from './monsters/monster.entity';
 import SpiderEntity from './monsters/spider.entity';
 import BaseEntity from './shared/base.entity';
 import NestEntity from './nest.entity';
+import FrogEntity from './monsters/frog.entity';
 
 enum GameState {
   Started,
@@ -61,10 +62,16 @@ export default class GameEntity extends BaseEntity {
     this._world = new WorldEntity(this._scene, 50, 50);
     this._nests = [
       new NestEntity<SpiderEntity>(this._scene, {
-        nestRadius: 5,
+        nestRadius: 10,
         instanceClass: SpiderEntity,
-        maxNbInstances: 10,
-        instantiationInterval: 0,
+        maxNbInstances: 3,
+        instantiationInterval: 1,
+      }),
+      new NestEntity<FrogEntity>(this._scene, {
+        nestRadius: 10,
+        instanceClass: FrogEntity,
+        maxNbInstances: 3,
+        instantiationInterval: 1,
       }),
     ];
 

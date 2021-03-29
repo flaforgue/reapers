@@ -1,17 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
-import { EntityKind } from '@reapers/game-client';
-import { labelPositions } from '../../configs/characters';
-
-enum UnknownAnimationKey {
-  Idle = 0,
-  Walk = 1,
-}
-
-enum NestAnimationKey {
-  Idle = 0,
-  Walk = 1,
-}
+import { CharacterKind } from '@reapers/game-client';
 
 enum PlayerAnimationKey {
   Defeat = 0,
@@ -34,18 +23,20 @@ enum SpiderAnimationKey {
   Walk = 3,
 }
 
-type AnyAnimationKey =
+enum FrogAnimationKey {
+  Idle = 0,
+  Walk = 1,
+}
+
+type CharacterAnimationKey =
   | typeof PlayerAnimationKey
   | typeof SpiderAnimationKey
-  | typeof UnknownAnimationKey
-  | typeof NestAnimationKey;
+  | typeof FrogAnimationKey;
 
-const animationKeys: Record<EntityKind, AnyAnimationKey> = {
-  [EntityKind.Unknown]: UnknownAnimationKey,
-  [EntityKind.World]: UnknownAnimationKey,
-  [EntityKind.Nest]: NestAnimationKey,
-  [EntityKind.Player]: PlayerAnimationKey,
-  [EntityKind.Spider]: SpiderAnimationKey,
+const animationKeys: Record<CharacterKind, CharacterAnimationKey> = {
+  [CharacterKind.Player]: PlayerAnimationKey,
+  [CharacterKind.Spider]: SpiderAnimationKey,
+  [CharacterKind.Frog]: FrogAnimationKey,
 };
 
 function worldToScreen(
@@ -63,9 +54,15 @@ function worldToScreen(
   );
 }
 
+const labelPositions: Record<CharacterKind, number> = {
+  [CharacterKind.Player]: 1.4,
+  [CharacterKind.Spider]: 1,
+  [CharacterKind.Frog]: 1,
+};
+
 function createLabel(
   name: string,
-  kind: EntityKind,
+  kind: CharacterKind,
   parent: BABYLON.TransformNode,
   gui: GUI.AdvancedDynamicTexture,
 ) {

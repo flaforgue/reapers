@@ -1,9 +1,9 @@
 import SocketIO from 'socket.io';
 import * as BABYLON from 'babylonjs';
-import { EntityKind, GameDTO, GameEvents } from '@reapers/game-shared';
-import MovableEntity from './shared/movable.entity';
+import { CharacterKind, GameDTO, GameEvents } from '@reapers/game-shared';
+import CharacterEntity from './shared/character.entity';
 
-export default class PlayerEntity extends MovableEntity {
+export default class PlayerEntity extends CharacterEntity {
   private readonly _socket: SocketIO.Socket;
 
   public constructor(
@@ -16,7 +16,7 @@ export default class PlayerEntity extends MovableEntity {
     super(
       name,
       BABYLON.MeshBuilder.CreateBox(
-        EntityKind.Player,
+        CharacterKind.Player,
         {
           height: 1,
           width: 0.5,
@@ -27,10 +27,10 @@ export default class PlayerEntity extends MovableEntity {
       position,
       rotation,
     );
-    this._kind = EntityKind.Player;
     this._socket = socket;
-    this._mesh.ellipsoid = new BABYLON.Vector3(0.5, 0.5, 0.5);
+    this._mesh.ellipsoid = new BABYLON.Vector3(0.5, 0.45, 0.5);
     this._mesh.checkCollisions = true;
+    this._kind = CharacterKind.Player;
   }
 
   public updateAndEmitGameState(gameDto: GameDTO) {

@@ -3,7 +3,7 @@ import * as http from 'http';
 import express from 'express';
 import { registerPlayerHandlers, registerSystemHandlers } from './handlers';
 import config from './config';
-import { GameEvents, plainToClass, PlayerDTO } from '@reapers/game-shared';
+import { GameEvents, plainToClass, CharacterDTO } from '@reapers/game-shared';
 import { GameEntity } from './entities';
 
 const port = config.port;
@@ -32,7 +32,7 @@ io.on(GameEvents.System.Connection, (socket: SocketIO.Socket) => {
         registerSystemHandlers(socket, player, game);
         registerPlayerHandlers(socket, player);
 
-        socket.emit(GameEvents.Player.Created, plainToClass(PlayerDTO, player));
+        socket.emit(GameEvents.Player.Created, plainToClass(CharacterDTO, player));
       } catch (e) {
         console.error(e);
       }

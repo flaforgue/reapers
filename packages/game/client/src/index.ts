@@ -1,14 +1,13 @@
 import socketIOClient from 'socket.io-client';
 import { writable } from 'svelte/store';
 import {
-  EntityKind,
-  MovableDTO,
+  CharacterKind,
+  EnvironmentKind,
+  CharacterDTO,
   GameDTO,
   GameEvents,
-  MonsterDTO,
   FrontMoveDirection,
   SideMoveDirection,
-  PlayerDTO,
   RotationDirection,
   WorldDTO,
 } from '@reapers/game-shared';
@@ -42,7 +41,7 @@ function useGame(serverUrl: string) {
   if (socket?.io?.uri != serverUrl) {
     socket?.disconnect();
     socket = socketIOClient(serverUrl);
-    socket.on(GameEvents.Player.Created, (player: PlayerDTO) => {
+    socket.on(GameEvents.Player.Created, (player: CharacterDTO) => {
       activePlayerId.set(player.id);
     });
 
@@ -64,10 +63,9 @@ export {
   activePlayerId,
   game,
   useGame,
-  EntityKind,
-  MovableDTO,
-  MonsterDTO,
-  PlayerDTO,
+  CharacterKind,
+  EnvironmentKind,
+  CharacterDTO,
   GameDTO,
   WorldDTO,
   GameEvents,

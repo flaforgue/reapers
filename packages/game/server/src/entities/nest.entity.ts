@@ -1,5 +1,5 @@
 import * as BABYLON from 'babylonjs';
-import { EntityKind } from '@reapers/game-shared';
+import { EnvironmentKind } from '@reapers/game-shared';
 import PositionableEntity from './shared/positionable.entity';
 import MonsterEntity from './monsters/monster.entity';
 import config from '../config';
@@ -40,7 +40,7 @@ export default class NestEntity<T extends MonsterEntity> extends PositionableEnt
   ) {
     super(
       BABYLON.MeshBuilder.CreateBox(
-        EntityKind.Nest,
+        EnvironmentKind.Nest,
         {
           height: 0,
           width: 0,
@@ -51,7 +51,7 @@ export default class NestEntity<T extends MonsterEntity> extends PositionableEnt
       position,
       rotation,
     );
-    this._kind = EntityKind.Nest;
+    this._kind = EnvironmentKind.Nest;
     this._configs = configs;
   }
 

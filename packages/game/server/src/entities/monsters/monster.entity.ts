@@ -1,7 +1,7 @@
 import * as BABYLON from 'babylonjs';
-import MovableEntity from '../shared/movable.entity';
+import CharacterEntity from '../shared/character.entity';
 
-export default class MonsterEntity extends MovableEntity {
+export default class MonsterEntity extends CharacterEntity {
   public constructor(
     name: string,
     mesh: BABYLON.Mesh,

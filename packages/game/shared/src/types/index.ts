@@ -43,10 +43,14 @@ export enum SideMoveDirection {
   Right,
 }
 
-export enum EntityKind {
+export enum CharacterKind {
+  Player = 'Player',
+  Spider = 'Spider',
+  Frog = 'Frog',
+}
+
+export enum EnvironmentKind {
   Unknown = 'Unknown',
   Nest = 'Nest',
   World = 'World',
-  Player = 'Player',
-  Spider = 'Spider',
 }

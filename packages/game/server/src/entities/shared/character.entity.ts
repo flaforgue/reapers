@@ -3,6 +3,7 @@ import {
   FrontMoveDirection,
   SideMoveDirection,
   RotationDirection,
+  CharacterKind,
 } from '@reapers/game-shared';
 import config from '../../config';
 import PositionableEntity from './positionable.entity';
@@ -11,8 +12,9 @@ const SPEED = new BABYLON.Vector3(config.moveStep, config.moveStep, config.moveS
 const LOW_SPEED = SPEED.multiply(
   new BABYLON.Vector3(Math.SQRT1_2, Math.SQRT1_2, Math.SQRT1_2),
 );
-export default class MovableEntity extends PositionableEntity {
+export default class CharacterEntity extends PositionableEntity {
   public readonly name: string;
+  protected _kind: CharacterKind = CharacterKind.Player;
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
   public rotationDirection: RotationDirection = RotationDirection.None;
@@ -25,6 +27,10 @@ export default class MovableEntity extends PositionableEntity {
   ) {
     super(mesh, position, rotation);
     this.name = name;
+  }
+
+  public get kind(): CharacterKind {
+    return this._kind;
   }
 
   public update() {

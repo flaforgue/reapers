@@ -26,14 +26,18 @@ export function createCamera(scene: BABYLON.Scene) {
     new BABYLON.Vector3(0, 2, -2),
     scene,
   );
-  camera.cameraAcceleration = 0.5;
-  camera.lowerRadiusLimit = 2;
-  camera.radius = 5;
-  camera.upperRadiusLimit = 5;
-  camera.lowerHeightOffsetLimit = 1;
-  camera.heightOffset = 3;
-  camera.upperHeightOffsetLimit = 4;
+
   camera.rotationOffset = 0;
+  camera.cameraAcceleration = 0.5;
+
+  camera.lowerRadiusLimit = 3;
+  camera.radius = 6;
+  camera.upperRadiusLimit = 8;
+
+  camera.lowerHeightOffsetLimit = 0.8;
+  camera.heightOffset = 4;
+  camera.upperHeightOffsetLimit = 5;
+
   camera.attachControl(true);
 
   return camera;

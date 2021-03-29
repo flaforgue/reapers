@@ -4,7 +4,7 @@
   import {
     SideMoveDirection,
     FrontMoveDirection,
-    MovableDTO,
+    CharacterDTO,
   } from '@reapers/game-client';
   import { disposeArray } from '../../utils';
   import { onDestroy } from 'svelte';
@@ -13,7 +13,7 @@
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
   export let camera: BABYLON.FollowCamera | undefined = undefined;
-  export let character: MovableDTO = new MovableDTO();
+  export let character: CharacterDTO = new CharacterDTO();
   export let gui: GUI.AdvancedDynamicTexture | undefined;
   export let shadowGenerator: BABYLON.ShadowGenerator | undefined;
 
@@ -53,7 +53,7 @@
     }
   }
 
-  function loadAssetContainer() {
+  function instantiateModels() {
     const entries = assetContainer?.instantiateModelsToScene();
 
     skeletons = entries?.skeletons ?? [];
@@ -63,9 +63,10 @@
     shadowGenerator?.addShadowCaster(rootNodes[0] as AbstractMesh);
   }
 
+  $: isAssetContainerReady = Boolean(assetContainer);
   $: {
-    if (assetContainer) {
-      loadAssetContainer();
+    if (isAssetContainerReady) {
+      instantiateModels();
     }
   }
 
