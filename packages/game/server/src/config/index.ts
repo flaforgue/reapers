@@ -9,5 +9,5 @@ export default {
   fps,
   moveStep: 0.07,
   rotationStep: 2,
-  gravity: -9.81 / fps,
+  gravity: -1,
 };
