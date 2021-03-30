@@ -25,4 +25,8 @@ export default class PositionableEntity extends BaseEntity {
   public get rotation() {
     return this._mesh.rotation.asArray();
   }
+
+  public dispose() {
+    this._mesh.dispose();
+  }
 }

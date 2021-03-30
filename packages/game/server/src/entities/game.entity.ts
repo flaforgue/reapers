@@ -61,18 +61,8 @@ export default class GameEntity extends BaseEntity {
 
     this._world = new WorldEntity(this._scene, 50, 50);
     this._nests = [
-      new NestEntity<SpiderEntity>(this._scene, {
-        nestRadius: 10,
-        instanceClass: SpiderEntity,
-        maxNbInstances: 3,
-        instantiationInterval: 1,
-      }),
-      new NestEntity<FrogEntity>(this._scene, {
-        nestRadius: 10,
-        instanceClass: FrogEntity,
-        maxNbInstances: 3,
-        instantiationInterval: 1,
-      }),
+      new NestEntity<SpiderEntity>(this._scene, SpiderEntity, 10, 1, 3),
+      new NestEntity<FrogEntity>(this._scene, FrogEntity, 10, 1, 3),
     ];
 
     this._scene.executeWhenReady(() => {
@@ -81,6 +71,10 @@ export default class GameEntity extends BaseEntity {
           if (this._state === GameState.Started) {
             this._update();
             this._scene.render();
+            // console.log(
+            //   this._scene.meshes.length,
+            //   this._scene.meshes.map((m) => m.name),
+            // );
           }
         } catch (err) {
           console.error(err);
@@ -149,10 +143,11 @@ export default class GameEntity extends BaseEntity {
     return player;
   }
 
-  public removePlayer(playerId: string) {
+  public removePlayer(player: PlayerEntity) {
     console.info(
-      `Player ${playerId} left (${this._players.length}/${config.nbMaxPlayers})`,
+      `Player ${player.id} left (${this._players.length}/${config.nbMaxPlayers})`,
     );
-    removeFromArrayById(this._players, playerId);
+    player.dispose();
+    removeFromArrayById(this._players, player.id);
   }
 }

@@ -5,7 +5,7 @@ import { GameEntity, PlayerEntity } from '../../entities';
 export default (socket: Socket, player: PlayerEntity, game: GameEntity) => {
   socket.on(GameEvents.System.Disconnect, (reason) => {
     console.info(`Player disconnected: ${reason}`);
-    game.removePlayer(player.id);
+    game.removePlayer(player);
     socket.broadcast.emit(GameEvents.Player.Deleted, plainToClass(CharacterDTO, player));
   });
 };
