@@ -17,6 +17,5 @@ export default class WorldEntity extends PositionableEntity {
     this.depth = depth;
     this.width = width;
     this._mesh.checkCollisions = true;
-    this._kind = EnvironmentKind.World;
   }
 }
