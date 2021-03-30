@@ -2,11 +2,13 @@ import * as BABYLON from '@babylonjs/core';
 
 export function createLight(scene: BABYLON.Scene) {
   const light = new BABYLON.DirectionalLight(
-    'DirectionalLight',
-    new BABYLON.Vector3(0, -1, 0),
+    'directionalLight',
+    new BABYLON.Vector3(0, -10, 0),
     scene,
   );
-  light.position = new BABYLON.Vector3(0, 100, 0);
+  // light.position = new BABYLON.Vector3(0, 30, 0);
+  // light.autoUpdateExtends = true;
+  // light.autoCalcShadowZBounds = true;
 
   return light;
 }

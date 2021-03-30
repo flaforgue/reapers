@@ -8,6 +8,6 @@ export default {
   nbMaxPlayers: 100,
   fps,
   moveStep: 0.07,
-  rotationStep: 2,
+  rotationStep: 0.035,
   gravity: -1,
 };

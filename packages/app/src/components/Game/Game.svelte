@@ -33,7 +33,6 @@
         `characters/${kind}.glb`,
         gameScene,
         (result) => {
-          console.log('Getting result for ', kind);
           result.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
           result.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
           for (let i = 0; i < result.animationGroups.length; i++) {
@@ -41,7 +40,6 @@
           }
 
           characterAssetContainers[kind] = result;
-          console.log('updating characterAssetContainers');
         },
       );
     }
@@ -82,7 +80,6 @@
     window.addEventListener('resize', handleResize);
 
     return () => {
-      console.log('leaving');
       leaveGame();
 
       for (let kind in characterAssetContainers) {
@@ -107,7 +104,7 @@
 
   function handleLightChanged(details: CustomEvent<BABYLON.DirectionalLight>) {
     shadowGenerator?.dispose();
-    shadowGenerator = new BABYLON.ShadowGenerator(4096, details.detail);
+    shadowGenerator = new BABYLON.ShadowGenerator(1024, details.detail);
     shadowGenerator.usePercentageCloserFiltering = true;
     shadowGenerator.filteringQuality = BABYLON.ShadowGenerator.QUALITY_LOW;
     shadowGenerator.setDarkness(0.6);

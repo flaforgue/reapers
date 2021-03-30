@@ -63,8 +63,6 @@
 
 <style>
   .Chat {
-    --input-height: 30px;
-
     position: absolute;
     z-index: var(--chat-z-index);
     font-size: 1rem;
@@ -75,10 +73,16 @@
     color: var(--color-grey);
     background-color: rgba(var(--color-black-rgb), var(--default-ui-opacity));
     border-top-right-radius: var(--default-border-radius);
+    transition: background-color var(--default-transition-duration);
+  }
+
+  .Chat:hover {
+    background-color: rgba(var(--color-black-rgb), calc(1.5 * var(--default-ui-opacity)));
   }
 
   .messagesContainer {
-    height: calc(100% - var(--input-height));
+    padding: 0.4rem;
+    height: calc(100% - 30px - 0.8rem);
     overflow: scroll;
   }
 
@@ -91,7 +95,7 @@
   }
 
   .inputContainer {
-    height: var(--input-height);
+    height: 30px;
     width: calc(100% - 8px);
   }
 

@@ -61,8 +61,8 @@ export default class GameEntity extends BaseEntity {
 
     this._world = new WorldEntity(this._scene, 50, 50);
     this._nests = [
-      new NestEntity<SpiderEntity>(this._scene, SpiderEntity, 10, 1, 3),
-      new NestEntity<FrogEntity>(this._scene, FrogEntity, 10, 1, 3),
+      new NestEntity<SpiderEntity>(this._scene, SpiderEntity, 1, 0, 1),
+      // new NestEntity<FrogEntity>(this._scene, FrogEntity, 1, 0, 1),
     ];
 
     this._scene.executeWhenReady(() => {

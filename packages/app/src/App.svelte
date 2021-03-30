@@ -28,7 +28,9 @@
 
     --default-border-radius: 4px;
     --default-transition: 0.2s;
-    --default-ui-opacity: 0.6;
+    --default-ui-opacity: 0.25;
+
+    --default-transition-duration: 0.2s;
 
     --game-z-index: 0;
     --chat-z-index: 1;

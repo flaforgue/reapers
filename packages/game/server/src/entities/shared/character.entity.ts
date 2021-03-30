@@ -77,6 +77,10 @@ export default class CharacterEntity extends PositionableEntity {
       rotationAmount = config.rotationStep;
     }
 
-    this._mesh.rotatePOV(0, BABYLON.Tools.ToRadians(rotationAmount), 0);
+    this._mesh.rotatePOV(0, rotationAmount, 0);
+  }
+
+  public setRotation(rotationY: number) {
+    this._mesh.rotation.y = rotationY;
   }
 }

@@ -6,6 +6,10 @@ import config from './config';
 import { GameEvents, plainToClass, CharacterDTO } from '@reapers/game-shared';
 import { GameEntity } from './entities';
 
+process.once('SIGUSR2', function () {
+  process.kill(process.pid, 'SIGUSR2');
+});
+
 const port = config.port;
 const app = express();
 const httpServer = http.createServer(app);
