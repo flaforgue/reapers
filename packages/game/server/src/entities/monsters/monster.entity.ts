@@ -21,10 +21,7 @@ export default class MonsterEntity extends CharacterEntity {
 
     this._initialPosition = this._mesh.position.clone();
     this._destination = this._mesh.position.clone();
-    this._scheduledMoveAction = new ActionScheduler(
-      () => this._findNewDestination(),
-      0.1,
-    );
+    this._scheduledMoveAction = new ActionScheduler(() => this._findNewDestination(), 10);
   }
 
   public get destination() {
