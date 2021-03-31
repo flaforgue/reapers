@@ -14,6 +14,7 @@ const LOW_SPEED = SPEED.multiply(
 );
 export default class CharacterEntity extends PositionableEntity {
   public readonly name: string;
+  protected readonly _shouldMoveWithCollisions: boolean = true;
   protected _kind: CharacterKind = CharacterKind.Player;
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
@@ -34,11 +35,16 @@ export default class CharacterEntity extends PositionableEntity {
   }
 
   public update() {
-    this._updatePosition();
+    if (this._shouldMoveWithCollisions) {
+      this._moveWithCollisions();
+    } else {
+      this._moveWithoutCollisions();
+    }
+
     this._updateRotation();
   }
 
-  private _updatePosition() {
+  private _moveWithCollisions() {
     const move = new BABYLON.Vector3(0, config.gravity, 0);
     let isMovingFront = true;
 
@@ -66,6 +72,37 @@ export default class CharacterEntity extends PositionableEntity {
     this._mesh.moveWithCollisions(
       move.multiply(isMovingFront && isMovingSide ? LOW_SPEED : SPEED),
     );
+  }
+
+  private _moveWithoutCollisions() {
+    let isMovingFront = true;
+    let isMovingSide = true;
+    let amountRight = 0;
+    let amountUp = 0;
+    let amountForward = 0;
+
+    if (this.frontMoveDirection === FrontMoveDirection.Forward) {
+      amountForward = config.moveStep;
+    } else if (this.frontMoveDirection === FrontMoveDirection.Backward) {
+      amountForward = config.moveStep * -1;
+    } else {
+      isMovingFront = false;
+    }
+
+    if (this.sideMoveDirection === SideMoveDirection.Right) {
+      amountRight = config.moveStep;
+    } else if (this.sideMoveDirection === SideMoveDirection.Left) {
+      amountRight = config.moveStep * -1;
+    } else {
+      isMovingSide = false;
+    }
+
+    if (isMovingFront && isMovingSide) {
+      amountRight *= Math.SQRT1_2;
+      amountForward *= Math.SQRT1_2;
+    }
+
+    this._mesh.movePOV(amountRight, amountUp, amountForward);
   }
 
   private _updateRotation() {

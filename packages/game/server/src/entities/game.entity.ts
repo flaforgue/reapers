@@ -4,7 +4,6 @@ import { GameDTO, GameEvents, plainToClass } from '@reapers/game-shared';
 import config from '../config';
 import PlayerEntity from './player.entity';
 import WorldEntity from './world.entity';
-import MonsterEntity from './monsters/monster.entity';
 import SpiderEntity from './monsters/spider.entity';
 import BaseEntity from './shared/base.entity';
 import NestEntity from './nest.entity';
@@ -33,7 +32,7 @@ export default class GameEntity extends BaseEntity {
   private _state = GameState.Stopped;
   private _world: WorldEntity;
   private _players: PlayerEntity[] = [];
-  private _nests: NestEntity<MonsterEntity>[] = [];
+  private _nests: NestEntity[] = [];
   private _frameIndex = 0;
   private readonly _engine: BABYLON.Engine;
   private readonly _scene: BABYLON.Scene;
@@ -61,8 +60,8 @@ export default class GameEntity extends BaseEntity {
 
     this._world = new WorldEntity(this._scene, 50, 50);
     this._nests = [
-      new NestEntity<SpiderEntity>(this._scene, SpiderEntity, 1, 0, 1),
-      // new NestEntity<FrogEntity>(this._scene, FrogEntity, 1, 0, 1),
+      new NestEntity(this._scene, SpiderEntity, 10, 0, 50),
+      new NestEntity(this._scene, FrogEntity, 10, 0, 50),
     ];
 
     this._scene.executeWhenReady(() => {
@@ -71,10 +70,6 @@ export default class GameEntity extends BaseEntity {
           if (this._state === GameState.Started) {
             this._update();
             this._scene.render();
-            // console.log(
-            //   this._scene.meshes.length,
-            //   this._scene.meshes.map((m) => m.name),
-            // );
           }
         } catch (err) {
           console.error(err);

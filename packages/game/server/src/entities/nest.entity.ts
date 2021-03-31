@@ -5,40 +5,28 @@ import MonsterEntity from './monsters/monster.entity';
 import ActionScheduler from './shared/action-scheduler';
 import { getRandomPosition, getRandomRotation } from './shared/utils';
 
-type Constructor<T extends MonsterEntity> = new (
+type MonsterConstructor<T extends MonsterEntity = MonsterEntity> = new (
   scene: BABYLON.Scene,
   position: number[],
   rotation: number[],
 ) => T;
-export default class NestEntity<T extends MonsterEntity> extends PositionableEntity {
+export default class NestEntity extends PositionableEntity {
   private readonly _createMonsterScheduler: ActionScheduler;
   private readonly _nbMaxInstances: number;
   private readonly _radius: number;
-  private readonly _instanceClass: Constructor<T>;
+  private readonly _instanceClass: MonsterConstructor;
   private _monsters: MonsterEntity[] = [];
 
   public constructor(
     scene: BABYLON.Scene,
-    instanceClass: Constructor<T>,
+    instanceClass: MonsterConstructor,
     radius: number,
     interval: number,
     nbMaxInstances: number,
     position = [0, 0, 0],
     rotation = [0, 0, 0],
   ) {
-    super(
-      BABYLON.MeshBuilder.CreateBox(
-        EnvironmentKind.Nest,
-        {
-          height: 0,
-          width: 0,
-          depth: 0,
-        },
-        scene,
-      ),
-      position,
-      rotation,
-    );
+    super(new BABYLON.Mesh(EnvironmentKind.Nest, scene), position, rotation);
     this._radius = radius;
     this._instanceClass = instanceClass;
     this._nbMaxInstances = nbMaxInstances;

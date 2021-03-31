@@ -2,12 +2,13 @@ import * as BABYLON from 'babylonjs';
 import BaseEntity from './base.entity';
 
 export default class PositionableEntity extends BaseEntity {
-  protected readonly _mesh: BABYLON.Mesh;
   public readonly halfHeight: number;
+  protected readonly _mesh: BABYLON.Mesh;
 
   public constructor(mesh: BABYLON.Mesh, position = [0, 0, 0], rotation = [0, 0, 0]) {
     super();
     this._mesh = mesh;
+
     this.halfHeight = this._mesh.getBoundingInfo().boundingBox.extendSize.y;
     this._mesh.position = new BABYLON.Vector3(
       position[0],

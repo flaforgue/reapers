@@ -110,6 +110,17 @@
     }
   }
 
+  // $: destination = (character as MonsterDTO).destination;
+  // $: [destX, destY, destZ] = destination ?? [0, 0, 0];
+  // $: {
+  //   if (destX || destY || destZ) {
+  //     const mesh = BABYLON.MeshBuilder.CreateBox('destination', {
+  //       size: 0.3,
+  //     });
+  //     mesh.position = new BABYLON.Vector3(destX, destY, destZ);
+  //   }
+  // }
+
   onDestroy(() => {
     disposeArray(animationGroups);
     disposeArray(rootNodes);
