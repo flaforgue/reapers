@@ -50,6 +50,7 @@ export function createGround(width: number, depth: number, scene: BABYLON.Scene)
   groundMat.diffuseTexture = texture;
   ground.material = groundMat;
   ground.receiveShadows = true;
+  ground.freezeWorldMatrix();
 
   return ground;
 }

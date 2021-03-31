@@ -1,4 +1,5 @@
 import '@babylonjs/loaders';
+import '@babylonjs/inspector';
 import App from './App.svelte';
 
 const app = new App({

@@ -19,6 +19,7 @@
   "dependencies": {
     "@babylonjs/core": "^4.2.0",
     "@babylonjs/gui": "^4.2.0",
+    "@babylonjs/inspector": "^4.2.0",
     "@babylonjs/loaders": "^4.2.0",
     "@reapers/chat-client": "^0.0.1",
     "@reapers/game-client": "^0.0.1",

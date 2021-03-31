@@ -35,6 +35,13 @@
         (result) => {
           result.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
           result.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
+
+          for (let i = 0; i < result.meshes.length; i++) {
+            result.meshes[i].freezeWorldMatrix();
+            result.meshes[i].cullingStrategy =
+              BABYLON.AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY;
+          }
+
           for (let i = 0; i < result.animationGroups.length; i++) {
             result.animationGroups[i].reset().stop();
           }
@@ -57,20 +64,27 @@
     joinGame($playerName);
     engine = createEngine(gameCanvas as HTMLCanvasElement);
     gameScene = createScene(engine);
-
-    showAxis(10, gameScene);
-
     gameCamera = createCamera(gameScene);
     gui = createGUI();
 
+    // showAxis(10, gameScene);
+    // gameScene.debugLayer.show({
+    //   embedMode: true,
+    // });
+
     loadAssets();
 
-    engine.runRenderLoop(function () {
-      try {
-        gameScene?.render();
-      } catch (err) {
-        console.error(err);
-      }
+    engine.displayLoadingUI();
+
+    gameScene.executeWhenReady(() => {
+      engine?.hideLoadingUI();
+      engine?.runRenderLoop(function () {
+        try {
+          gameScene?.render();
+        } catch (err) {
+          console.error(err);
+        }
+      });
     });
 
     function handleResize() {
@@ -112,9 +126,6 @@
 </script>
 
 <div class="Game">
-  <div class="engineInfos">
-    {engine?.getFps().toFixed()}
-  </div>
   <canvas bind:this={gameCanvas} />
   <World world={$game.world} scene={gameScene} on:lightChanged={handleLightChanged} />
   <PlayerController
@@ -161,14 +172,5 @@
   .Game canvas {
     width: 100%;
     height: 100%;
-  }
-
-  .engineInfos {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 1rem;
-    background-color: rgba(var(--color-black-rgb), 0.3);
-    color: var(--color-white);
   }
 </style>
