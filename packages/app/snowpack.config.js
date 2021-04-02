@@ -21,7 +21,8 @@ module.exports = {
     /* ... */
   },
   devOptions: {
-    /* ... */
+    hmr: false,
+    out: 'dist',
   },
   buildOptions: {
     sourcemap: true,
