@@ -32,6 +32,7 @@
     "@snowpack/plugin-typescript": "^1.2.0",
     "@types/chai": "^4.2.13",
     "@types/mocha": "^8.2.0",
+    "@types/react": "^17.0.3",
     "@types/snowpack-env": "^2.3.2",
     "add": "^2.0.6",
     "chai": "^4.2.0",
