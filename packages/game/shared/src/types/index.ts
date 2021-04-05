@@ -51,6 +51,6 @@ export enum CharacterKind {
 
 export enum EnvironmentKind {
   Unknown = 'Unknown',
-  Nest = 'Nest',
+  MonsterGenerator = 'MonsterGenerator',
   World = 'World',
 }

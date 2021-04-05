@@ -7,6 +7,7 @@ import {
 } from '@reapers/game-shared';
 import config from '../../config';
 import PositionableEntity from './positionable.entity';
+import BoundedValue from './bounded-value';
 
 const SPEED = new BABYLON.Vector3(config.moveStep, config.moveStep, config.moveStep);
 const LOW_SPEED = SPEED.multiply(
@@ -14,24 +15,35 @@ const LOW_SPEED = SPEED.multiply(
 );
 export default class CharacterEntity extends PositionableEntity {
   public readonly name: string;
-  protected readonly _shouldMoveWithCollisions: boolean = true;
-  protected _kind: CharacterKind = CharacterKind.Player;
+  public readonly level: number;
+  public readonly life: BoundedValue;
+
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
   public rotationDirection: RotationDirection = RotationDirection.None;
 
+  protected readonly _shouldMoveWithCollisions: boolean = true;
+  protected _kind: CharacterKind = CharacterKind.Player;
+
   public constructor(
     name: string,
+    level: number,
     mesh: BABYLON.Mesh,
     position?: number[],
     rotation?: number[],
   ) {
     super(mesh, position, rotation);
     this.name = name;
+    this.level = level;
+    this.life = this._createLifeBoudedValue();
   }
 
   public get kind(): CharacterKind {
     return this._kind;
+  }
+
+  protected _createLifeBoudedValue(): BoundedValue {
+    return new BoundedValue();
   }
 
   public update() {

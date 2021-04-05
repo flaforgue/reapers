@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import NestDTO from './nest.dto';
+import MonsterGeneratorDTO from './monster-generator.dto';
 import CharacterDTO from './common/character.dto';
 import WorldDTO from './world.dto';
 
@@ -10,8 +10,8 @@ export default class GameDTO {
   public players: CharacterDTO[] = [];
 
   @Expose()
-  @Type(() => NestDTO)
-  public nests: NestDTO[] = [];
+  @Type(() => MonsterGeneratorDTO)
+  public monsterGenerators: MonsterGeneratorDTO[] = [];
 
   @Expose()
   @Type(() => WorldDTO)

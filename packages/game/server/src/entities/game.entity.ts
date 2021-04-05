@@ -6,7 +6,7 @@ import PlayerEntity from './player.entity';
 import WorldEntity from './world.entity';
 import SpiderEntity from './monsters/spider.entity';
 import BaseEntity from './shared/base.entity';
-import NestEntity from './nest.entity';
+import MonsterGeneratorEntity from './monster-generator.entity';
 import FrogEntity from './monsters/frog.entity';
 
 enum GameState {
@@ -22,17 +22,12 @@ function removeFromArrayById(arr: BaseEntity[], id: string) {
   }
 }
 
-function hrtimeMs() {
-  const time = process.hrtime();
-  return time[0] * 1000 + time[1] / 1000000;
-}
-
 export default class GameEntity extends BaseEntity {
   private _namespace: SocketIO.Namespace;
   private _state = GameState.Stopped;
   private _world: WorldEntity;
   private _players: PlayerEntity[] = [];
-  private _nests: NestEntity[] = [];
+  private _monsterGenerators: MonsterGeneratorEntity[] = [];
   private _frameIndex = 0;
   private readonly _engine: BABYLON.Engine;
   private readonly _scene: BABYLON.Scene;
@@ -59,11 +54,29 @@ export default class GameEntity extends BaseEntity {
     );
 
     this._world = new WorldEntity(this._scene, 50, 50);
-    this._nests = [
-      new NestEntity(this._scene, SpiderEntity, 10, 2, 10),
-      new NestEntity(this._scene, FrogEntity, 10, 4, 10),
-      // new NestEntity(this._scene, SpiderEntity, 25, 0, 200),
-      // new NestEntity(this._scene, FrogEntity, 25, 0, 200),
+    this._monsterGenerators = [
+      new MonsterGeneratorEntity(this._scene, {
+        instanceClass: SpiderEntity,
+        radius: 10,
+        interval: 2,
+        nbMaxInstances: 10,
+        level: {
+          min: 1,
+          max: 5,
+        },
+      }),
+      new MonsterGeneratorEntity(this._scene, {
+        instanceClass: FrogEntity,
+        radius: 10,
+        interval: 4,
+        nbMaxInstances: 10,
+        level: {
+          min: 1,
+          max: 5,
+        },
+      }),
+      // new MonsterGeneratorEntity(this._scene, SpiderEntity, 25, 0, 200),
+      // new MonsterGeneratorEntity(this._scene, FrogEntity, 25, 0, 200),
     ];
 
     this._scene.executeWhenReady(() => {
@@ -86,8 +99,8 @@ export default class GameEntity extends BaseEntity {
     return this._players;
   }
 
-  public get nests() {
-    return this._nests;
+  public get monsterGenerators() {
+    return this._monsterGenerators;
   }
 
   public get world() {
@@ -114,8 +127,8 @@ export default class GameEntity extends BaseEntity {
       this._players[i].updateAndEmitGameState(gameDto);
     }
 
-    for (let i = 0; i < this._nests.length; i++) {
-      this._nests[i].update();
+    for (let i = 0; i < this._monsterGenerators.length; i++) {
+      this._monsterGenerators[i].update();
     }
   }
 

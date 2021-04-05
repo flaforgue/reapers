@@ -3,13 +3,20 @@
   import * as GUI from '@babylonjs/gui';
   import { onMount } from 'svelte';
   import { useGame, game, activePlayerId, CharacterKind } from '@reapers/game-client';
-  import { FocusElement, focusElement, playerName } from '../../stores';
+  import { FocusElement, focusElement, playerName, targetInfos } from '../../stores';
   import { servers } from '../../configs/servers.config';
+  import { Key } from '../../configs/keycodes.config';
   import World from '../World/World.svelte';
   import PlayerController from '../PlayerController/PlayerController.svelte';
-  import { createCamera, createEngine, createGUI, createScene } from './game.utils';
+  import {
+    createBaseActiveMesh,
+    createCamera,
+    createEngine,
+    createGUI,
+    createScene,
+  } from './game.utils';
   import Character from '../Character/Character.svelte';
-  import { showAxis } from '../../utils';
+  // import { showAxis } from '../../utils';
 
   let engine: BABYLON.Engine | undefined;
   let gameCamera: BABYLON.FollowCamera | undefined;
@@ -23,8 +30,15 @@
     [CharacterKind.Spider]: undefined,
     [CharacterKind.Frog]: undefined,
   };
+  let baseActiveMesh: BABYLON.Mesh | undefined;
   let gui: GUI.AdvancedDynamicTexture | undefined;
   let shadowGenerator: BABYLON.ShadowGenerator | undefined;
+
+  function keyboardEventHandler({ type, event }: BABYLON.KeyboardInfo) {
+    if (type === BABYLON.KeyboardEventTypes.KEYDOWN && event.key === Key.Escape) {
+      $targetInfos = null;
+    }
+  }
 
   function loadAssets() {
     for (let kind of Object.values(CharacterKind)) {
@@ -64,6 +78,7 @@
     joinGame($playerName);
     engine = createEngine(gameCanvas as HTMLCanvasElement);
     gameScene = createScene(engine);
+    gameScene.onKeyboardObservable?.add(keyboardEventHandler);
     gameCamera = createCamera(gameScene);
     gui = createGUI();
 
@@ -73,6 +88,7 @@
     // });
 
     loadAssets();
+    baseActiveMesh = createBaseActiveMesh(gameScene);
 
     engine.displayLoadingUI();
 
@@ -138,21 +154,23 @@
 
   {#each $game.players as player}
     <Character
+      character={player}
+      {baseActiveMesh}
       {shadowGenerator}
       {gui}
       assetContainer={characterAssetContainers[player.kind]}
-      character={player}
       camera={player.id === $activePlayerId ? gameCamera : undefined}
     />
   {/each}
 
-  {#each $game.nests as nest}
-    {#each nest.monsters as monster}
+  {#each $game.monsterGenerators as monsterGenerator}
+    {#each monsterGenerator.monsters as monster}
       <Character
+        character={monster}
+        {baseActiveMesh}
         {shadowGenerator}
         {gui}
         assetContainer={characterAssetContainers[monster.kind]}
-        character={monster}
       />
     {/each}
   {/each}

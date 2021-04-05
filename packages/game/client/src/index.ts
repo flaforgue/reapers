@@ -3,6 +3,7 @@ import { writable } from 'svelte/store';
 import {
   CharacterKind,
   EnvironmentKind,
+  BoundedValueDTO,
   CharacterDTO,
   MonsterDTO,
   GameDTO,
@@ -66,6 +67,7 @@ export {
   useGame,
   CharacterKind,
   EnvironmentKind,
+  BoundedValueDTO,
   CharacterDTO,
   MonsterDTO,
   GameDTO,

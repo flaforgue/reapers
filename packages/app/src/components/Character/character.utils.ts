@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
-import { CharacterKind } from '@reapers/game-client';
+import { CharacterDTO, CharacterKind } from '@reapers/game-client';
+import type { CharacterInfos } from '../../stores';
 
 enum PlayerAnimationKey {
   Defeat = 0,
@@ -56,12 +57,18 @@ function worldToScreen(
 
 const labelPositions: Record<CharacterKind, number> = {
   [CharacterKind.Player]: 1.4,
-  [CharacterKind.Spider]: 1,
   [CharacterKind.Frog]: 1,
+  [CharacterKind.Spider]: 1,
+};
+
+const activeMeshRadius: Record<CharacterKind, number> = {
+  [CharacterKind.Player]: 1.5,
+  [CharacterKind.Frog]: 2.5,
+  [CharacterKind.Spider]: 3.5,
 };
 
 function createLabel(
-  name: string,
+  value: string,
   kind: CharacterKind,
   parent: BABYLON.TransformNode,
   gui: GUI.AdvancedDynamicTexture,
@@ -69,10 +76,10 @@ function createLabel(
   const scene = parent.getScene();
   const engine = scene.getEngine();
   const height = labelPositions[kind];
-  const label = new GUI.TextBlock('label', name);
+  const label = new GUI.TextBlock('label', value);
 
   label.color = '#ccc';
-  label.fontSize = 20;
+  label.fontSize = 16;
 
   gui.addControl(label);
 
@@ -91,4 +98,32 @@ function createLabel(
   return label;
 }
 
-export { animationKeys, createLabel };
+function createTargetInfos(character: CharacterDTO | CharacterInfos): CharacterInfos {
+  return {
+    id: character.id,
+    kind: character.kind,
+    level: character.level,
+    name: character.name,
+    life: character.life,
+  };
+}
+
+function createActiveMesh(
+  baseMesh: BABYLON.Mesh,
+  parent: BABYLON.Mesh,
+  kind: CharacterKind,
+  isActive: boolean,
+) {
+  const activeMesh = baseMesh.clone('Clone of activeMesh', parent);
+  activeMesh.setEnabled(true);
+  activeMesh.scaling = new BABYLON.Vector3().setAll(activeMeshRadius[kind]);
+  activeMesh.material = baseMesh.material?.clone('Clone of activeMeshMat') ?? null;
+
+  if (activeMesh.material) {
+    activeMesh.material.alpha = isActive ? 0.5 : 0.1;
+  }
+
+  return activeMesh;
+}
+
+export { animationKeys, createLabel, createTargetInfos, createActiveMesh };

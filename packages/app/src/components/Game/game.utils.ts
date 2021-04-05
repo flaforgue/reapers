@@ -3,8 +3,9 @@ import * as GUI from '@babylonjs/gui';
 
 export function createEngine(canvas: HTMLCanvasElement) {
   return new BABYLON.Engine(canvas, false, {
-    useHighPrecisionFloats: false,
     doNotHandleContextLost: true,
+    useHighPrecisionFloats: false,
+    stencil: true,
   });
 }
 
@@ -14,6 +15,7 @@ export function createScene(engine: BABYLON.Engine) {
     useMaterialMeshMap: true,
     useClonedMeshMap: true,
   });
+
   scene.autoClear = false;
   scene.autoClearDepthAndStencil = false;
 
@@ -48,4 +50,19 @@ export function createGUI() {
   gui.useInvalidateRectOptimization = true;
 
   return gui;
+}
+
+export function createBaseActiveMesh(scene: BABYLON.Scene) {
+  const material = new BABYLON.StandardMaterial('activeMeshMat', scene);
+  material.diffuseColor = new BABYLON.Color3(1, 0.3, 0.1);
+
+  const activeMesh = BABYLON.MeshBuilder.CreateDisc('activeMesh', {
+    radius: 1,
+  });
+  activeMesh.rotate(BABYLON.Axis.X, Math.PI / 2);
+  activeMesh.position = new BABYLON.Vector3(0, 0.001, 0);
+  activeMesh.material = material;
+  activeMesh.setEnabled(false);
+
+  return activeMesh;
 }

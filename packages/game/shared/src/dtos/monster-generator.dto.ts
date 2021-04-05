@@ -4,7 +4,7 @@ import PositionableDTO from './common/positionable.dto';
 import MonsterDTO from './monster.dto';
 
 @Exclude()
-export default class NestDTO extends PositionableDTO {
+export default class MonsterGeneratorDTO extends PositionableDTO {
   @Expose()
   @Type(() => MonsterDTO)
   public monsters: MonsterDTO[] = [];

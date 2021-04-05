@@ -1,7 +1,14 @@
 import 'reflect-metadata';
 
 import { plainToClass } from 'class-transformer';
-import { NestDTO, MonsterDTO, CharacterDTO, GameDTO, WorldDTO } from './dtos';
+import {
+  MonsterGeneratorDTO,
+  MonsterDTO,
+  BoundedValueDTO,
+  CharacterDTO,
+  GameDTO,
+  WorldDTO,
+} from './dtos';
 import {
   EnvironmentKind,
   CharacterKind,
@@ -14,9 +21,10 @@ import {
 export {
   EnvironmentKind,
   CharacterKind,
+  BoundedValueDTO,
   CharacterDTO,
   MonsterDTO,
-  NestDTO,
+  MonsterGeneratorDTO,
   GameDTO,
   GameEvents,
   FrontMoveDirection,

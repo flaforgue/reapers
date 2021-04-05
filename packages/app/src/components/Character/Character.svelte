@@ -7,21 +7,34 @@
     CharacterDTO,
   } from '@reapers/game-client';
   import { disposeArray } from '../../utils';
+  import type { CharacterInfos } from '../../stores';
+  import { targetInfos } from '../../stores';
   import { onDestroy } from 'svelte';
-  import { animationKeys, createLabel } from './character.utils';
-  import { AbstractMesh } from '@babylonjs/core';
+  import {
+    animationKeys,
+    createActiveMesh,
+    createLabel,
+    createTargetInfos,
+  } from './character.utils';
+  import { AbstractMesh, Scene } from '@babylonjs/core';
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
+  export let baseActiveMesh: BABYLON.Mesh | undefined;
   export let camera: BABYLON.FollowCamera | undefined = undefined;
   export let character: CharacterDTO = new CharacterDTO();
   export let gui: GUI.AdvancedDynamicTexture | undefined;
   export let shadowGenerator: BABYLON.ShadowGenerator | undefined;
 
-  let rootNodes: BABYLON.TransformNode[] = [];
+  let rootNode: BABYLON.Mesh | undefined;
+  let rootNodes: BABYLON.Mesh[] = [];
+
   let animationGroups: BABYLON.AnimationGroup[] = [];
   let skeletons: BABYLON.Skeleton[] = [];
   let currentAnimation: BABYLON.AnimationGroup | undefined;
+  let isTarget = false;
   let label: GUI.TextBlock | undefined;
+  let activeMesh: BABYLON.Mesh | undefined;
+  let hoverMesh: BABYLON.Mesh | undefined;
 
   function switchAnimation(animationKey: number) {
     const newAnimation = animationGroups[animationKey];
@@ -34,19 +47,19 @@
   }
 
   function updatePosition(x = 0, y = 0, z = 0) {
-    if (rootNodes[0]) {
-      rootNodes[0].position = new BABYLON.Vector3(x, y, z);
+    if (rootNode) {
+      rootNode.position = new BABYLON.Vector3(x, y, z);
     }
   }
 
   function updateRotation(x = 0, y = 0, z = 0) {
-    if (rootNodes[0]) {
-      rootNodes[0].rotation = new BABYLON.Vector3(x, y, z);
+    if (rootNode) {
+      rootNode.rotation = new BABYLON.Vector3(x, y, z);
     }
   }
 
   function updateAnimation(direction: FrontMoveDirection | SideMoveDirection) {
-    if (rootNodes[0] && direction) {
+    if (rootNode && direction) {
       switchAnimation(animationKeys[character.kind].Walk);
     } else {
       switchAnimation(animationKeys[character.kind].Idle);
@@ -54,19 +67,57 @@
   }
 
   function instantiateModels() {
-    const entries = assetContainer?.instantiateModelsToScene(
-      (sourceName) => `Clone of ${sourceName}`,
-      false,
-      {
-        doNotInstantiate: false,
-      },
-    );
+    const entries = assetContainer?.instantiateModelsToScene();
 
     skeletons = entries?.skeletons ?? [];
-    rootNodes = entries?.rootNodes ?? [];
+    rootNodes = (entries?.rootNodes ?? []) as BABYLON.Mesh[];
+    rootNode = rootNodes[0];
+
+    rootNode.actionManager = new BABYLON.ActionManager(
+      assetContainer?.scene as BABYLON.Scene,
+    );
+    rootNode.actionManager.isRecursive = true;
+    rootNode.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        { trigger: BABYLON.ActionManager.OnPickTrigger },
+        function () {
+          hoverMesh?.dispose();
+          hoverMesh = undefined;
+          setGUITargetInfos(character);
+
+          if (!activeMesh && baseActiveMesh && rootNode) {
+            activeMesh = createActiveMesh(baseActiveMesh, rootNode, kind, true);
+          }
+        },
+      ),
+    );
+    rootNode.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        { trigger: BABYLON.ActionManager.OnPointerOverTrigger },
+        function () {
+          if (!activeMesh && baseActiveMesh && rootNode) {
+            hoverMesh = createActiveMesh(baseActiveMesh, rootNode, kind, false);
+          }
+        },
+      ),
+    );
+    rootNode.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        { trigger: BABYLON.ActionManager.OnPointerOutTrigger },
+        function () {
+          hoverMesh?.dispose();
+          hoverMesh = undefined;
+        },
+      ),
+    );
+
     animationGroups = entries?.animationGroups ?? [];
     animationGroups[animationKeys[character.kind].Walk].speedRatio = 2;
-    shadowGenerator?.addShadowCaster(rootNodes[0] as AbstractMesh);
+    shadowGenerator?.addShadowCaster(rootNode as AbstractMesh);
+  }
+
+  function setGUITargetInfos(character: CharacterDTO | CharacterInfos) {
+    $targetInfos = createTargetInfos(character);
   }
 
   $: isAssetContainerReady = Boolean(assetContainer);
@@ -77,24 +128,25 @@
   }
 
   $: {
-    if (camera && rootNodes[0] && !camera.lockedTarget) {
-      camera.lockedTarget = rootNodes[0] as AbstractMesh;
+    if (camera && rootNode && !camera.lockedTarget) {
+      camera.lockedTarget = rootNode as AbstractMesh;
     }
   }
 
   $: name = character.name;
+  $: level = character.level;
   $: kind = character.kind;
   $: {
-    if (rootNodes[0] && gui && name) {
-      label = createLabel(name, kind, rootNodes[0], gui);
+    if (rootNode && gui && name && level) {
+      label = createLabel(`${name} • ${level}`, kind, rootNode, gui);
     }
   }
 
   $: position = character.position;
   $: [posX, posY, posZ] = position;
   $: {
-    // assetContainer must be part of reactivity deps
-    if (assetContainer) {
+    // isAssetContainerReady must be part of reactivity deps
+    if (isAssetContainerReady) {
       updatePosition(posX, posY, posZ);
     }
   }
@@ -102,8 +154,8 @@
   $: rotation = character.rotation;
   $: [rotX, rotY, rotZ] = rotation;
   $: {
-    // assetContainer must be part of reactivity deps
-    if (assetContainer) {
+    // isAssetContainerReady must be part of reactivity deps
+    if (isAssetContainerReady) {
       updateRotation(rotX, rotY, rotZ);
     }
   }
@@ -111,8 +163,33 @@
   $: frontMoveDirection = character.frontMoveDirection;
   $: sideMoveDirection = character.sideMoveDirection;
   $: {
-    if (assetContainer) {
+    // isAssetContainerReady must be part of reactivity deps
+    if (isAssetContainerReady) {
       updateAnimation(frontMoveDirection || sideMoveDirection);
+    }
+  }
+
+  $: isTarget = $targetInfos?.id === character.id;
+  $: id = character.id;
+  $: minLife = character.life.min;
+  $: maxLife = character.life.max;
+  $: valueLife = character.life.value;
+  $: {
+    if (isTarget) {
+      setGUITargetInfos({
+        id,
+        kind,
+        name,
+        level,
+        life: {
+          min: minLife,
+          max: maxLife,
+          value: valueLife,
+        },
+      });
+    } else if (activeMesh) {
+      activeMesh.dispose();
+      activeMesh = undefined;
     }
   }
 

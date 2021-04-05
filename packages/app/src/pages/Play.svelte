@@ -5,6 +5,7 @@
   import { Key } from '../configs/keycodes.config';
   import Chat from '../components/Chat/Chat.svelte';
   import Game from '../components/Game/Game.svelte';
+  import GUI from '../components/GUI/GUI.svelte';
 
   if (!String($playerName).length) {
     push('#/');
@@ -30,6 +31,7 @@
 <div class="Play">
   <Chat />
   <Game />
+  <GUI />
 </div>
 
 <style>

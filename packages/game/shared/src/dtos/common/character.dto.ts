@@ -1,16 +1,24 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 import {
   FrontMoveDirection,
   SideMoveDirection,
   RotationDirection,
   CharacterKind,
 } from '../../types';
+import BoundedValueDTO from './bounded-value.dto';
 import PositionableDTO from './positionable.dto';
 
 @Exclude()
 export default class CharacterDTO extends PositionableDTO {
   @Expose()
   public name = '';
+
+  @Expose()
+  public level = 1;
+
+  @Expose()
+  @Type(() => BoundedValueDTO)
+  public life = new BoundedValueDTO();
 
   @Expose()
   public kind: CharacterKind = CharacterKind.Player;

@@ -79,7 +79,7 @@
     background-color: var(--color-blue-pale);
     border-radius: var(--default-border-radius);
     border: none;
-    transition: background-color var(--default-transition);
+    transition: background-color var(--default-transition-duration);
   }
 
   .button:hover {

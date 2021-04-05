@@ -5,34 +5,39 @@ import MonsterEntity from './monsters/monster.entity';
 import ActionScheduler from './shared/action-scheduler';
 import { getRandomPosition, getRandomRotation } from './shared/utils';
 
+type MonsterGeneratorConfig = {
+  instanceClass: MonsterConstructor;
+  radius: number;
+  interval: number;
+  nbMaxInstances: number;
+  level: {
+    min: number;
+    max: number;
+  };
+};
+
 type MonsterConstructor<T extends MonsterEntity = MonsterEntity> = new (
   scene: BABYLON.Scene,
+  level: number,
   position: number[],
   rotation: number[],
 ) => T;
-export default class NestEntity extends PositionableEntity {
+export default class MonsterGeneratorEntity extends PositionableEntity {
   private readonly _createMonsterScheduler: ActionScheduler;
-  private readonly _nbMaxInstances: number;
-  private readonly _radius: number;
-  private readonly _instanceClass: MonsterConstructor;
+  private readonly _config: MonsterGeneratorConfig;
   private _monsters: MonsterEntity[] = [];
 
   public constructor(
     scene: BABYLON.Scene,
-    instanceClass: MonsterConstructor,
-    radius: number,
-    interval: number,
-    nbMaxInstances: number,
+    config: MonsterGeneratorConfig,
     position = [0, 0, 0],
     rotation = [0, 0, 0],
   ) {
-    super(new BABYLON.Mesh(EnvironmentKind.Nest, scene), position, rotation);
-    this._radius = radius;
-    this._instanceClass = instanceClass;
-    this._nbMaxInstances = nbMaxInstances;
+    super(new BABYLON.Mesh(EnvironmentKind.MonsterGenerator, scene), position, rotation);
+    this._config = config;
     this._createMonsterScheduler = new ActionScheduler(
       () => this.createMonster(),
-      interval,
+      config.interval,
     );
   }
 
@@ -41,7 +46,7 @@ export default class NestEntity extends PositionableEntity {
   }
 
   public update() {
-    if (this._monsters.length < this._nbMaxInstances) {
+    if (this._monsters.length < this._config.nbMaxInstances) {
       this._createMonsterScheduler.update();
     }
 
@@ -51,11 +56,14 @@ export default class NestEntity extends PositionableEntity {
   }
 
   public createMonster() {
+    const levelRange = this._config.level.max - this._config.level.min;
+
     this._monsters.push(
-      new this._instanceClass(
+      new this._config.instanceClass(
         this._mesh._scene,
-        getRandomPosition(this._mesh.position, this._radius).asArray(),
-        getRandomRotation(this._mesh.position, this._radius).asArray(),
+        Math.round(Math.random() * levelRange) + this._config.level.min,
+        getRandomPosition(this._mesh.position, this._config.radius).asArray(),
+        getRandomRotation(this._mesh.position, this._config.radius).asArray(),
       ),
     );
   }

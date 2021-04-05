@@ -13,11 +13,12 @@ export default class MonsterEntity extends CharacterEntity {
 
   public constructor(
     name: string,
+    level: number,
     mesh: BABYLON.Mesh,
     position: number[],
     rotation: number[],
   ) {
-    super(name, mesh, position, rotation);
+    super(name, level, mesh, position, rotation);
 
     this._initialPosition = this._mesh.position.clone();
     this._destination = this._mesh.position.clone();
