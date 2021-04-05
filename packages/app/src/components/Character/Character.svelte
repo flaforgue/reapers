@@ -54,7 +54,13 @@
   }
 
   function instantiateModels() {
-    const entries = assetContainer?.instantiateModelsToScene();
+    const entries = assetContainer?.instantiateModelsToScene(
+      (sourceName) => `Clone of ${sourceName}`,
+      false,
+      {
+        doNotInstantiate: false,
+      },
+    );
 
     skeletons = entries?.skeletons ?? [];
     rootNodes = entries?.rootNodes ?? [];
