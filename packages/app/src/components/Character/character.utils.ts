@@ -117,13 +117,32 @@ function createActiveMesh(
   isActive: boolean,
 ) {
   const activeMesh = baseMesh.clone('Clone of activeMesh', parent);
-  activeMesh.setEnabled(true);
-  activeMesh.scaling = new BABYLON.Vector3().setAll(activeMeshRadius[kind]);
-  activeMesh.material = baseMesh.material?.clone('Clone of activeMeshMat') ?? null;
 
-  if (activeMesh.material) {
-    activeMesh.material.alpha = isActive ? 0.5 : 0.1;
-  }
+  activeMesh.setEnabled(true);
+  activeMesh.material = (baseMesh.material as BABYLON.StandardMaterial).clone(
+    'Clone of activeMeshMat',
+  );
+  activeMesh.material.alpha = isActive ? 0.5 : 0.1;
+  activeMesh.animations = [...baseMesh.animations];
+  activeMesh.animations[0].setKeys([
+    {
+      frame: 0,
+      value: new BABYLON.Vector3().setAll(0),
+    },
+    {
+      frame: 10,
+      value: new BABYLON.Vector3().setAll(activeMeshRadius[kind]),
+    },
+    {
+      frame: 20,
+      value: new BABYLON.Vector3().setAll(activeMeshRadius[kind] * 0.7),
+    },
+    {
+      frame: 30,
+      value: new BABYLON.Vector3().setAll(activeMeshRadius[kind]),
+    },
+  ]);
+  activeMesh.getScene().beginAnimation(activeMesh, 0, 100);
 
   return activeMesh;
 }

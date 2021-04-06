@@ -58,8 +58,8 @@ export default class GameEntity extends BaseEntity {
       new MonsterGeneratorEntity(this._scene, {
         instanceClass: SpiderEntity,
         radius: 25,
-        interval: 0,
-        nbMaxInstances: 200,
+        interval: 2,
+        nbMaxInstances: 20,
         level: {
           min: 1,
           max: 5,
@@ -68,8 +68,8 @@ export default class GameEntity extends BaseEntity {
       new MonsterGeneratorEntity(this._scene, {
         instanceClass: FrogEntity,
         radius: 25,
-        interval: 0,
-        nbMaxInstances: 200,
+        interval: 4,
+        nbMaxInstances: 20,
         level: {
           min: 1,
           max: 5,

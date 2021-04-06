@@ -53,16 +53,25 @@ export function createGUI() {
 }
 
 export function createBaseActiveMesh(scene: BABYLON.Scene) {
-  const material = new BABYLON.StandardMaterial('activeMeshMat', scene);
-  material.diffuseColor = new BABYLON.Color3(1, 0.3, 0.1);
-
   const activeMesh = BABYLON.MeshBuilder.CreateDisc('activeMesh', {
     radius: 1,
   });
+  const material = new BABYLON.StandardMaterial('activeMeshMat', scene);
+
+  activeMesh.setEnabled(false);
   activeMesh.rotate(BABYLON.Axis.X, Math.PI / 2);
   activeMesh.position = new BABYLON.Vector3(0, 0.001, 0);
+  material.diffuseColor = new BABYLON.Color3(1, 0.3, 0.1);
   activeMesh.material = material;
-  activeMesh.setEnabled(false);
+
+  const animation = new BABYLON.Animation(
+    'activeMesh animation',
+    'scaling',
+    100,
+    BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+  );
+  activeMesh.animations.push(animation);
 
   return activeMesh;
 }
