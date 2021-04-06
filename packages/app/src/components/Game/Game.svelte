@@ -50,12 +50,6 @@
           result.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
           result.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
 
-          for (let i = 0; i < result.meshes.length; i++) {
-            result.meshes[i].freezeWorldMatrix();
-            result.meshes[i].cullingStrategy =
-              BABYLON.AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY;
-          }
-
           for (let i = 0; i < result.animationGroups.length; i++) {
             result.animationGroups[i].reset().stop();
           }
