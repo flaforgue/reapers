@@ -57,9 +57,9 @@ export default class GameEntity extends BaseEntity {
     this._monsterGenerators = [
       new MonsterGeneratorEntity(this._scene, {
         instanceClass: SpiderEntity,
-        radius: 10,
-        interval: 2,
-        nbMaxInstances: 10,
+        radius: 25,
+        interval: 0,
+        nbMaxInstances: 200,
         level: {
           min: 1,
           max: 5,
@@ -67,16 +67,14 @@ export default class GameEntity extends BaseEntity {
       }),
       new MonsterGeneratorEntity(this._scene, {
         instanceClass: FrogEntity,
-        radius: 10,
-        interval: 4,
-        nbMaxInstances: 10,
+        radius: 25,
+        interval: 0,
+        nbMaxInstances: 200,
         level: {
           min: 1,
           max: 5,
         },
       }),
-      // new MonsterGeneratorEntity(this._scene, SpiderEntity, 25, 0, 200),
-      // new MonsterGeneratorEntity(this._scene, FrogEntity, 25, 0, 200),
     ];
 
     this._scene.executeWhenReady(() => {

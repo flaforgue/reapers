@@ -34,7 +34,6 @@
   let isTarget = false;
   let label: GUI.TextBlock | undefined;
   let activeMesh: BABYLON.Mesh | undefined;
-  let hoverMesh: BABYLON.Mesh | undefined;
 
   function switchAnimation(animationKey: number) {
     const newAnimation = animationGroups[animationKey];
@@ -66,8 +65,17 @@
     }
   }
 
+  function setRootNodeMaterialAlpha(value: number) {
+    const material = rootNode?.getChildMeshes()[0].material;
+    if (material) {
+      material.alpha = value;
+    }
+  }
+
   function instantiateModels() {
-    const entries = assetContainer?.instantiateModelsToScene();
+    const entries = assetContainer?.instantiateModelsToScene((sourceName) => {
+      return `Clone of ${sourceName}`;
+    }, true);
 
     skeletons = entries?.skeletons ?? [];
     rootNodes = (entries?.rootNodes ?? []) as BABYLON.Mesh[];
@@ -81,8 +89,6 @@
       new BABYLON.ExecuteCodeAction(
         { trigger: BABYLON.ActionManager.OnPickTrigger },
         function () {
-          hoverMesh?.dispose();
-          hoverMesh = undefined;
           setGUITargetInfos(character);
 
           if (!activeMesh && baseActiveMesh && rootNode) {
@@ -95,9 +101,8 @@
       new BABYLON.ExecuteCodeAction(
         { trigger: BABYLON.ActionManager.OnPointerOverTrigger },
         function () {
-          if (!activeMesh && baseActiveMesh && rootNode) {
-            hoverMesh = createActiveMesh(baseActiveMesh, rootNode, kind, false);
-          }
+          document.body.style.cursor = 'pointer';
+          setRootNodeMaterialAlpha(0.8);
         },
       ),
     );
@@ -105,8 +110,8 @@
       new BABYLON.ExecuteCodeAction(
         { trigger: BABYLON.ActionManager.OnPointerOutTrigger },
         function () {
-          hoverMesh?.dispose();
-          hoverMesh = undefined;
+          document.body.style.cursor = 'default';
+          setRootNodeMaterialAlpha(1);
         },
       ),
     );
@@ -118,6 +123,12 @@
 
   function setGUITargetInfos(character: CharacterDTO | CharacterInfos) {
     $targetInfos = createTargetInfos(character);
+  }
+
+  function createCharacterLabel() {
+    if (rootNode && gui) {
+      label = createLabel(`${name} • ${level}`, kind, rootNode, gui);
+    }
   }
 
   $: isAssetContainerReady = Boolean(assetContainer);
@@ -133,12 +144,13 @@
     }
   }
 
+  $: rootNodeId = rootNode?.id;
   $: name = character.name;
   $: level = character.level;
   $: kind = character.kind;
   $: {
-    if (rootNode && gui && name && level) {
-      label = createLabel(`${name} • ${level}`, kind, rootNode, gui);
+    if (rootNodeId && gui && name && level) {
+      createCharacterLabel();
     }
   }
 

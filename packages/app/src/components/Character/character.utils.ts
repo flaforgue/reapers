@@ -43,7 +43,8 @@ const animationKeys: Record<CharacterKind, CharacterAnimationKey> = {
 function worldToScreen(
   worldPosition: BABYLON.Vector3,
   scene: BABYLON.Scene,
-  engine: BABYLON.Engine,
+  screenWidth: number,
+  screenHeight: number,
 ) {
   const camera = scene.activeCamera as BABYLON.FollowCamera;
 
@@ -51,7 +52,7 @@ function worldToScreen(
     worldPosition,
     BABYLON.Matrix.Identity(),
     scene.getTransformMatrix(),
-    camera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()),
+    camera.viewport.toGlobal(screenWidth, screenHeight),
   );
 }
 
@@ -70,7 +71,7 @@ const activeMeshRadius: Record<CharacterKind, number> = {
 function createLabel(
   value: string,
   kind: CharacterKind,
-  parent: BABYLON.TransformNode,
+  parent: BABYLON.Mesh,
   gui: GUI.AdvancedDynamicTexture,
 ) {
   const scene = parent.getScene();
@@ -89,7 +90,8 @@ function createLabel(
     const screenPosition = worldToScreen(
       parent.position.add(new BABYLON.Vector3(0, height, 0)),
       scene,
-      engine,
+      screenWidth,
+      screenHeight,
     );
     label.left = (screenPosition.x - screenWidth / 2).toFixed(1);
     label.top = (screenPosition.y - screenHeight / 2).toFixed(1);
