@@ -16,7 +16,7 @@
     createLabel,
     createTargetInfos,
   } from './character.utils';
-  import { AbstractMesh, Scene } from '@babylonjs/core';
+  import { AbstractMesh } from '@babylonjs/core';
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
   export let baseActiveMesh: BABYLON.Mesh | undefined;
@@ -25,8 +25,8 @@
   export let gui: GUI.AdvancedDynamicTexture | undefined;
   export let shadowGenerator: BABYLON.ShadowGenerator | undefined;
 
-  let rootNode: BABYLON.Mesh | undefined;
-  let rootNodes: BABYLON.Mesh[] = [];
+  let rootMesh: BABYLON.Mesh | undefined;
+  let rootMeshes: BABYLON.Mesh[] = [];
 
   let animationGroups: BABYLON.AnimationGroup[] = [];
   let skeletons: BABYLON.Skeleton[] = [];
@@ -46,27 +46,27 @@
   }
 
   function updatePosition(x = 0, y = 0, z = 0) {
-    if (rootNode) {
-      rootNode.position = new BABYLON.Vector3(x, y, z);
+    if (rootMesh) {
+      rootMesh.position = new BABYLON.Vector3(x, y, z);
     }
   }
 
   function updateRotation(x = 0, y = 0, z = 0) {
-    if (rootNode) {
-      rootNode.rotation = new BABYLON.Vector3(x, y, z);
+    if (rootMesh) {
+      rootMesh.rotation = new BABYLON.Vector3(x, y, z);
     }
   }
 
   function updateAnimation(direction: FrontMoveDirection | SideMoveDirection) {
-    if (rootNode && direction) {
+    if (rootMesh && direction) {
       switchAnimation(animationKeys[character.kind].Walk);
     } else {
       switchAnimation(animationKeys[character.kind].Idle);
     }
   }
 
-  function setRootNodeMaterialAlpha(value: number) {
-    const material = rootNode?.getChildMeshes()[0].material;
+  function setRootMeshMaterialAlpha(value: number) {
+    const material = rootMesh?.getChildMeshes()[0].material;
     if (material) {
       material.alpha = value;
     }
@@ -78,47 +78,49 @@
     }, true);
 
     skeletons = entries?.skeletons ?? [];
-    rootNodes = (entries?.rootNodes ?? []) as BABYLON.Mesh[];
-    rootNode = rootNodes[0];
+    rootMeshes = (entries?.rootNodes ?? []) as BABYLON.Mesh[];
+    rootMesh = rootMeshes[0];
 
-    rootNode.actionManager = new BABYLON.ActionManager(
+    rootMesh.actionManager = new BABYLON.ActionManager(
       assetContainer?.scene as BABYLON.Scene,
     );
-    rootNode.actionManager.isRecursive = true;
-    rootNode.actionManager.registerAction(
+    rootMesh.actionManager.isRecursive = true;
+    rootMesh.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         { trigger: BABYLON.ActionManager.OnPickTrigger },
         function () {
           setGUITargetInfos(character);
 
-          if (!activeMesh && baseActiveMesh && rootNode) {
-            activeMesh = createActiveMesh(baseActiveMesh, rootNode, kind, true);
+          if (!activeMesh && baseActiveMesh && rootMesh) {
+            activeMesh = createActiveMesh(baseActiveMesh, rootMesh, kind, true);
           }
+
+          activeMesh?.getScene().beginAnimation(activeMesh, 0, 100);
         },
       ),
     );
-    rootNode.actionManager.registerAction(
+    rootMesh.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         { trigger: BABYLON.ActionManager.OnPointerOverTrigger },
         function () {
           document.body.style.cursor = 'pointer';
-          setRootNodeMaterialAlpha(0.8);
+          setRootMeshMaterialAlpha(0.8);
         },
       ),
     );
-    rootNode.actionManager.registerAction(
+    rootMesh.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         { trigger: BABYLON.ActionManager.OnPointerOutTrigger },
         function () {
           document.body.style.cursor = 'default';
-          setRootNodeMaterialAlpha(1);
+          setRootMeshMaterialAlpha(1);
         },
       ),
     );
 
     animationGroups = entries?.animationGroups ?? [];
     animationGroups[animationKeys[character.kind].Walk].speedRatio = 2;
-    shadowGenerator?.addShadowCaster(rootNode as AbstractMesh);
+    shadowGenerator?.addShadowCaster(rootMesh as AbstractMesh);
   }
 
   function setGUITargetInfos(character: CharacterDTO | CharacterInfos) {
@@ -126,8 +128,8 @@
   }
 
   function createCharacterLabel() {
-    if (rootNode && gui) {
-      label = createLabel(`${name} • ${level}`, kind, rootNode, gui);
+    if (rootMesh && gui) {
+      label = createLabel(`${name} • ${level}`, kind, rootMesh, gui);
     }
   }
 
@@ -139,17 +141,17 @@
   }
 
   $: {
-    if (camera && rootNode && !camera.lockedTarget) {
-      camera.lockedTarget = rootNode as AbstractMesh;
+    if (camera && rootMesh && !camera.lockedTarget) {
+      camera.lockedTarget = rootMesh as AbstractMesh;
     }
   }
 
-  $: rootNodeId = rootNode?.id;
+  $: rootMeshId = rootMesh?.id;
   $: name = character.name;
   $: level = character.level;
   $: kind = character.kind;
   $: {
-    if (rootNodeId && gui && name && level) {
+    if (rootMeshId && gui && name && level) {
       createCharacterLabel();
     }
   }
@@ -190,6 +192,7 @@
     if (isTarget) {
       setGUITargetInfos({
         id,
+        position: new BABYLON.Vector3(...[posX, posY, posZ]),
         kind,
         name,
         level,
@@ -218,7 +221,7 @@
 
   onDestroy(() => {
     disposeArray(animationGroups);
-    disposeArray(rootNodes);
+    disposeArray(rootMeshes);
     disposeArray(skeletons);
     label?.dispose();
   });

@@ -1,4 +1,5 @@
 export enum Key {
+  Space = ' ',
   Escape = 'Escape',
   Enter = 'Enter',
   ArrowUp = 'ArrowUp',

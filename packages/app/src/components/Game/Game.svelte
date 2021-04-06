@@ -138,13 +138,6 @@
 <div class="Game">
   <canvas bind:this={gameCanvas} />
   <World world={$game.world} scene={gameScene} on:lightChanged={handleLightChanged} />
-  <PlayerController
-    camera={gameCamera}
-    scene={gameScene}
-    {updateFrontMoveDirection}
-    {updateSideMoveDirection}
-    {updateRotationDirection}
-  />
 
   {#each $game.players as player}
     <Character
@@ -155,6 +148,17 @@
       assetContainer={characterAssetContainers[player.kind]}
       camera={player.id === $activePlayerId ? gameCamera : undefined}
     />
+
+    {#if player.id === $activePlayerId}
+      <PlayerController
+        camera={gameCamera}
+        scene={gameScene}
+        {player}
+        {updateFrontMoveDirection}
+        {updateSideMoveDirection}
+        {updateRotationDirection}
+      />
+    {/if}
   {/each}
 
   {#each $game.monsterGenerators as monsterGenerator}

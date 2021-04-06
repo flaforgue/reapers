@@ -1,3 +1,4 @@
+import * as BABYLON from '@babylonjs/core';
 import { BoundedValueDTO, CharacterKind } from '@reapers/game-client';
 import { writable } from 'svelte/store';
 
@@ -12,6 +13,7 @@ export type CharacterInfos = {
   name: string;
   level: number;
   life: BoundedValueDTO;
+  position: BABYLON.Vector3;
 };
 
 export const focusElement = writable(FocusElement.Game);

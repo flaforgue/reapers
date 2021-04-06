@@ -101,12 +101,17 @@ function createLabel(
 }
 
 function createTargetInfos(character: CharacterDTO | CharacterInfos): CharacterInfos {
+  const position = Array.isArray(character.position)
+    ? new BABYLON.Vector3(...character.position)
+    : character.position;
+
   return {
     id: character.id,
     kind: character.kind,
     level: character.level,
     name: character.name,
     life: character.life,
+    position,
   };
 }
 
