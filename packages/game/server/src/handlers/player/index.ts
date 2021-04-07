@@ -5,7 +5,7 @@ import {
   FrontMoveDirection,
   RotationDirection,
 } from '@reapers/game-shared';
-import { PlayerEntity } from '../../entities';
+import { GameEntity, PlayerEntity } from '../../entities';
 
 function isValidFrontMoveDirection(direction: unknown) {
   return Boolean(FrontMoveDirection[Number(direction)]);
@@ -19,7 +19,7 @@ function isValidRotationDirection(direction: unknown) {
   return Boolean(RotationDirection[Number(direction)]);
 }
 
-export default (socket: Socket, player: PlayerEntity) => {
+export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
   socket.on(
     GameEvents.Player.FrontMoveDirectionUpdated,
     (direction: FrontMoveDirection) => {
@@ -46,4 +46,25 @@ export default (socket: Socket, player: PlayerEntity) => {
       }
     },
   );
+
+  socket.on(GameEvents.Player.Attacked, (id: string) => {
+    const target = game.findCharacterById(id);
+
+    if (target) {
+      const vectorToTarget = target.meshPosition.subtract(player.meshPosition);
+      const distanceToTarget = vectorToTarget.length();
+
+      if (distanceToTarget <= player.attackRange) {
+        player.attack(target);
+      }
+    }
+
+    return false;
+  });
+
+  // socket.on(GameEvents.Player.Attacked, (id: string, fn) => {
+  //   const target =
+
+  //   return fn(player.canAttack(target));
+  // });
 };

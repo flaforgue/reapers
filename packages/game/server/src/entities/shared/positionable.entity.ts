@@ -23,8 +23,16 @@ export default class PositionableEntity extends BaseEntity {
     return this._mesh.position.add(new BABYLON.Vector3(0, -this.halfHeight, 0)).asArray();
   }
 
+  public get meshPosition() {
+    return this._mesh.position;
+  }
+
   public get rotation() {
     return this._mesh.rotation.asArray();
+  }
+
+  public getDistanceTo(position: BABYLON.Vector3) {
+    return BABYLON.Vector3.Distance(this._mesh.position, position);
   }
 
   public dispose() {

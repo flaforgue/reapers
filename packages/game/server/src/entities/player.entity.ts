@@ -6,6 +6,7 @@ import BoundedValue from './shared/bounded-value';
 
 export default class PlayerEntity extends CharacterEntity {
   private readonly _socket: SocketIO.Socket;
+  public readonly attackRange = 10;
 
   public constructor(
     socket: SocketIO.Socket,

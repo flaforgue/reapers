@@ -21,6 +21,9 @@ export default class CharacterDTO extends PositionableDTO {
   public life = new BoundedValueDTO();
 
   @Expose()
+  public attackRange = 0;
+
+  @Expose()
   public kind: CharacterKind = CharacterKind.Player;
 
   @Expose()

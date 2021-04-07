@@ -8,6 +8,7 @@ import SpiderEntity from './monsters/spider.entity';
 import BaseEntity from './shared/base.entity';
 import MonsterGeneratorEntity from './monster-generator.entity';
 import FrogEntity from './monsters/frog.entity';
+import CharacterEntity from './shared/character.entity';
 
 enum GameState {
   Started,
@@ -32,6 +33,9 @@ export default class GameEntity extends BaseEntity {
   private readonly _engine: BABYLON.Engine;
   private readonly _scene: BABYLON.Scene;
 
+  // for performance reasons
+  private _charactersById: Record<string, CharacterEntity> = {};
+
   public constructor(namespace: SocketIO.Namespace) {
     super();
     this._namespace = namespace;
@@ -54,27 +58,40 @@ export default class GameEntity extends BaseEntity {
     );
 
     this._world = new WorldEntity(this._scene, 50, 50);
+
+    const addToCharactersById = (character: CharacterEntity) => {
+      this._charactersById[character.id] = character;
+    };
+
     this._monsterGenerators = [
-      new MonsterGeneratorEntity(this._scene, {
-        instanceClass: SpiderEntity,
-        radius: 25,
-        interval: 2,
-        nbMaxInstances: 20,
-        level: {
-          min: 1,
-          max: 5,
+      new MonsterGeneratorEntity(
+        this._scene,
+        {
+          instanceClass: SpiderEntity,
+          radius: 25,
+          interval: 3,
+          nbMaxInstances: 20,
+          level: {
+            min: 1,
+            max: 5,
+          },
         },
-      }),
-      new MonsterGeneratorEntity(this._scene, {
-        instanceClass: FrogEntity,
-        radius: 25,
-        interval: 4,
-        nbMaxInstances: 20,
-        level: {
-          min: 1,
-          max: 5,
+        addToCharactersById,
+      ),
+      new MonsterGeneratorEntity(
+        this._scene,
+        {
+          instanceClass: FrogEntity,
+          radius: 25,
+          interval: 4,
+          nbMaxInstances: 20,
+          level: {
+            min: 1,
+            max: 5,
+          },
         },
-      }),
+        addToCharactersById,
+      ),
     ];
 
     this._scene.executeWhenReady(() => {
@@ -144,6 +161,7 @@ export default class GameEntity extends BaseEntity {
 
     const player = new PlayerEntity(socket, this._scene, name, [0, 0, 0]);
     this._players.push(player);
+    this._charactersById[player.id] = player;
     console.info(
       `Player ${name} - ${player.id} created (${this._players.length}/${config.nbMaxPlayers})`,
     );
@@ -157,5 +175,9 @@ export default class GameEntity extends BaseEntity {
     );
     player.dispose();
     removeFromArrayById(this._players, player.id);
+  }
+
+  public findCharacterById(id: string): CharacterEntity | null {
+    return this._charactersById[id] ?? null;
   }
 }

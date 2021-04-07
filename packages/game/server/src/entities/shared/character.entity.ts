@@ -17,6 +17,7 @@ export default class CharacterEntity extends PositionableEntity {
   public readonly name: string;
   public readonly level: number;
   public readonly life: BoundedValue;
+  public readonly attackRange: number = 0;
 
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
@@ -131,5 +132,9 @@ export default class CharacterEntity extends PositionableEntity {
 
   public setRotation(rotationY: number) {
     this._mesh.rotation.y = rotationY;
+  }
+
+  public attack(target: CharacterEntity) {
+    this._mesh.lookAt(target.meshPosition, Math.PI);
   }
 }

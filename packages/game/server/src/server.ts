@@ -34,7 +34,7 @@ io.on(GameEvents.System.Connection, (socket: SocketIO.Socket) => {
         const player = game.addPlayer(socket, name);
 
         registerSystemHandlers(socket, player, game);
-        registerPlayerHandlers(socket, player);
+        registerPlayerHandlers(socket, game, player);
 
         socket.emit(GameEvents.Player.Created, plainToClass(CharacterDTO, player));
       } catch (e) {

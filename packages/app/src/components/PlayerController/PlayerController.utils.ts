@@ -38,22 +38,3 @@ export function resetCamera(camera: BABYLON.FollowCamera) {
     camera.animations = [];
   });
 }
-
-export function createParticleSystem(scene: BABYLON.Scene) {
-  const ps = new BABYLON.ParticleSystem('particles', 1, scene);
-
-  ps.createPointEmitter(BABYLON.Vector3.Forward(), BABYLON.Vector3.Forward());
-  ps.worldOffset = new BABYLON.Vector3(0, 0.5, 0);
-  ps.particleTexture = new BABYLON.Texture('/textures/flare.png', scene);
-  ps.color1 = new BABYLON.Color4(200, 30, 30, 1);
-  ps.color2 = new BABYLON.Color4(255, 230, 0, 1);
-  ps.minSize = 0.3;
-  ps.maxSize = 0.3;
-  ps.minEmitPower = 70;
-  ps.maxEmitPower = 70;
-  ps.updateSpeed = 0.01;
-  ps.manualEmitCount = 0;
-  ps.start();
-
-  return ps;
-}

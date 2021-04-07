@@ -39,6 +39,10 @@ function updateRotationDirection(direction: RotationDirection) {
   socket?.emit(GameEvents.Player.RotationDirectionUpdated, direction);
 }
 
+function attack(targetId: string) {
+  socket?.emit(GameEvents.Player.Attacked, targetId);
+}
+
 function useGame(serverUrl: string) {
   if (socket?.io?.uri != serverUrl) {
     socket?.disconnect();
@@ -58,6 +62,7 @@ function useGame(serverUrl: string) {
     updateFrontMoveDirection,
     updateSideMoveDirection,
     updateRotationDirection,
+    attack,
   };
 }
 

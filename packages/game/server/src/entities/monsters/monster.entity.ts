@@ -6,6 +6,7 @@ import { FrontMoveDirection, RotationDirection } from '@reapers/game-shared';
 
 const walkingArea = 3;
 export default class MonsterEntity extends CharacterEntity {
+  public readonly attackRange = 1;
   private readonly _initialPosition: BABYLON.Vector3;
   private readonly _scheduledMoveAction: ActionScheduler;
   protected readonly _shouldMoveWithCollisions = false;

@@ -33,11 +33,11 @@ export function createCamera(scene: BABYLON.Scene) {
   camera.cameraAcceleration = 0.5;
 
   camera.lowerRadiusLimit = 3;
-  camera.radius = 6;
+  camera.radius = 8;
   camera.upperRadiusLimit = 8;
 
   camera.lowerHeightOffsetLimit = 0.8;
-  camera.heightOffset = 4;
+  camera.heightOffset = 5;
   camera.upperHeightOffsetLimit = 5;
 
   camera.attachControl(true);

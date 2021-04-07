@@ -14,6 +14,7 @@
     animationKeys,
     createActiveMesh,
     createLabel,
+    createParticleSystem,
     createTargetInfos,
   } from './character.utils';
   import { AbstractMesh } from '@babylonjs/core';
@@ -34,6 +35,7 @@
   let isTarget = false;
   let label: GUI.TextBlock | undefined;
   let activeMesh: BABYLON.Mesh | undefined;
+  let particleSystem: BABYLON.ParticleSystem | undefined;
 
   function switchAnimation(animationKey: number) {
     const newAnimation = animationGroups[animationKey];
@@ -80,6 +82,9 @@
     skeletons = entries?.skeletons ?? [];
     rootMeshes = (entries?.rootNodes ?? []) as BABYLON.Mesh[];
     rootMesh = rootMeshes[0];
+
+    updatePosition(...character.position);
+    updateRotation(...character.rotation);
 
     rootMesh.actionManager = new BABYLON.ActionManager(
       assetContainer?.scene as BABYLON.Scene,
@@ -133,6 +138,38 @@
     }
   }
 
+  function attack() {
+    const scene = rootMesh?.getScene();
+
+    if ($targetInfos?.position && scene && character?.position) {
+      if (!particleSystem) {
+        particleSystem = createParticleSystem(scene);
+      }
+
+      const vectorToTarget = $targetInfos.position.subtract(
+        new BABYLON.Vector3(...character.position),
+      );
+      const distanceToTarget = vectorToTarget.length();
+      const directionToTarget = vectorToTarget.normalize();
+      const lifeTime = distanceToTarget / particleSystem.minEmitPower;
+
+      particleSystem.direction1 = directionToTarget;
+      particleSystem.direction2 = directionToTarget;
+      particleSystem.minLifeTime = lifeTime;
+      particleSystem.maxLifeTime = lifeTime;
+      particleSystem.emitter = new BABYLON.Vector3(...character.position).add(
+        new BABYLON.Vector3(0, 0.5, 0),
+      );
+      particleSystem.manualEmitCount = 1;
+
+      // show animations to other players
+      // animation character
+      // cooldown
+      // on attack ended, client send attack message to backend
+      // backend check if attack is possible and attack
+    }
+  }
+
   $: isAssetContainerReady = Boolean(assetContainer);
   $: {
     if (isAssetContainerReady) {
@@ -141,8 +178,8 @@
   }
 
   $: {
-    if (camera && rootMesh && !camera.lockedTarget) {
-      camera.lockedTarget = rootMesh as AbstractMesh;
+    if (camera && rootMesh && !camera.parent) {
+      camera.parent = rootMesh as AbstractMesh;
     }
   }
 
@@ -208,18 +245,12 @@
     }
   }
 
-  // $: destination = (character as MonsterDTO).destination;
-  // $: [destX, destY, destZ] = destination ?? [0, 0, 0];
-  // $: {
-  //   if (destX || destY || destZ) {
-  //     const mesh = BABYLON.MeshBuilder.CreateBox('destination', {
-  //       size: 0.3,
-  //     });
-  //     mesh.position = new BABYLON.Vector3(destX, destY, destZ);
-  //   }
-  // }
-
   onDestroy(() => {
+    const particleSystems = (particleSystem?.subEmitters ?? []).map(
+      (s) => (s as BABYLON.SubEmitter).particleSystem,
+    );
+    disposeArray(particleSystems);
+    particleSystem?.dispose();
     disposeArray(animationGroups);
     disposeArray(rootMeshes);
     disposeArray(skeletons);

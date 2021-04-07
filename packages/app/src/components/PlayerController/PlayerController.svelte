@@ -14,17 +14,16 @@
     isSideMoveDirection,
     isRotationDirection,
     resetCamera,
-    createParticleSystem,
   } from './PlayerController.utils';
 
   export let updateFrontMoveDirection: (direction: FrontMoveDirection) => void;
   export let updateSideMoveDirection: (direction: SideMoveDirection) => void;
   export let updateRotationDirection: (direction: RotationDirection) => void;
+  export let attack: (targetId: string) => void;
   export let player: CharacterDTO | undefined;
   export let scene: BABYLON.Scene | undefined;
   export let camera: BABYLON.FollowCamera | undefined;
 
-  let ps: BABYLON.ParticleSystem | undefined;
   let keyboardEventObserver:
     | BABYLON.Nullable<BABYLON.Observer<BABYLON.KeyboardInfo>>
     | undefined;
@@ -40,21 +39,15 @@
   }
 
   function localAttack() {
-    if ($targetInfos?.position && scene && player?.position) {
-      if (!ps) {
-        ps = createParticleSystem(scene);
+    if ($targetInfos?.position && player) {
+      const vectorToTarget = $targetInfos.position.subtract(
+        new BABYLON.Vector3(...player.position),
+      );
+      const distanceToTarget = vectorToTarget.length();
+
+      if (distanceToTarget <= player.attackRange) {
+        attack($targetInfos.id);
       }
-
-      // send attack socket message with target id
-      // backend checks if attack is possible based on distance and maxRange
-      // if possible, instant rotate the player to the target and send success response
-      // callback on success :
-      // ps.emitter = new BABYLON.Vector3(...player.position);
-      // ps.manualEmitCount = 1;
-
-      // the particle must disappear when reaching target
-      // the target must lose life when hit by particle
-      // the particle must be beautiful
     }
   }
 
@@ -102,6 +95,5 @@
 
   onDestroy(() => {
     scene?.onKeyboardObservable?.remove(keyboardEventObserver ?? null);
-    ps?.dispose();
   });
 </script>
