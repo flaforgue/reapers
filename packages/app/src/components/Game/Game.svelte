@@ -7,6 +7,8 @@
   import { servers } from '../../configs/servers.config';
   import { Key } from '../../configs/keycodes.config';
   import World from '../World/World.svelte';
+  import Player from '../Player/Player.svelte';
+  import Monster from '../Monster/Monster.svelte';
   import PlayerController from '../PlayerController/PlayerController.svelte';
   import {
     createBaseActiveMesh,
@@ -30,7 +32,7 @@
     [CharacterKind.Spider]: undefined,
     [CharacterKind.Frog]: undefined,
   };
-  let baseActiveMesh: BABYLON.Mesh | undefined;
+  let baseHighlightMesh: BABYLON.Mesh | undefined;
   let gui: GUI.AdvancedDynamicTexture | undefined;
   let shadowGenerator: BABYLON.CascadedShadowGenerator | undefined;
 
@@ -82,7 +84,7 @@
     // });
 
     loadAssets();
-    baseActiveMesh = createBaseActiveMesh(gameScene);
+    baseHighlightMesh = createBaseActiveMesh(gameScene);
 
     engine.displayLoadingUI();
 
@@ -150,15 +152,14 @@
   <World world={$game.world} scene={gameScene} on:lightChanged={handleLightChanged} />
 
   {#each $game.players as player}
-    <Character
-      character={player}
-      {baseActiveMesh}
-      {shadowGenerator}
+    <Player
+      {player}
       {gui}
+      {baseHighlightMesh}
+      {shadowGenerator}
       assetContainer={characterAssetContainers[player.kind]}
       camera={player.id === $activePlayerId ? gameCamera : undefined}
     />
-
     {#if player.id === $activePlayerId}
       <PlayerController
         camera={gameCamera}
@@ -174,11 +175,11 @@
 
   {#each $game.monsterGenerators as monsterGenerator}
     {#each monsterGenerator.monsters as monster}
-      <Character
-        character={monster}
-        {baseActiveMesh}
-        {shadowGenerator}
+      <Monster
+        {monster}
         {gui}
+        {baseHighlightMesh}
+        {shadowGenerator}
         assetContainer={characterAssetContainers[monster.kind]}
       />
     {/each}

@@ -12,6 +12,7 @@ import {
 import {
   EnvironmentKind,
   CharacterKind,
+  MonsterKind,
   GameEvents,
   FrontMoveDirection,
   SideMoveDirection,
@@ -22,6 +23,7 @@ import {
 export {
   EnvironmentKind,
   CharacterKind,
+  MonsterKind,
   BoundedValueDTO,
   CharacterDTO,
   MonsterDTO,

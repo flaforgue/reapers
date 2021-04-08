@@ -50,6 +50,11 @@ export enum CharacterKind {
   Frog = 'Frog',
 }
 
+export enum MonsterKind {
+  Spider = 'Spider',
+  Frog = 'Frog',
+}
+
 export enum CharacterAction {
   Standing = 'Standing',
   Attacking = 'Attacking',

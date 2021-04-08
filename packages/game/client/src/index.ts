@@ -2,6 +2,7 @@ import socketIOClient from 'socket.io-client';
 import { writable } from 'svelte/store';
 import {
   CharacterKind,
+  MonsterKind,
   CharacterAction,
   EnvironmentKind,
   BoundedValueDTO,
@@ -72,6 +73,7 @@ export {
   game,
   useGame,
   CharacterKind,
+  MonsterKind,
   CharacterAction,
   EnvironmentKind,
   BoundedValueDTO,
