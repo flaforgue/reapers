@@ -122,7 +122,6 @@ function createActiveMesh(
   baseMesh: BABYLON.Mesh,
   parent: BABYLON.Mesh,
   kind: CharacterKind,
-  isActive: boolean,
 ) {
   const activeMesh = baseMesh.clone('Clone of activeMesh', parent);
 
@@ -130,7 +129,6 @@ function createActiveMesh(
   activeMesh.material = (baseMesh.material as BABYLON.StandardMaterial).clone(
     'Clone of activeMeshMat',
   );
-  activeMesh.material.alpha = isActive ? 0.5 : 0.1;
   activeMesh.animations = [...baseMesh.animations];
   activeMesh.animations[0].setKeys([
     {

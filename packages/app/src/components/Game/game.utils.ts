@@ -62,6 +62,7 @@ export function createBaseActiveMesh(scene: BABYLON.Scene) {
   activeMesh.rotate(BABYLON.Axis.X, Math.PI / 2);
   activeMesh.position = new BABYLON.Vector3(0, 0.001, 0);
   material.diffuseColor = new BABYLON.Color3(1, 0.3, 0.1);
+  material.alpha = 0.5;
   activeMesh.material = material;
 
   const animation = new BABYLON.Animation(

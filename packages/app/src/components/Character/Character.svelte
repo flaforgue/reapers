@@ -97,7 +97,7 @@
           setGUITargetInfos(character);
 
           if (!activeMesh && baseActiveMesh && rootMesh) {
-            activeMesh = createActiveMesh(baseActiveMesh, rootMesh, kind, true);
+            activeMesh = createActiveMesh(baseActiveMesh, rootMesh, kind);
           }
 
           activeMesh?.getScene().beginAnimation(activeMesh, 0, 100);
@@ -138,7 +138,7 @@
     }
   }
 
-  function attack() {
+  function castSpell() {
     const scene = rootMesh?.getScene();
 
     if ($targetInfos?.position && scene && character?.position) {
