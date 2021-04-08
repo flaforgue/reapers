@@ -22,7 +22,7 @@
   export let attack: (targetId: string) => void;
   export let player: CharacterDTO | undefined;
   export let scene: BABYLON.Scene | undefined;
-  export let camera: BABYLON.FollowCamera | undefined;
+  export let camera: BABYLON.ArcRotateCamera | undefined;
 
   let keyboardEventObserver:
     | BABYLON.Nullable<BABYLON.Observer<BABYLON.KeyboardInfo>>
@@ -31,7 +31,7 @@
   function localUpdateRotationDirection(direction: RotationDirection) {
     const isAlreadyResetting = camera?.animations?.length;
 
-    if (camera && camera.rotationOffset !== 0 && !isAlreadyResetting) {
+    if (camera && camera.alpha !== -Math.PI / 2 && !isAlreadyResetting) {
       resetCamera(camera);
     }
 

@@ -21,7 +21,7 @@
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
   export let baseActiveMesh: BABYLON.Mesh | undefined;
-  export let camera: BABYLON.FollowCamera | undefined = undefined;
+  export let camera: BABYLON.ArcRotateCamera | undefined = undefined;
   export let character: CharacterDTO = new CharacterDTO();
   export let gui: GUI.AdvancedDynamicTexture | undefined;
   export let shadowGenerator: BABYLON.ShadowGenerator | undefined;

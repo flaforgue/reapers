@@ -134,7 +134,5 @@ export default class CharacterEntity extends PositionableEntity {
     this._mesh.rotation.y = rotationY;
   }
 
-  public attack(target: CharacterEntity) {
-    this._mesh.lookAt(target.meshPosition, Math.PI);
-  }
+  public attack(target: CharacterEntity) {}
 }

@@ -23,24 +23,24 @@ export function createScene(engine: BABYLON.Engine) {
 }
 
 export function createCamera(scene: BABYLON.Scene) {
-  const camera = new BABYLON.FollowCamera(
+  const camera = new BABYLON.ArcRotateCamera(
     'playerCamera',
-    new BABYLON.Vector3(0, 2, -2),
+    -Math.PI / 2,
+    Math.PI / 3.5,
+    25,
+    BABYLON.Vector3.Zero(),
     scene,
+    true,
   );
 
-  camera.rotationOffset = 0;
-  camera.cameraAcceleration = 0.5;
-
-  camera.lowerRadiusLimit = 3;
-  camera.radius = 8;
-  camera.upperRadiusLimit = 8;
-
-  camera.lowerHeightOffsetLimit = 0.8;
-  camera.heightOffset = 5;
-  camera.upperHeightOffsetLimit = 5;
-
+  camera.ignoreParentScaling = true;
+  camera.lowerRadiusLimit = 8;
+  camera.radius = 25;
+  camera.upperRadiusLimit = 40;
+  camera.upperBetaLimit = Math.PI / 2.5;
+  camera.lowerBetaLimit = Math.PI / 5;
   camera.attachControl(true);
+  camera.panningSensibility = 0;
 
   return camera;
 }

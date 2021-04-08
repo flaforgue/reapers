@@ -6,9 +6,7 @@ export function createLight(scene: BABYLON.Scene) {
     new BABYLON.Vector3(0, -10, 0),
     scene,
   );
-  // light.position = new BABYLON.Vector3(0, 30, 0);
-  // light.autoUpdateExtends = true;
-  // light.autoCalcShadowZBounds = true;
+  light.position = new BABYLON.Vector3(0, 1000, 0);
 
   return light;
 }
@@ -46,7 +44,6 @@ export function createGround(width: number, depth: number, scene: BABYLON.Scene)
   texture.uScale = 20;
   texture.vScale = 20;
   const groundMat = new BABYLON.StandardMaterial('groundMat', scene);
-  groundMat.backFaceCulling = false;
   groundMat.diffuseTexture = texture;
   ground.material = groundMat;
   ground.receiveShadows = true;

@@ -46,7 +46,7 @@ function worldToScreen(
   screenWidth: number,
   screenHeight: number,
 ) {
-  const camera = scene.activeCamera as BABYLON.FollowCamera;
+  const camera = scene.activeCamera as BABYLON.ArcRotateCamera;
 
   return BABYLON.Vector3.Project(
     worldPosition,

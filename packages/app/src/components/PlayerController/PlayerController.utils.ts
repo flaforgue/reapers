@@ -13,10 +13,10 @@ export function isSideMoveDirection(value: string) {
   return ([Key.a, Key.e] as string[]).indexOf(value) != -1;
 }
 
-export function resetCamera(camera: BABYLON.FollowCamera) {
+export function resetCamera(camera: BABYLON.ArcRotateCamera) {
   const animation = new BABYLON.Animation(
     'cameraAnimation',
-    'rotationOffset',
+    'alpha',
     100,
     BABYLON.Animation.ANIMATIONTYPE_FLOAT,
     BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
@@ -24,11 +24,11 @@ export function resetCamera(camera: BABYLON.FollowCamera) {
   animation.setKeys([
     {
       frame: 0,
-      value: camera.rotationOffset,
+      value: camera.alpha,
     },
     {
       frame: 100,
-      value: 0,
+      value: -Math.PI / 2,
     },
   ]);
 

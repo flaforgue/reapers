@@ -16,10 +16,10 @@
     createScene,
   } from './game.utils';
   import Character from '../Character/Character.svelte';
-  // import { showAxis } from '../../utils';
+  import { showAxis } from '../../utils';
 
   let engine: BABYLON.Engine | undefined;
-  let gameCamera: BABYLON.FollowCamera | undefined;
+  let gameCamera: BABYLON.ArcRotateCamera | undefined;
   let gameCanvas: HTMLCanvasElement | undefined;
   let gameScene: BABYLON.Scene | undefined;
   let characterAssetContainers: Record<
@@ -48,7 +48,6 @@
         gameScene,
         (result) => {
           result.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
-          result.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.WORLD);
 
           for (let i = 0; i < result.animationGroups.length; i++) {
             result.animationGroups[i].reset().stop();
