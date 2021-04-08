@@ -17,25 +17,22 @@
   let skyBox: BABYLON.Mesh | undefined;
   const dispatch = createEventDispatcher<WorldEvents>();
 
-  $: {
-    if (scene) {
-      light?.dispose();
-      light = createLight(scene);
-      dispatch('lightChanged', light);
-
-      sound?.dispose();
-      sound = createSound(scene);
-
-      skyBox?.dispose();
-      skyBox = createSkyBox(scene);
-    }
-  }
-
   $: ({ width, depth } = world);
   $: {
     if (scene && width && depth) {
       ground?.dispose();
       ground = createGround(width, depth, scene);
+
+      sound?.dispose();
+      sound = createSound(scene);
+
+      skyBox?.dispose();
+      skyBox = createSkyBox(scene, width, depth);
+
+      light?.dispose();
+      light = createLight(scene);
+
+      dispatch('lightChanged', light);
     }
   }
 

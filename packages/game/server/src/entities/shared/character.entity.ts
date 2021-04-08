@@ -3,6 +3,7 @@ import {
   FrontMoveDirection,
   SideMoveDirection,
   RotationDirection,
+  CharacterAction,
   CharacterKind,
 } from '@reapers/game-shared';
 import config from '../../config';
@@ -25,6 +26,7 @@ export default class CharacterEntity extends PositionableEntity {
 
   protected readonly _shouldMoveWithCollisions: boolean = true;
   protected _kind: CharacterKind = CharacterKind.Player;
+  protected _action: CharacterAction = CharacterAction.Standing;
 
   public constructor(
     name: string,
@@ -41,6 +43,10 @@ export default class CharacterEntity extends PositionableEntity {
 
   public get kind(): CharacterKind {
     return this._kind;
+  }
+
+  public get action(): CharacterAction {
+    return this._action;
   }
 
   protected _createLifeBoudedValue(): BoundedValue {
@@ -146,7 +152,7 @@ export default class CharacterEntity extends PositionableEntity {
   }
 
   protected _attack(target: CharacterEntity) {
-    console.warn('No _attack implementation');
+    this._action = CharacterAction.Attacking;
 
     return false;
   }

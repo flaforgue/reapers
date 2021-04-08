@@ -19,12 +19,14 @@ enum PlayerAnimationKey {
 
 enum SpiderAnimationKey {
   Attack = 0,
+  Punch = 1,
   Idle = 1,
   Jump = 2,
   Walk = 3,
 }
 
 enum FrogAnimationKey {
+  Punch = 0,
   Idle = 0,
   Walk = 1,
 }

@@ -6,7 +6,7 @@ export function createLight(scene: BABYLON.Scene) {
     new BABYLON.Vector3(0, -10, 0),
     scene,
   );
-  light.position = new BABYLON.Vector3(0, 1000, 0);
+  light.position = new BABYLON.Vector3(0, 10, 0);
 
   return light;
 }
@@ -18,8 +18,16 @@ export function createSound(scene: BABYLON.Scene) {
   });
 }
 
-export function createSkyBox(scene: BABYLON.Scene) {
-  const skybox = BABYLON.MeshBuilder.CreateBox('skyBox', { size: 1000.0 }, scene);
+export function createSkyBox(scene: BABYLON.Scene, width: number, depth: number) {
+  const skybox = BABYLON.MeshBuilder.CreateBox(
+    'skyBox',
+    {
+      width: width + 10,
+      depth: depth + 10,
+      height: 20,
+    },
+    scene,
+  );
   var skyboxMaterial = new BABYLON.StandardMaterial('skyBox', scene);
   skyboxMaterial.backFaceCulling = false;
   skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(

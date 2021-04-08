@@ -4,6 +4,7 @@ import {
   SideMoveDirection,
   RotationDirection,
   CharacterKind,
+  CharacterAction,
 } from '../../types';
 import BoundedValueDTO from './bounded-value.dto';
 import PositionableDTO from './positionable.dto';
@@ -25,6 +26,9 @@ export default class CharacterDTO extends PositionableDTO {
 
   @Expose()
   public kind: CharacterKind = CharacterKind.Player;
+
+  @Expose()
+  public action: CharacterAction = CharacterAction.Standing;
 
   @Expose()
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;

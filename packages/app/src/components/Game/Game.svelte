@@ -32,7 +32,7 @@
   };
   let baseActiveMesh: BABYLON.Mesh | undefined;
   let gui: GUI.AdvancedDynamicTexture | undefined;
-  let shadowGenerator: BABYLON.ShadowGenerator | undefined;
+  let shadowGenerator: BABYLON.CascadedShadowGenerator | undefined;
 
   function keyboardEventHandler({ type, event }: BABYLON.KeyboardInfo) {
     if (type === BABYLON.KeyboardEventTypes.KEYDOWN && event.key === Key.Escape) {
@@ -127,11 +127,21 @@
   }
 
   function handleLightChanged(details: CustomEvent<BABYLON.DirectionalLight>) {
+    const maxZ = Math.max($game.world.width, $game.world.depth) * 2;
+
     shadowGenerator?.dispose();
-    shadowGenerator = new BABYLON.ShadowGenerator(1024, details.detail);
+
+    if (gameCamera && maxZ > 0) {
+      gameCamera.maxZ = maxZ;
+    }
+
+    shadowGenerator = new BABYLON.CascadedShadowGenerator(1024, details.detail);
+    shadowGenerator.shadowMaxZ = maxZ;
+    shadowGenerator.stabilizeCascades = true;
+    shadowGenerator.cascadeBlendPercentage = 0;
     shadowGenerator.usePercentageCloserFiltering = true;
     shadowGenerator.filteringQuality = BABYLON.ShadowGenerator.QUALITY_LOW;
-    shadowGenerator.setDarkness(0.6);
+    shadowGenerator.setDarkness(0.4);
   }
 </script>
 

@@ -48,30 +48,11 @@
     }
   }
 
-  function updatePosition(x = 0, y = 0, z = 0) {
-    if (rootMesh) {
-      rootMesh.position = new BABYLON.Vector3(x, y, z);
-    }
-  }
-
-  function updateRotation(x = 0, y = 0, z = 0) {
-    if (rootMesh) {
-      rootMesh.rotation = new BABYLON.Vector3(x, y, z);
-    }
-  }
-
   function updateAnimation(direction: FrontMoveDirection | SideMoveDirection) {
     if (rootMesh && direction) {
       switchAnimation(animationKeys[character.kind].Walk);
     } else {
       switchAnimation(animationKeys[character.kind].Idle);
-    }
-  }
-
-  function setRootMeshMaterialAlpha(value: number) {
-    const material = rootMesh?.getChildMeshes()[0].material;
-    if (material) {
-      material.alpha = value;
     }
   }
 
@@ -84,8 +65,9 @@
     rootMeshes = (entries?.rootNodes ?? []) as BABYLON.Mesh[];
     rootMesh = rootMeshes[0];
 
-    updatePosition(...character.position);
-    updateRotation(...character.rotation);
+    // give to Character
+    // updatePosition(...character.position);
+    // updateRotation(...character.rotation);
 
     rootMesh.actionManager = new BABYLON.ActionManager(
       assetContainer?.scene as BABYLON.Scene,
@@ -129,16 +111,6 @@
     shadowGenerator?.addShadowCaster(rootMesh as AbstractMesh);
   }
 
-  function setGUITargetInfos(character: CharacterDTO | CharacterInfos) {
-    $targetInfos = createTargetInfos(character);
-  }
-
-  function createCharacterLabel() {
-    if (rootMesh && gui) {
-      label = createLabel(`${name} • ${level}`, kind, rootMesh, gui);
-    }
-  }
-
   function castSpell() {
     const scene = rootMesh?.getScene();
 
@@ -179,48 +151,33 @@
     }
   }
 
-  $: {
-    if (camera && rootMesh && !camera.parent) {
-      camera.parent = rootMesh as AbstractMesh;
-    }
-  }
+  // same behavior from Character
+  // $: position = character.position;
+  // $: [posX, posY, posZ] = position;
+  // $: {
+  //   // isAssetContainerReady must be part of reactivity deps
+  //   if (isAssetContainerReady) {
+  //     updatePosition(posX, posY, posZ);
+  //   }
+  // }
 
-  $: rootMeshId = rootMesh?.id;
-  $: name = character.name;
-  $: level = character.level;
-  $: kind = character.kind;
-  $: {
-    if (rootMeshId && gui && name && level) {
-      createCharacterLabel();
-    }
-  }
+  // $: rotation = character.rotation;
+  // $: [rotX, rotY, rotZ] = rotation;
+  // $: {
+  //   // isAssetContainerReady must be part of reactivity deps
+  //   if (isAssetContainerReady) {
+  //     updateRotation(rotX, rotY, rotZ);
+  //   }
+  // }
 
-  $: position = character.position;
-  $: [posX, posY, posZ] = position;
-  $: {
-    // isAssetContainerReady must be part of reactivity deps
-    if (isAssetContainerReady) {
-      updatePosition(posX, posY, posZ);
-    }
-  }
-
-  $: rotation = character.rotation;
-  $: [rotX, rotY, rotZ] = rotation;
-  $: {
-    // isAssetContainerReady must be part of reactivity deps
-    if (isAssetContainerReady) {
-      updateRotation(rotX, rotY, rotZ);
-    }
-  }
-
-  $: frontMoveDirection = character.frontMoveDirection;
-  $: sideMoveDirection = character.sideMoveDirection;
-  $: {
-    // isAssetContainerReady must be part of reactivity deps
-    if (isAssetContainerReady) {
-      updateAnimation(frontMoveDirection || sideMoveDirection);
-    }
-  }
+  // $: frontMoveDirection = character.frontMoveDirection;
+  // $: sideMoveDirection = character.sideMoveDirection;
+  // $: {
+  //   // isAssetContainerReady must be part of reactivity deps
+  //   if (isAssetContainerReady) {
+  //     updateAnimation(frontMoveDirection || sideMoveDirection);
+  //   }
+  // }
 
   $: isTarget = $targetInfos?.id === character.id;
   $: id = character.id;
