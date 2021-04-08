@@ -10,5 +10,5 @@ export default {
   moveStep: 0.07,
   // moveStep: 0.7,
   rotationStep: 0.035,
-  gravity: -1,
+  gravity: -2,
 };
