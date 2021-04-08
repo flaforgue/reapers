@@ -44,4 +44,8 @@ export default class PlayerEntity extends CharacterEntity {
     this._socket.volatile.emit(GameEvents.Game.Updated, gameDto);
     this.update();
   }
+
+  protected _attack(character: CharacterEntity) {
+    return true;
+  }
 }

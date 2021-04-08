@@ -39,8 +39,8 @@ function updateRotationDirection(direction: RotationDirection) {
   socket?.emit(GameEvents.Player.RotationDirectionUpdated, direction);
 }
 
-function attack(targetId: string) {
-  socket?.emit(GameEvents.Player.Attacked, targetId);
+function castSpell(targetId: string) {
+  socket?.emit(GameEvents.Player.SpellCasted, targetId);
 }
 
 function useGame(serverUrl: string) {
@@ -62,7 +62,7 @@ function useGame(serverUrl: string) {
     updateFrontMoveDirection,
     updateSideMoveDirection,
     updateRotationDirection,
-    attack,
+    castSpell,
   };
 }
 

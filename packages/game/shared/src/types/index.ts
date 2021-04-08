@@ -11,7 +11,7 @@ enum PlayerEvent {
   FrontMoveDirectionUpdated = 'PlayerEvent.FrontMoveDirectionUpdated',
   SideMoveDirectionUpdated = 'PlayerEvent.SideMoveDirectionUpdated',
   RotationDirectionUpdated = 'PlayerEvent.RotationDirectionUpdated',
-  Attacked = 'PlayerEvent.Attacked',
+  SpellCasted = 'PlayerEvent.SpellCasted',
 }
 
 enum GameEvent {

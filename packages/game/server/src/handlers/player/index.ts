@@ -47,24 +47,10 @@ export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
     },
   );
 
-  socket.on(GameEvents.Player.Attacked, (id: string) => {
+  socket.on(GameEvents.Player.SpellCasted, (id: string) => {
     const target = game.findCharacterById(id);
-
     if (target) {
-      const vectorToTarget = target.meshPosition.subtract(player.meshPosition);
-      const distanceToTarget = vectorToTarget.length();
-
-      if (distanceToTarget <= player.attackRange) {
-        player.attack(target);
-      }
+      player.attackIfInRange(target);
     }
-
-    return false;
   });
-
-  // socket.on(GameEvents.Player.Attacked, (id: string, fn) => {
-  //   const target =
-
-  //   return fn(player.canAttack(target));
-  // });
 };

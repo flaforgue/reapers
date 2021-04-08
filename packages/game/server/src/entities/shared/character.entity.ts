@@ -134,5 +134,20 @@ export default class CharacterEntity extends PositionableEntity {
     this._mesh.rotation.y = rotationY;
   }
 
-  public attack(target: CharacterEntity) {}
+  public attackIfInRange(target: CharacterEntity) {
+    const distanceToTarget = BABYLON.Vector3.Distance(
+      target.meshPosition,
+      this._mesh.position,
+    );
+
+    if (distanceToTarget <= this.attackRange) {
+      this._attack(target);
+    }
+  }
+
+  protected _attack(target: CharacterEntity) {
+    console.warn('No _attack implementation');
+
+    return false;
+  }
 }

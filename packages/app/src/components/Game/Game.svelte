@@ -65,7 +65,7 @@
     updateSideMoveDirection,
     updateFrontMoveDirection,
     updateRotationDirection,
-    attack,
+    castSpell,
   } = useGame(servers.game.url);
 
   onMount(() => {
@@ -157,7 +157,7 @@
         {updateFrontMoveDirection}
         {updateSideMoveDirection}
         {updateRotationDirection}
-        {attack}
+        {castSpell}
       />
     {/if}
   {/each}
