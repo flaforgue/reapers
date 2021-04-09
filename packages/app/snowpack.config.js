@@ -23,6 +23,7 @@ module.exports = {
   devOptions: {
     hmr: false,
     out: 'dist',
+    open: 'none',
   },
   buildOptions: {
     sourcemap: true,
