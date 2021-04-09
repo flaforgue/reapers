@@ -57,8 +57,12 @@
         particleSystem = createParticleSystem(scene, player.attackLinearSpeed);
       }
 
+      particleSystem.emitter = new BABYLON.Vector3(...player.position).add(
+        new BABYLON.Vector3(0, 0.25, 0),
+      );
+
       const vectorToTarget = new BABYLON.Vector3(...targetPosition).subtract(
-        new BABYLON.Vector3(...player.position),
+        particleSystem.emitter,
       );
       const distanceToTarget = vectorToTarget.length();
       const directionToTarget = vectorToTarget.normalize();
@@ -68,13 +72,8 @@
       particleSystem.direction2 = directionToTarget;
       particleSystem.minLifeTime = lifeTime;
       particleSystem.maxLifeTime = lifeTime;
-      particleSystem.emitter = new BABYLON.Vector3(...player.position).add(
-        new BABYLON.Vector3(0, 0.25, 0),
-      );
-      particleSystem.manualEmitCount = 1;
 
-      // an attack removes life
-      // sometimes, no impact particules
+      particleSystem.manualEmitCount = 2;
     }
   }
 
