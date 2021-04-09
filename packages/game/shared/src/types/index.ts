@@ -55,11 +55,6 @@ export enum MonsterKind {
   Frog = 'Frog',
 }
 
-export enum CharacterAction {
-  Standing = 'Standing',
-  Attacking = 'Attacking',
-}
-
 export enum EnvironmentKind {
   Unknown = 'Unknown',
   MonsterGenerator = 'MonsterGenerator',

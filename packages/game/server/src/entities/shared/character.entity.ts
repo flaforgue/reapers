@@ -3,30 +3,32 @@ import {
   FrontMoveDirection,
   SideMoveDirection,
   RotationDirection,
-  CharacterAction,
   CharacterKind,
 } from '@reapers/game-shared';
 import config from '../../config';
 import PositionableEntity from './positionable.entity';
 import BoundedValue from './bounded-value';
-
-const SPEED = new BABYLON.Vector3(config.moveStep, config.moveStep, config.moveStep);
-const LOW_SPEED = SPEED.multiply(
-  new BABYLON.Vector3(Math.SQRT1_2, Math.SQRT1_2, Math.SQRT1_2),
-);
+import AttackEntity from './attack.entity';
 export default class CharacterEntity extends PositionableEntity {
   public readonly name: string;
   public readonly level: number;
   public readonly life: BoundedValue;
-  public readonly attackRange: number = 0;
+  public readonly attackRange: number = 1;
+  public readonly attackDamageAmount: number = 0;
+  public readonly attackLinearSpeed: number = 1;
 
+  public isAttacking: boolean = false;
+  public currentAttack: AttackEntity | null = null;
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
   public rotationDirection: RotationDirection = RotationDirection.None;
 
+  protected readonly _speedFactor = new BABYLON.Vector3(1, 1, 1);
   protected readonly _shouldMoveWithCollisions: boolean = true;
-  protected _kind: CharacterKind = CharacterKind.Player;
-  protected _action: CharacterAction = CharacterAction.Standing;
+  protected readonly _kind: CharacterKind = CharacterKind.Player;
+  protected readonly _attackDuration: number = 0.75; // in seconds
+  private readonly _speed: BABYLON.Vector3;
+  private readonly _low_speed: BABYLON.Vector3;
 
   public constructor(
     name: string,
@@ -36,20 +38,24 @@ export default class CharacterEntity extends PositionableEntity {
     rotation?: number[],
   ) {
     super(mesh, position, rotation);
+    this._speed = new BABYLON.Vector3(
+      config.moveStep,
+      config.moveStep,
+      config.moveStep,
+    ).multiply(this._speedFactor);
+    this._low_speed = this._speed.multiply(
+      new BABYLON.Vector3(Math.SQRT1_2, Math.SQRT1_2, Math.SQRT1_2),
+    );
     this.name = name;
     this.level = level;
     this.life = this._createLifeBoudedValue();
   }
 
-  public get kind(): CharacterKind {
+  public get kind() {
     return this._kind;
   }
 
-  public get action(): CharacterAction {
-    return this._action;
-  }
-
-  protected _createLifeBoudedValue(): BoundedValue {
+  protected _createLifeBoudedValue() {
     return new BoundedValue();
   }
 
@@ -61,6 +67,7 @@ export default class CharacterEntity extends PositionableEntity {
     }
 
     this._updateRotation();
+    this.currentAttack?.update();
   }
 
   private _moveWithCollisions() {
@@ -89,7 +96,7 @@ export default class CharacterEntity extends PositionableEntity {
     }
 
     this._mesh.moveWithCollisions(
-      move.multiply(isMovingFront && isMovingSide ? LOW_SPEED : SPEED),
+      move.multiply(isMovingFront && isMovingSide ? this._low_speed : this._speed),
     );
   }
 
@@ -133,7 +140,11 @@ export default class CharacterEntity extends PositionableEntity {
       rotationAmount = config.rotationStep;
     }
 
-    this._mesh.rotatePOV(0, rotationAmount, 0);
+    this._mesh.rotation = new BABYLON.Vector3(
+      0,
+      (this._mesh.rotation.y + rotationAmount) % (2 * Math.PI),
+      0,
+    );
   }
 
   public setRotation(rotationY: number) {
@@ -147,13 +158,20 @@ export default class CharacterEntity extends PositionableEntity {
     );
 
     if (distanceToTarget <= this.attackRange) {
-      this._attack(target);
+      this._attack(target, distanceToTarget);
     }
   }
 
-  protected _attack(target: CharacterEntity) {
-    this._action = CharacterAction.Attacking;
+  protected _attack(target: CharacterEntity, distanceToTarget: number) {
+    this._mesh.lookAt(target.meshPosition, Math.PI);
 
-    return false;
+    this.frontMoveDirection = FrontMoveDirection.None;
+    this.sideMoveDirection = SideMoveDirection.None;
+    this.isAttacking = true;
+    this.currentAttack = new AttackEntity(this, target, {
+      damageAmount: this.attackDamageAmount,
+      timeToCast: 0.45,
+      timeToHit: distanceToTarget / this.attackLinearSpeed,
+    });
   }
 }

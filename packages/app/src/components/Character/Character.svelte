@@ -13,6 +13,7 @@
   export let rootMesh: BABYLON.Mesh | undefined;
   export let animationGroups: BABYLON.AnimationGroup[] = [];
   export let currentAnimationKey: number;
+  export let isAnimationLoop: boolean;
 
   let label: GUI.TextBlock | undefined;
   let highlightMesh: BABYLON.Mesh | undefined;
@@ -31,12 +32,18 @@
   }
 
   function switchAnimation(animationKey: number, isLoop = true) {
+    currentAnimation?.reset()?.stop();
+
     const newAnimation = animationGroups[animationKey];
 
-    if (newAnimation && newAnimation !== currentAnimation) {
-      currentAnimation?.stop();
-      currentAnimation = newAnimation;
-      currentAnimation.play(isLoop);
+    if (newAnimation) {
+      currentAnimation = newAnimation.start(
+        isLoop,
+        newAnimation.speedRatio,
+        newAnimation.from,
+        newAnimation.to,
+        false,
+      );
     }
   }
 
@@ -106,7 +113,7 @@
 
   $: {
     if (isRootMeshReady) {
-      switchAnimation(currentAnimationKey);
+      switchAnimation(currentAnimationKey, isAnimationLoop);
     }
   }
 

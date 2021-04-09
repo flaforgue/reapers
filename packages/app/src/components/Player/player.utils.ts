@@ -18,13 +18,14 @@ function createMainParticleSystem(
   scene: BABYLON.Scene,
   particleTexture: BABYLON.Texture,
   particleColor: BABYLON.Color4,
+  attackLinearSpeed: number,
 ) {
   const ps = new BABYLON.ParticleSystem('particles', 1000, scene);
 
   ps.createPointEmitter(BABYLON.Vector3.Forward(), BABYLON.Vector3.Forward());
   ps.particleTexture = particleTexture;
-  ps.minEmitPower = 30;
-  ps.maxEmitPower = 30;
+  ps.minEmitPower = attackLinearSpeed;
+  ps.maxEmitPower = attackLinearSpeed;
   ps.updateSpeed = 0.01;
   ps.color1 = particleColor;
   ps.color2 = particleColor;
@@ -92,7 +93,7 @@ function createTrailParticleSystem(
   return ps;
 }
 
-export function createParticleSystem(scene: BABYLON.Scene) {
+export function createParticleSystem(scene: BABYLON.Scene, attackLinearSpeed: number) {
   const particleTexture = new BABYLON.Texture('/textures/flare.png', scene);
   const particleColor = new BABYLON.Color4(0.2, 0.2, 0.85, 1);
 
@@ -100,6 +101,7 @@ export function createParticleSystem(scene: BABYLON.Scene) {
     scene,
     particleTexture,
     particleColor,
+    attackLinearSpeed,
   );
 
   const trailParticleSystem = createTrailParticleSystem(

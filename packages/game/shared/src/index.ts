@@ -17,7 +17,6 @@ import {
   FrontMoveDirection,
   SideMoveDirection,
   RotationDirection,
-  CharacterAction,
 } from './types';
 
 export {
@@ -34,6 +33,5 @@ export {
   SideMoveDirection,
   RotationDirection,
   WorldDTO,
-  CharacterAction,
   plainToClass,
 };

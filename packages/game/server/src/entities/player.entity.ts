@@ -5,8 +5,11 @@ import CharacterEntity from './shared/character.entity';
 import BoundedValue from './shared/bounded-value';
 
 export default class PlayerEntity extends CharacterEntity {
-  private readonly _socket: SocketIO.Socket;
   public readonly attackRange = 10;
+  public readonly attackDamageAmount: number = 10;
+  public readonly attackLinearSpeed: number = 30;
+  private readonly _socket: SocketIO.Socket;
+  protected readonly _kind: CharacterKind = CharacterKind.Player;
 
   public constructor(
     socket: SocketIO.Socket,
@@ -33,7 +36,6 @@ export default class PlayerEntity extends CharacterEntity {
     this._socket = socket;
     this._mesh.ellipsoid = new BABYLON.Vector3(0.25, 0.45, 0.25);
     this._mesh.checkCollisions = true;
-    this._kind = CharacterKind.Player;
   }
 
   protected _createLifeBoudedValue(): BoundedValue {

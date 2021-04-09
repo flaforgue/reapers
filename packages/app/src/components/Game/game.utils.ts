@@ -25,18 +25,17 @@ export function createScene(engine: BABYLON.Engine) {
 export function createCamera(scene: BABYLON.Scene) {
   const camera = new BABYLON.ArcRotateCamera(
     'playerCamera',
-    -Math.PI / 2,
+    Math.PI / 2,
     Math.PI / 3.5,
-    25,
+    8,
     BABYLON.Vector3.Zero(),
     scene,
     true,
   );
 
-  camera.ignoreParentScaling = true;
-  camera.lowerRadiusLimit = 8;
-  camera.radius = 25;
-  camera.upperRadiusLimit = 40;
+  camera.lowerRadiusLimit = 4;
+  camera.radius = 8;
+  camera.upperRadiusLimit = 14;
   camera.upperBetaLimit = Math.PI / 2.5;
   camera.lowerBetaLimit = Math.PI / 5;
   camera.attachControl(true);

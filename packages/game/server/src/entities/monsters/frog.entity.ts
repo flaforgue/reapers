@@ -4,6 +4,9 @@ import BoundedValue from '../shared/bounded-value';
 import MonsterEntity from './monster.entity';
 
 export default class FrogEntity extends MonsterEntity {
+  protected readonly _kind: CharacterKind = CharacterKind.Frog;
+  protected _speedFactor = new BABYLON.Vector3(1.5, 1.5, 1.5);
+
   public constructor(
     scene: BABYLON.Scene,
     level: number,
@@ -27,7 +30,6 @@ export default class FrogEntity extends MonsterEntity {
     );
     this._mesh.checkCollisions = true;
     this._mesh.ellipsoid = new BABYLON.Vector3(0.5, 0.25, 0.5);
-    this._kind = CharacterKind.Frog;
   }
 
   protected _createLifeBoudedValue(): BoundedValue {

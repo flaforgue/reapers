@@ -1,12 +1,12 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
+  import { AbstractMesh } from '@babylonjs/core';
+  import { onDestroy } from 'svelte';
   import { CharacterDTO } from '@reapers/game-client';
   import { disposeArray } from '../../utils';
-  import { onDestroy } from 'svelte';
-  import { AnimationKey } from './player.utils';
+  import { AnimationKey, createParticleSystem } from './player.utils';
   import Character from '../Character/Character.svelte';
-  import { AbstractMesh } from '@babylonjs/core';
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
   export let baseHighlightMesh: BABYLON.Mesh | undefined;
@@ -17,10 +17,10 @@
 
   let rootMeshes: BABYLON.Mesh[] = [];
   let skeletons: BABYLON.Skeleton[] = [];
-  let animationGroups: BABYLON.AnimationGroup[] = [];
-  let currentAnimation: BABYLON.AnimationGroup | undefined;
-  let currentAnimationKey = AnimationKey.Idle;
   let particleSystem: BABYLON.ParticleSystem | undefined;
+  let animationGroups: BABYLON.AnimationGroup[] = [];
+  let currentAnimationKey = AnimationKey.Idle;
+  let isAnimationLoop = true;
 
   function instantiateModels() {
     const entries = assetContainer?.instantiateModelsToScene((sourceName) => {
@@ -31,40 +31,59 @@
     rootMeshes = (entries?.rootNodes ?? []) as BABYLON.Mesh[];
     animationGroups = entries?.animationGroups ?? [];
     animationGroups[AnimationKey.Walk].speedRatio = 2;
+
+    const attackAnimation =
+      animationGroups[AnimationKey.Punch].targetedAnimations[0].animation;
+
+    attackAnimation.addEvent(
+      new BABYLON.AnimationEvent(0.4, function () {
+        castSpell();
+      }),
+    );
+    attackAnimation.addEvent(
+      new BABYLON.AnimationEvent(0.75, function () {
+        currentAnimationKey = AnimationKey.Idle;
+      }),
+    );
     shadowGenerator?.addShadowCaster(rootMeshes[0] as AbstractMesh);
   }
 
-  // function castSpell() {
-  //   const scene = rootMeshes[0]?.getScene();
+  function castSpell() {
+    const scene = rootMeshes[0]?.getScene();
+    const targetPosition = player?.currentAttack?.targetPosition;
 
-  //   if ($targetInfos?.position && scene && player?.position) {
-  //     if (!particleSystem) {
-  //       particleSystem = createParticleSystem(scene);
-  //     }
+    if (targetPosition && scene && player?.position) {
+      if (!particleSystem) {
+        particleSystem = createParticleSystem(scene, player.attackLinearSpeed);
+      }
 
-  //     const vectorToTarget = $targetInfos.position.subtract(
-  //       new BABYLON.Vector3(...player.position),
-  //     );
-  //     const distanceToTarget = vectorToTarget.length();
-  //     const directionToTarget = vectorToTarget.normalize();
-  //     const lifeTime = distanceToTarget / particleSystem.minEmitPower;
+      const vectorToTarget = new BABYLON.Vector3(...targetPosition).subtract(
+        new BABYLON.Vector3(...player.position),
+      );
+      const distanceToTarget = vectorToTarget.length();
+      const directionToTarget = vectorToTarget.normalize();
+      const lifeTime = distanceToTarget / player.attackLinearSpeed;
 
-  //     particleSystem.direction1 = directionToTarget;
-  //     particleSystem.direction2 = directionToTarget;
-  //     particleSystem.minLifeTime = lifeTime;
-  //     particleSystem.maxLifeTime = lifeTime;
-  //     particleSystem.emitter = new BABYLON.Vector3(...player.position).add(
-  //       new BABYLON.Vector3(0, 0.5, 0),
-  //     );
-  //     particleSystem.manualEmitCount = 1;
+      particleSystem.direction1 = directionToTarget;
+      particleSystem.direction2 = directionToTarget;
+      particleSystem.minLifeTime = lifeTime;
+      particleSystem.maxLifeTime = lifeTime;
+      particleSystem.emitter = new BABYLON.Vector3(...player.position).add(
+        new BABYLON.Vector3(0, 0.25, 0),
+      );
+      particleSystem.manualEmitCount = 1;
 
-  //     // show animations to other players
-  //     // animation player
-  //     // cooldown
-  //     // on attack ended, client send attack message to backend
-  //     // backend check if attack is possible and attack
-  //   }
-  // }
+      // an attack removes life
+      // sometimes, no impact particules
+    }
+  }
+
+  function updateCameraAlpha(rotZ: number) {
+    // !player.isAttacking because we don't want to rotate because of the lookAt caused by attack
+    if (camera && !player.isAttacking) {
+      camera.alpha = (rotZ - Math.PI / 2) * -1;
+    }
+  }
 
   $: isAssetContainerReady = Boolean(assetContainer);
   $: isShadowGeneratorReady = Boolean(shadowGenerator);
@@ -76,8 +95,13 @@
 
   $: {
     if (camera && rootMeshes[0] && !camera.parent) {
-      camera.parent = rootMeshes[0];
+      camera.lockedTarget = rootMeshes[0];
     }
+  }
+
+  $: rotZ = player.rotation[1];
+  $: {
+    updateCameraAlpha(rotZ);
   }
 
   $: isRootMeshReady = Boolean(rootMeshes[0]);
@@ -86,17 +110,20 @@
   $: {
     if (isRootMeshReady && (frontMoveDirection || sideMoveDirection)) {
       currentAnimationKey = AnimationKey.Walk;
+      isAnimationLoop = true;
     } else {
       currentAnimationKey = AnimationKey.Idle;
+      isAnimationLoop = true;
     }
   }
 
-  // $: action = character.action;
-  // $: {
-  //   if (action === CharacterAction.Attacking) {
-  //     switchAnimation(animationKeys[character.kind].Punch, false);
-  //   }
-  // }
+  $: currentAttackId = player?.currentAttack?.id;
+  $: {
+    if (currentAttackId) {
+      currentAnimationKey = AnimationKey.Punch;
+      isAnimationLoop = false;
+    }
+  }
 
   onDestroy(() => {
     const particleSystems = (particleSystem?.subEmitters ?? []).map(
@@ -115,6 +142,7 @@
   character={player}
   {animationGroups}
   {currentAnimationKey}
+  {isAnimationLoop}
   {baseHighlightMesh}
   {gui}
 />

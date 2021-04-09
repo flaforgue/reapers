@@ -162,7 +162,6 @@
     />
     {#if player.id === $activePlayerId}
       <PlayerController
-        camera={gameCamera}
         scene={gameScene}
         {player}
         {updateFrontMoveDirection}

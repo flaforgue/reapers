@@ -24,10 +24,10 @@ export default class BoundedValue {
   }
 
   public add(value: number) {
-    this._value += value;
+    this._value = Math.min(this._value + value, this._max);
   }
 
   public remove(value: number) {
-    this._value -= value;
+    this._value = Math.max(this._value - value, this._min);
   }
 }

@@ -23,7 +23,7 @@ export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
   socket.on(
     GameEvents.Player.FrontMoveDirectionUpdated,
     (direction: FrontMoveDirection) => {
-      if (isValidFrontMoveDirection(direction)) {
+      if (!player.isAttacking && isValidFrontMoveDirection(direction)) {
         player.frontMoveDirection = direction;
       }
     },
@@ -32,7 +32,7 @@ export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
   socket.on(
     GameEvents.Player.SideMoveDirectionUpdated,
     (direction: SideMoveDirection) => {
-      if (isValidSideMoveDirection(direction)) {
+      if (!player.isAttacking && isValidSideMoveDirection(direction)) {
         player.sideMoveDirection = direction;
       }
     },
@@ -41,17 +41,19 @@ export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
   socket.on(
     GameEvents.Player.RotationDirectionUpdated,
     (direction: RotationDirection) => {
-      if (isValidRotationDirection(direction)) {
+      if (!player.isAttacking && isValidRotationDirection(direction)) {
         player.rotationDirection = direction;
       }
     },
   );
 
   socket.on(GameEvents.Player.SpellCasted, (id: string) => {
-    // if !player.isAttacking()
-    const target = game.findCharacterById(id);
-    if (target) {
-      player.attackIfInRange(target);
+    if (!player.isAttacking && !player.currentAttack) {
+      const target = game.findCharacterById(id);
+
+      if (target) {
+        player.attackIfInRange(target);
+      }
     }
   });
 };

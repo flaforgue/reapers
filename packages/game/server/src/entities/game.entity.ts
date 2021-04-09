@@ -136,7 +136,11 @@ export default class GameEntity extends BaseEntity {
 
   private _update() {
     this._frameIndex = (this._frameIndex + 1) % config.fps;
-    const gameDto = plainToClass(GameDTO, this);
+    const gameDto = plainToClass(GameDTO, this, {
+      exposeDefaultValues: true,
+      excludeExtraneousValues: true,
+      strategy: 'excludeAll',
+    });
 
     for (let i = 0; i < this._players.length; i++) {
       this._players[i].updateAndEmitGameState(gameDto);

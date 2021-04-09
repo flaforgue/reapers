@@ -4,8 +4,8 @@ import {
   SideMoveDirection,
   RotationDirection,
   CharacterKind,
-  CharacterAction,
 } from '../../types';
+import AttackDTO from './attack.dto';
 import BoundedValueDTO from './bounded-value.dto';
 import PositionableDTO from './positionable.dto';
 
@@ -25,10 +25,17 @@ export default class CharacterDTO extends PositionableDTO {
   public attackRange = 0;
 
   @Expose()
+  public attackLinearSpeed = 0;
+
+  @Expose()
   public kind: CharacterKind = CharacterKind.Player;
 
   @Expose()
-  public action: CharacterAction = CharacterAction.Standing;
+  @Type(() => AttackDTO)
+  public currentAttack: AttackDTO | null = null;
+
+  @Expose()
+  public isAttacking: boolean = false;
 
   @Expose()
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;

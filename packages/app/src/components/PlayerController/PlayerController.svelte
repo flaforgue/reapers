@@ -13,7 +13,6 @@
     isFrontMoveDirection,
     isSideMoveDirection,
     isRotationDirection,
-    resetCamera,
   } from './PlayerController.utils';
 
   export let updateFrontMoveDirection: (direction: FrontMoveDirection) => void;
@@ -22,28 +21,23 @@
   export let castSpell: (targetId: string) => void;
   export let player: CharacterDTO | undefined;
   export let scene: BABYLON.Scene | undefined;
-  export let camera: BABYLON.ArcRotateCamera | undefined;
 
   let keyboardEventObserver:
     | BABYLON.Nullable<BABYLON.Observer<BABYLON.KeyboardInfo>>
     | undefined;
 
   function localUpdateRotationDirection(direction: RotationDirection) {
-    const isAlreadyResetting = camera?.animations?.length;
-
-    if (camera && camera.alpha !== -Math.PI / 2 && !isAlreadyResetting) {
-      resetCamera(camera);
+    if (!player?.isAttacking) {
+      updateRotationDirection(direction);
     }
-
-    updateRotationDirection(direction);
   }
 
   function localCastSpell() {
-    if ($targetInfos?.position && player) {
-      const vectorToTarget = $targetInfos.position.subtract(
+    if (!player?.isAttacking && $targetInfos?.position && player) {
+      const distanceToTarget = BABYLON.Vector3.Distance(
         new BABYLON.Vector3(...player.position),
+        $targetInfos.position,
       );
-      const distanceToTarget = vectorToTarget.length();
 
       if (distanceToTarget <= player.attackRange) {
         castSpell($targetInfos.id);
@@ -54,7 +48,7 @@
   }
 
   function keyboardEventHandler({ type, event }: BABYLON.KeyboardInfo) {
-    if (type === BABYLON.KeyboardEventTypes.KEYDOWN) {
+    if (!player?.isAttacking && type === BABYLON.KeyboardEventTypes.KEYDOWN) {
       switch (event.key) {
         case Key.z:
           updateFrontMoveDirection(FrontMoveDirection.Forward);
