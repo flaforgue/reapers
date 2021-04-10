@@ -19,7 +19,7 @@ export default class AttackEntity extends BaseEntity {
     attack: {
       damageAmount: number;
       timeToCast: number; // time to cast the attack
-      timeToHit: number; // time to hit, after timeToCast
+      timeToHit: number; // time to reach the target
     },
   ) {
     super();
@@ -35,7 +35,7 @@ export default class AttackEntity extends BaseEntity {
     this.timeToHit = attack.timeToHit;
     this._attackHitScheduler = new ActionScheduler(() => {
       this._target.life.remove(this.damageAmount);
-      this._parent.currentAttack = null;
+      this._parent.removeCurrentAttack(this.id);
     }, this.timeToCast + this.timeToHit);
   }
 

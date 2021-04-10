@@ -37,21 +37,18 @@
   }
 
   function switchAnimation(animationKey: number) {
-    if (character.kind === CharacterKind.Player) {
-      console.log('switchAnimation', animationKey);
-    }
-
     currentAnimation?.reset()?.stop();
 
     const newAnimation = animationGroups[animationKey];
-    const isLoop = animationKey !== attackAnimationKey;
+    const isAttackAnimation = animationKey === attackAnimationKey;
+    const to = isAttackAnimation ? character.attackTimeToCast : newAnimation.to;
 
     if (newAnimation) {
       currentAnimation = newAnimation.start(
-        isLoop,
+        !isAttackAnimation,
         newAnimation.speedRatio,
         newAnimation.from,
-        newAnimation.to,
+        to,
         false,
       );
     }
@@ -116,7 +113,8 @@
 
   function createCurrentAttackLabelAsync() {
     if (rootMesh && character.currentAttack) {
-      createAttackLabelAsync(character.currentAttack, rootMesh.getScene());
+      const currentAttackClone = Object.assign({}, character.currentAttack);
+      createAttackLabelAsync(currentAttackClone, rootMesh.getScene());
     }
   }
 
@@ -187,7 +185,6 @@
   $: currentAttackId = character?.currentAttack?.id;
   $: {
     if (currentAttackId) {
-      currentAnimationKey = attackAnimationKey;
       createCurrentAttackLabelAsync();
     }
   }

@@ -9,7 +9,7 @@ enum SpiderAnimationKey {
 enum FrogAnimationKey {
   Idle = 0,
   Walk = 1,
-  Attack = 1,
+  Attack = 2,
 }
 
 type AnimationKeyType = typeof SpiderAnimationKey | typeof FrogAnimationKey;

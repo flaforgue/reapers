@@ -9,18 +9,11 @@ import BaseEntity from './shared/base.entity';
 import MonsterGeneratorEntity from './monster-generator.entity';
 import FrogEntity from './monsters/frog.entity';
 import CharacterEntity from './shared/character.entity';
+import { removeFromArrayById } from './shared/utils';
 
 enum GameState {
   Started,
   Stopped,
-}
-
-function removeFromArrayById(arr: BaseEntity[], id: string) {
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i].id === id) {
-      return arr.splice(i, 1)[0];
-    }
-  }
 }
 
 export default class GameEntity extends BaseEntity {

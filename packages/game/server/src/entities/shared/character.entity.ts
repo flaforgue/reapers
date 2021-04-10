@@ -9,6 +9,7 @@ import config from '../../config';
 import PositionableEntity from './positionable.entity';
 import BoundedValue from './bounded-value';
 import AttackEntity from './attack.entity';
+import { removeFromArrayById } from './utils';
 export default class CharacterEntity extends PositionableEntity {
   public readonly name: string;
   public readonly level: number;
@@ -19,7 +20,6 @@ export default class CharacterEntity extends PositionableEntity {
   public readonly attackTimeToCast: number = 0.1;
 
   public isAttacking: boolean = false;
-  public currentAttack: AttackEntity | null = null;
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
   public rotationDirection: RotationDirection = RotationDirection.None;
@@ -30,6 +30,7 @@ export default class CharacterEntity extends PositionableEntity {
   protected readonly _attackDuration: number = 0.75; // in seconds
   private readonly _speed: BABYLON.Vector3;
   private readonly _low_speed: BABYLON.Vector3;
+  private readonly _currentAttacks: AttackEntity[] = [];
 
   public constructor(
     name: string,
@@ -56,6 +57,10 @@ export default class CharacterEntity extends PositionableEntity {
     return this._kind;
   }
 
+  public get currentAttack() {
+    return this._currentAttacks[this._currentAttacks.length - 1] ?? null;
+  }
+
   protected _createLifeBoudedValue() {
     return new BoundedValue();
   }
@@ -68,7 +73,10 @@ export default class CharacterEntity extends PositionableEntity {
     }
 
     this._updateRotation();
-    this.currentAttack?.update();
+
+    for (let i = 0; i < this._currentAttacks.length; i++) {
+      this._currentAttacks[i].update();
+    }
   }
 
   private _moveWithCollisions() {
@@ -169,10 +177,16 @@ export default class CharacterEntity extends PositionableEntity {
     this.frontMoveDirection = FrontMoveDirection.None;
     this.sideMoveDirection = SideMoveDirection.None;
     this.isAttacking = true;
-    this.currentAttack = new AttackEntity(this, target, {
-      damageAmount: this.attackDamageAmount,
-      timeToCast: this.attackTimeToCast,
-      timeToHit: distanceToTarget / this.attackLinearSpeed,
-    });
+    this._currentAttacks.push(
+      new AttackEntity(this, target, {
+        damageAmount: this.attackDamageAmount,
+        timeToCast: this.attackTimeToCast,
+        timeToHit: distanceToTarget / this.attackLinearSpeed,
+      }),
+    );
+  }
+
+  public removeCurrentAttack(attackId: string) {
+    removeFromArrayById(this._currentAttacks, attackId);
   }
 }

@@ -48,7 +48,7 @@ export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
   );
 
   socket.on(GameEvents.Player.SpellCasted, (id: string) => {
-    if (!player.isAttacking && !player.currentAttack) {
+    if (!player.isAttacking) {
       const target = game.findCharacterById(id);
 
       if (target) {

@@ -3,7 +3,7 @@
   import * as GUI from '@babylonjs/gui';
   import { AbstractMesh } from '@babylonjs/core';
   import { onDestroy } from 'svelte';
-  import { CharacterDTO } from '@reapers/game-client';
+  import { AttackDTO, CharacterDTO } from '@reapers/game-client';
   import { disposeArray } from '../../utils';
   import { AnimationKey, createParticleSystem } from './player.utils';
   import Character from '../Character/Character.svelte';
@@ -32,9 +32,8 @@
     rootMeshes = (entries?.rootNodes ?? []) as BABYLON.Mesh[];
     animationGroups = entries?.animationGroups ?? [];
     animationGroups[AnimationKey.Walk].speedRatio = 2;
-
     animationGroups[attackAnimationKey].targetedAnimations[0].animation.addEvent(
-      new BABYLON.AnimationEvent(0.75, function () {
+      new BABYLON.AnimationEvent(player.attackTimeToCast, function () {
         currentAnimationKey = AnimationKey.Idle;
       }),
     );
@@ -42,9 +41,8 @@
     shadowGenerator?.addShadowCaster(rootMeshes[0] as AbstractMesh);
   }
 
-  function castSpell() {
+  function castSpell(currentAttack: AttackDTO) {
     const scene = rootMeshes[0]?.getScene();
-    const currentAttack = player?.currentAttack;
 
     if (currentAttack && scene && player?.position) {
       const targetPosition = currentAttack.targetPosition;
@@ -68,13 +66,17 @@
       particleSystem.direction2 = directionToTarget;
       particleSystem.minLifeTime = lifeTime;
       particleSystem.maxLifeTime = lifeTime;
-      particleSystem.manualEmitCount = 2;
+      particleSystem.manualEmitCount = 3;
     }
   }
 
   function castSpellAsync() {
     if (player.currentAttack) {
-      setTimeout(castSpell, player.currentAttack.timeToCast * 1000);
+      const currentAttackClone = Object.assign({}, player.currentAttack);
+      setTimeout(
+        () => castSpell(currentAttackClone),
+        player.currentAttack.timeToCast * 1000,
+      );
     }
   }
 
@@ -116,6 +118,12 @@
   }
 
   $: currentAttackId = player?.currentAttack?.id;
+  $: {
+    if (currentAttackId) {
+      currentAnimationKey = attackAnimationKey;
+    }
+  }
+
   $: {
     if (currentAttackId) {
       castSpellAsync();
