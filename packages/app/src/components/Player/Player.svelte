@@ -55,17 +55,14 @@
         new BABYLON.Vector3(0, 0.25, 0),
       );
 
-      const vectorToTarget = new BABYLON.Vector3(...targetPosition).subtract(
-        particleSystem.emitter,
-      );
-      const distanceToTarget = vectorToTarget.length();
-      const directionToTarget = vectorToTarget.normalize();
-      const lifeTime = distanceToTarget / player.attackLinearSpeed;
+      const directionToTarget = new BABYLON.Vector3(...targetPosition)
+        .subtract(particleSystem.emitter)
+        .normalize();
 
       particleSystem.direction1 = directionToTarget;
       particleSystem.direction2 = directionToTarget;
-      particleSystem.minLifeTime = lifeTime;
-      particleSystem.maxLifeTime = lifeTime;
+      particleSystem.minLifeTime = currentAttack.timeToHit;
+      particleSystem.maxLifeTime = currentAttack.timeToHit;
       particleSystem.manualEmitCount = 3;
     }
   }

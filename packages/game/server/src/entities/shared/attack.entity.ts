@@ -47,6 +47,10 @@ export default class AttackEntity extends BaseEntity {
     return this._target.meshPosition.asArray();
   }
 
+  public get targetKind() {
+    return this._target.kind;
+  }
+
   public update() {
     this._attackCastedScheduler.update();
     this._attackHitScheduler.update();

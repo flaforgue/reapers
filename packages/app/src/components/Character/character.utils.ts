@@ -16,11 +16,10 @@ const activeMeshRadius: Record<CharacterKind, number> = {
   [CharacterKind.Spider]: 3.5,
 };
 
-export function createLabel(
+export function createLinkedLabel(
   value: string,
   kind: CharacterKind,
   parent: BABYLON.Mesh,
-  gui: GUI.AdvancedDynamicTexture,
 ) {
   const scene = parent.getScene();
   const height = labelPositions[kind];
@@ -28,8 +27,6 @@ export function createLabel(
 
   label.color = '#ccc';
   label.fontSize = 16;
-
-  gui.addControl(label);
 
   function updateLabelPosition() {
     const guiPosition = worldToGUI(
@@ -43,28 +40,60 @@ export function createLabel(
 
   updateLabelPosition();
   scene.registerAfterRender(updateLabelPosition);
+  label.onDisposeObservable.add(function () {
+    scene.unregisterAfterRender(updateLabelPosition);
+  });
 
   return label;
 }
 
-export function createAttackLabelAsync(attack: AttackDTO, scene: BABYLON.Scene) {
-  const lifeTime = 2000;
-  const label = document.createElement('div');
-  const labelPosition = worldToGUI(new BABYLON.Vector3(...attack.targetPosition), scene);
+function createFreeLabel(
+  value: string,
+  kind: CharacterKind,
+  position: BABYLON.Vector3,
+  scene: BABYLON.Scene,
+) {
+  const height = labelPositions[kind];
+  const label = new GUI.TextBlock('label', value);
 
-  label.id = attack.id;
-  label.innerText = attack.damageAmount.toString();
-  label.style.position = 'absolute';
-  label.style.left = `${Number(labelPosition.x) - label.clientWidth / 2}px`;
-  label.style.top = `${Number(labelPosition.y) - label.clientHeight / 2}px`;
-  label.style.fontSize = `${36}px`;
-  label.style.color = '#fff';
-  label.style.textShadow = '3px 3px rgba(0, 0, 0, 0.6)';
+  label.color = '#fff';
+  label.fontSize = 32;
+  label.shadowOffsetX = 3;
+  label.shadowOffsetY = 3;
+  label.shadowBlur = 5;
+  label.metadata = {
+    offsetY: 0,
+  };
 
-  setTimeout(() => {
-    document.body.appendChild(label);
-    setTimeout(() => document.getElementById(attack.id)?.remove(), lifeTime);
-  }, attack.timeToHit * 1000);
+  function updateLabelPosition() {
+    const guiPosition = worldToGUI(
+      position.add(new BABYLON.Vector3(0, height + label.metadata.offsetY, 0)),
+      scene,
+    );
+
+    label.left = guiPosition.x;
+    label.top = guiPosition.y;
+  }
+
+  updateLabelPosition();
+  scene.registerAfterRender(updateLabelPosition);
+
+  label.onDisposeObservable.add(function () {
+    scene.unregisterAfterRender(updateLabelPosition);
+  });
+
+  return label;
+}
+
+export function createAttackLabel(attack: AttackDTO, scene: BABYLON.Scene) {
+  const label = createFreeLabel(
+    attack.damageAmount.toString(),
+    attack.targetKind,
+    new BABYLON.Vector3(...attack.targetPosition),
+    scene,
+  );
+
+  return label;
 }
 
 export function createTargetInfos(
@@ -117,4 +146,40 @@ export function createHighlightMesh(
   activeMesh.getScene().beginAnimation(activeMesh, 0, 100);
 
   return activeMesh;
+}
+
+// Enforced types are required to animate a GUI Element
+export function animateAttackLabel(label: GUI.TextBlock, scene: BABYLON.Scene) {
+  ((label as unknown) as BABYLON.Node).getScene = () => scene;
+
+  BABYLON.Animation.CreateAndStartAnimation(
+    'attackLabel',
+    (label as unknown) as BABYLON.Node,
+    'fontSize',
+    10,
+    1,
+    0,
+    50,
+    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+  );
+  BABYLON.Animation.CreateAndStartAnimation(
+    'attackLabel',
+    (label as unknown) as BABYLON.Node,
+    'alpha',
+    3,
+    1,
+    1,
+    0,
+    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+  );
+  BABYLON.Animation.CreateAndStartAnimation(
+    'attackLabel',
+    (label as unknown) as BABYLON.Node,
+    'metadata.offsetY',
+    2,
+    1,
+    0,
+    1,
+    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+  );
 }

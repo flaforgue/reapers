@@ -70,6 +70,7 @@ export default class GameEntity extends BaseEntity {
           },
         },
         addToCharactersById,
+        [5, 0, 0],
       ),
       new MonsterGeneratorEntity(
         this._scene,
@@ -84,6 +85,7 @@ export default class GameEntity extends BaseEntity {
           },
         },
         addToCharactersById,
+        [0, 0, 5],
       ),
     ];
 

@@ -1,15 +1,16 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
-  import { CharacterDTO, CharacterKind } from '@reapers/game-client';
+  import { activePlayerId, CharacterDTO } from '@reapers/game-client';
   import type { CharacterInfos } from '../../stores';
   import { targetInfos } from '../../stores';
   import { onDestroy } from 'svelte';
   import {
-    createLabel,
+    createLinkedLabel,
     createTargetInfos,
     createHighlightMesh,
-    createAttackLabelAsync,
+    createAttackLabel,
+    animateAttackLabel,
   } from './character.utils';
 
   export let character: CharacterDTO = new CharacterDTO();
@@ -68,7 +69,8 @@
 
   function createCharacterLabel() {
     if (rootMesh && gui) {
-      label = createLabel(`${name} • ${level}`, kind, rootMesh, gui);
+      label = createLinkedLabel(`${name} • ${level}`, kind, rootMesh);
+      gui.addControl(label);
     }
   }
 
@@ -112,9 +114,21 @@
   }
 
   function createCurrentAttackLabelAsync() {
-    if (rootMesh && character.currentAttack) {
+    if (character.id === $activePlayerId && character.currentAttack && rootMesh && gui) {
       const currentAttackClone = Object.assign({}, character.currentAttack);
-      createAttackLabelAsync(currentAttackClone, rootMesh.getScene());
+      const attackLabel = createAttackLabel(currentAttackClone, rootMesh.getScene());
+
+      setTimeout(() => {
+        if (gui && rootMesh) {
+          gui.addControl(attackLabel);
+          animateAttackLabel(attackLabel, rootMesh.getScene());
+        }
+
+        setTimeout(() => {
+          attackLabel?.dispose();
+        }, 500);
+        // :todo + 0.2 is arbitrary (maybe the particle maxLife is not sync with real time)
+      }, (currentAttackClone.timeToCast + currentAttackClone.timeToHit + 0.2) * 1000);
     }
   }
 

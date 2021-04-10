@@ -24,7 +24,7 @@ export function createSkyBox(scene: BABYLON.Scene, width: number, depth: number)
     {
       width: width + 10,
       depth: depth + 10,
-      height: 20,
+      height: 50,
     },
     scene,
   );
