@@ -1,11 +1,16 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
-  import { CharacterDTO } from '@reapers/game-client';
+  import { CharacterDTO, CharacterKind } from '@reapers/game-client';
   import type { CharacterInfos } from '../../stores';
   import { targetInfos } from '../../stores';
   import { onDestroy } from 'svelte';
-  import { createLabel, createTargetInfos, createHighlightMesh } from './character.utils';
+  import {
+    createLabel,
+    createTargetInfos,
+    createHighlightMesh,
+    createAttackLabelAsync,
+  } from './character.utils';
 
   export let character: CharacterDTO = new CharacterDTO();
   export let gui: GUI.AdvancedDynamicTexture | undefined;
@@ -13,7 +18,7 @@
   export let rootMesh: BABYLON.Mesh | undefined;
   export let animationGroups: BABYLON.AnimationGroup[] = [];
   export let currentAnimationKey: number;
-  export let isAnimationLoop: boolean;
+  export let attackAnimationKey: number;
 
   let label: GUI.TextBlock | undefined;
   let highlightMesh: BABYLON.Mesh | undefined;
@@ -31,10 +36,15 @@
     }
   }
 
-  function switchAnimation(animationKey: number, isLoop = true) {
+  function switchAnimation(animationKey: number) {
+    if (character.kind === CharacterKind.Player) {
+      console.log('switchAnimation', animationKey);
+    }
+
     currentAnimation?.reset()?.stop();
 
     const newAnimation = animationGroups[animationKey];
+    const isLoop = animationKey !== attackAnimationKey;
 
     if (newAnimation) {
       currentAnimation = newAnimation.start(
@@ -104,6 +114,12 @@
     }
   }
 
+  function createCurrentAttackLabelAsync() {
+    if (rootMesh && character.currentAttack) {
+      createAttackLabelAsync(character.currentAttack, rootMesh.getScene());
+    }
+  }
+
   $: isRootMeshReady = Boolean(rootMesh);
   $: {
     if (isRootMeshReady) {
@@ -113,7 +129,7 @@
 
   $: {
     if (isRootMeshReady) {
-      switchAnimation(currentAnimationKey, isAnimationLoop);
+      switchAnimation(currentAnimationKey);
     }
   }
 
@@ -149,7 +165,7 @@
   $: valueLife = character.life.value;
   $: {
     if (isTarget) {
-      // for update purpose
+      // update GUI when target infos changes
       setGUITargetInfos({
         id,
         position: new BABYLON.Vector3(...[posX, posY, posZ]),
@@ -165,6 +181,14 @@
     } else if (highlightMesh) {
       highlightMesh.dispose();
       highlightMesh = undefined;
+    }
+  }
+
+  $: currentAttackId = character?.currentAttack?.id;
+  $: {
+    if (currentAttackId) {
+      currentAnimationKey = attackAnimationKey;
+      createCurrentAttackLabelAsync();
     }
   }
 

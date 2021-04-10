@@ -1,23 +1,8 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
-import { CharacterDTO, CharacterKind } from '@reapers/game-client';
+import { AttackDTO, CharacterDTO, CharacterKind } from '@reapers/game-client';
+import { worldToGUI } from '../../utils';
 import type { CharacterInfos } from '../../stores';
-
-function worldToScreen(
-  worldPosition: BABYLON.Vector3,
-  scene: BABYLON.Scene,
-  screenWidth: number,
-  screenHeight: number,
-) {
-  const camera = scene.activeCamera as BABYLON.ArcRotateCamera;
-
-  return BABYLON.Vector3.Project(
-    worldPosition,
-    BABYLON.Matrix.Identity(),
-    scene.getTransformMatrix(),
-    camera.viewport.toGlobal(screenWidth, screenHeight),
-  );
-}
 
 const labelPositions: Record<CharacterKind, number> = {
   [CharacterKind.Player]: 1.4,
@@ -31,14 +16,13 @@ const activeMeshRadius: Record<CharacterKind, number> = {
   [CharacterKind.Spider]: 3.5,
 };
 
-function createLabel(
+export function createLabel(
   value: string,
   kind: CharacterKind,
   parent: BABYLON.Mesh,
   gui: GUI.AdvancedDynamicTexture,
 ) {
   const scene = parent.getScene();
-  const engine = scene.getEngine();
   const height = labelPositions[kind];
   const label = new GUI.TextBlock('label', value);
 
@@ -48,16 +32,13 @@ function createLabel(
   gui.addControl(label);
 
   function updateLabelPosition() {
-    const screenWidth = engine.getRenderWidth();
-    const screenHeight = engine.getRenderHeight();
-    const screenPosition = worldToScreen(
+    const guiPosition = worldToGUI(
       parent.position.add(new BABYLON.Vector3(0, height, 0)),
       scene,
-      screenWidth,
-      screenHeight,
     );
-    label.left = (screenPosition.x - screenWidth / 2).toFixed(1);
-    label.top = (screenPosition.y - screenHeight / 2).toFixed(1);
+
+    label.left = guiPosition.x;
+    label.top = guiPosition.y;
   }
 
   updateLabelPosition();
@@ -66,7 +47,29 @@ function createLabel(
   return label;
 }
 
-function createTargetInfos(character: CharacterDTO | CharacterInfos): CharacterInfos {
+export function createAttackLabelAsync(attack: AttackDTO, scene: BABYLON.Scene) {
+  const lifeTime = 2000;
+  const label = document.createElement('div');
+  const labelPosition = worldToGUI(new BABYLON.Vector3(...attack.targetPosition), scene);
+
+  label.id = attack.id;
+  label.innerText = attack.damageAmount.toString();
+  label.style.position = 'absolute';
+  label.style.left = `${Number(labelPosition.x) - label.clientWidth / 2}px`;
+  label.style.top = `${Number(labelPosition.y) - label.clientHeight / 2}px`;
+  label.style.fontSize = `${36}px`;
+  label.style.color = '#fff';
+  label.style.textShadow = '3px 3px rgba(0, 0, 0, 0.6)';
+
+  setTimeout(() => {
+    document.body.appendChild(label);
+    setTimeout(() => document.getElementById(attack.id)?.remove(), lifeTime);
+  }, attack.timeToHit * 1000);
+}
+
+export function createTargetInfos(
+  character: CharacterDTO | CharacterInfos,
+): CharacterInfos {
   const position = Array.isArray(character.position)
     ? new BABYLON.Vector3(...character.position)
     : character.position;
@@ -81,7 +84,7 @@ function createTargetInfos(character: CharacterDTO | CharacterInfos): CharacterI
   };
 }
 
-function createHighlightMesh(
+export function createHighlightMesh(
   baseMesh: BABYLON.Mesh,
   parent: BABYLON.Mesh,
   kind: CharacterKind,
@@ -115,5 +118,3 @@ function createHighlightMesh(
 
   return activeMesh;
 }
-
-export { createLabel, createTargetInfos, createHighlightMesh };

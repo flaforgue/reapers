@@ -28,6 +28,9 @@ export default class CharacterDTO extends PositionableDTO {
   public attackLinearSpeed = 0;
 
   @Expose()
+  public attackTimeToCast = 0;
+
+  @Expose()
   public kind: CharacterKind = CharacterKind.Player;
 
   @Expose()

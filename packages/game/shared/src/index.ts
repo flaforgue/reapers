@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import { plainToClass } from 'class-transformer';
 import {
+  AttackDTO,
   MonsterGeneratorDTO,
   MonsterDTO,
   BoundedValueDTO,
@@ -23,6 +24,7 @@ export {
   EnvironmentKind,
   CharacterKind,
   MonsterKind,
+  AttackDTO,
   BoundedValueDTO,
   CharacterDTO,
   MonsterDTO,

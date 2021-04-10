@@ -16,6 +16,7 @@ export default class CharacterEntity extends PositionableEntity {
   public readonly attackRange: number = 1;
   public readonly attackDamageAmount: number = 0;
   public readonly attackLinearSpeed: number = 1;
+  public readonly attackTimeToCast: number = 0.1;
 
   public isAttacking: boolean = false;
   public currentAttack: AttackEntity | null = null;
@@ -170,7 +171,7 @@ export default class CharacterEntity extends PositionableEntity {
     this.isAttacking = true;
     this.currentAttack = new AttackEntity(this, target, {
       damageAmount: this.attackDamageAmount,
-      timeToCast: 0.45,
+      timeToCast: this.attackTimeToCast,
       timeToHit: distanceToTarget / this.attackLinearSpeed,
     });
   }

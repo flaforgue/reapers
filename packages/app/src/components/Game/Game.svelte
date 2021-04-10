@@ -16,9 +16,8 @@
     createEngine,
     createGUI,
     createScene,
+    showAxis,
   } from './game.utils';
-  import Character from '../Character/Character.svelte';
-  import { showAxis } from '../../utils';
 
   let engine: BABYLON.Engine | undefined;
   let gameCamera: BABYLON.ArcRotateCamera | undefined;
@@ -77,26 +76,21 @@
     gameScene.onKeyboardObservable?.add(keyboardEventHandler);
     gameCamera = createCamera(gameScene);
     gui = createGUI();
+    loadAssets();
+    baseHighlightMesh = createBaseActiveMesh(gameScene);
 
     // showAxis(10, gameScene);
     // gameScene.debugLayer.show({
     //   embedMode: true,
     // });
 
-    loadAssets();
-    baseHighlightMesh = createBaseActiveMesh(gameScene);
-
-    engine.displayLoadingUI();
-
-    gameScene.executeWhenReady(() => {
-      engine?.hideLoadingUI();
-      engine?.runRenderLoop(function () {
-        try {
-          gameScene?.render();
-        } catch (err) {
-          console.error(err);
-        }
-      });
+    engine?.hideLoadingUI();
+    engine?.runRenderLoop(function () {
+      try {
+        gameScene?.render();
+      } catch (err) {
+        console.error(err);
+      }
     });
 
     function handleResize() {

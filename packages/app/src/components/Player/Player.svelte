@@ -20,7 +20,8 @@
   let particleSystem: BABYLON.ParticleSystem | undefined;
   let animationGroups: BABYLON.AnimationGroup[] = [];
   let currentAnimationKey = AnimationKey.Idle;
-  let isAnimationLoop = true;
+
+  const attackAnimationKey = AnimationKey.Punch;
 
   function instantiateModels() {
     const entries = assetContainer?.instantiateModelsToScene((sourceName) => {
@@ -32,27 +33,22 @@
     animationGroups = entries?.animationGroups ?? [];
     animationGroups[AnimationKey.Walk].speedRatio = 2;
 
-    const attackAnimation =
-      animationGroups[AnimationKey.Punch].targetedAnimations[0].animation;
-
-    attackAnimation.addEvent(
-      new BABYLON.AnimationEvent(0.4, function () {
-        castSpell();
-      }),
-    );
-    attackAnimation.addEvent(
+    animationGroups[attackAnimationKey].targetedAnimations[0].animation.addEvent(
       new BABYLON.AnimationEvent(0.75, function () {
         currentAnimationKey = AnimationKey.Idle;
       }),
     );
+
     shadowGenerator?.addShadowCaster(rootMeshes[0] as AbstractMesh);
   }
 
   function castSpell() {
     const scene = rootMeshes[0]?.getScene();
-    const targetPosition = player?.currentAttack?.targetPosition;
+    const currentAttack = player?.currentAttack;
 
-    if (targetPosition && scene && player?.position) {
+    if (currentAttack && scene && player?.position) {
+      const targetPosition = currentAttack.targetPosition;
+
       if (!particleSystem) {
         particleSystem = createParticleSystem(scene, player.attackLinearSpeed);
       }
@@ -72,8 +68,13 @@
       particleSystem.direction2 = directionToTarget;
       particleSystem.minLifeTime = lifeTime;
       particleSystem.maxLifeTime = lifeTime;
-
       particleSystem.manualEmitCount = 2;
+    }
+  }
+
+  function castSpellAsync() {
+    if (player.currentAttack) {
+      setTimeout(castSpell, player.currentAttack.timeToCast * 1000);
     }
   }
 
@@ -109,18 +110,15 @@
   $: {
     if (isRootMeshReady && (frontMoveDirection || sideMoveDirection)) {
       currentAnimationKey = AnimationKey.Walk;
-      isAnimationLoop = true;
     } else {
       currentAnimationKey = AnimationKey.Idle;
-      isAnimationLoop = true;
     }
   }
 
   $: currentAttackId = player?.currentAttack?.id;
   $: {
     if (currentAttackId) {
-      currentAnimationKey = AnimationKey.Punch;
-      isAnimationLoop = false;
+      castSpellAsync();
     }
   }
 
@@ -141,7 +139,7 @@
   character={player}
   {animationGroups}
   {currentAnimationKey}
-  {isAnimationLoop}
+  {attackAnimationKey}
   {baseHighlightMesh}
   {gui}
 />

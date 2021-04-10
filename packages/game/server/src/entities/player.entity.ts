@@ -8,7 +8,10 @@ export default class PlayerEntity extends CharacterEntity {
   public readonly attackRange = 10;
   public readonly attackDamageAmount: number = 10;
   public readonly attackLinearSpeed: number = 30;
+  public readonly attackTimeToCast: number = 0.45;
+
   private readonly _socket: SocketIO.Socket;
+
   protected readonly _kind: CharacterKind = CharacterKind.Player;
 
   public constructor(

@@ -4,12 +4,13 @@ import BaseEntity from './base.entity';
 import CharacterEntity from './character.entity';
 
 export default class AttackEntity extends BaseEntity {
+  public readonly damageAmount: number;
+  public readonly timeToHit: number;
+  public readonly timeToCast: number;
+
   protected readonly _parent: CharacterEntity;
   protected readonly _target: CharacterEntity;
-  protected readonly _damageAmount: number;
-  protected readonly _timeToHit: number;
   protected readonly _attackHitScheduler: ActionScheduler;
-  protected readonly _timeToCast: number;
   protected readonly _attackCastedScheduler: ActionScheduler;
 
   public constructor(
@@ -24,18 +25,18 @@ export default class AttackEntity extends BaseEntity {
     super();
     this._parent = parent;
     this._target = target;
-    this._damageAmount = attack.damageAmount;
+    this.damageAmount = attack.damageAmount;
 
-    this._timeToCast = attack.timeToCast;
+    this.timeToCast = attack.timeToCast;
     this._attackCastedScheduler = new ActionScheduler(() => {
       this._parent.isAttacking = false;
-    }, this._timeToCast);
+    }, this.timeToCast);
 
-    this._timeToHit = attack.timeToHit;
+    this.timeToHit = attack.timeToHit;
     this._attackHitScheduler = new ActionScheduler(() => {
-      this._target.life.remove(this._damageAmount);
+      this._target.life.remove(this.damageAmount);
       this._parent.currentAttack = null;
-    }, this._timeToCast + this._timeToHit);
+    }, this.timeToCast + this.timeToHit);
   }
 
   public get targetId() {

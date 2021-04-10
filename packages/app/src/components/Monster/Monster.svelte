@@ -20,7 +20,8 @@
   let skeletons: BABYLON.Skeleton[] = [];
   let animationGroups: BABYLON.AnimationGroup[] = [];
   let currentAnimationKey = animationKeys.Idle;
-  let isAnimationLoop = true;
+
+  const attackAnimationKey = animationKeys.Attack;
 
   function instantiateModels() {
     const entries = assetContainer?.instantiateModelsToScene((sourceName) => {
@@ -48,10 +49,8 @@
   $: {
     if (isRootMeshReady && (frontMoveDirection || sideMoveDirection)) {
       currentAnimationKey = animationKeys.Walk;
-      isAnimationLoop = true;
     } else {
       currentAnimationKey = animationKeys.Idle;
-      isAnimationLoop = true;
     }
   }
 
@@ -67,7 +66,7 @@
   character={monster}
   {animationGroups}
   {currentAnimationKey}
-  {isAnimationLoop}
+  {attackAnimationKey}
   {baseHighlightMesh}
   {gui}
 />

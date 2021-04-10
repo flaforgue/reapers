@@ -4,42 +4,31 @@ export function disposeArray(arr: BABYLON.IDisposable[]) {
   arr.map((item) => item.dispose());
 }
 
-export function showAxis(size: number, scene: BABYLON.Scene) {
-  const axisX = BABYLON.Mesh.CreateLines(
-    'axisX',
-    [
-      BABYLON.Vector3.Zero(),
-      new BABYLON.Vector3(size, 0, 0),
-      new BABYLON.Vector3(size * 0.95, 0.05 * size, 0),
-      new BABYLON.Vector3(size, 0, 0),
-      new BABYLON.Vector3(size * 0.95, -0.05 * size, 0),
-    ],
-    scene,
-  );
-  const axisY = BABYLON.Mesh.CreateLines(
-    'axisY',
-    [
-      BABYLON.Vector3.Zero(),
-      new BABYLON.Vector3(0, size, 0),
-      new BABYLON.Vector3(-0.05 * size, size * 0.95, 0),
-      new BABYLON.Vector3(0, size, 0),
-      new BABYLON.Vector3(0.05 * size, size * 0.95, 0),
-    ],
-    scene,
-  );
-  const axisZ = BABYLON.Mesh.CreateLines(
-    'axisZ',
-    [
-      BABYLON.Vector3.Zero(),
-      new BABYLON.Vector3(0, 0, size),
-      new BABYLON.Vector3(0, -0.05 * size, size * 0.95),
-      new BABYLON.Vector3(0, 0, size),
-      new BABYLON.Vector3(0, 0.05 * size, size * 0.95),
-    ],
-    scene,
+function worldToScreen(worldPosition: BABYLON.Vector3, scene: BABYLON.Scene) {
+  const engine = scene.getEngine();
+  const camera = scene.activeCamera as BABYLON.ArcRotateCamera;
+  const screenWidth = engine.getRenderWidth();
+  const screenHeight = engine.getRenderHeight();
+  const vector = BABYLON.Vector3.Project(
+    worldPosition,
+    BABYLON.Matrix.Identity(),
+    scene.getTransformMatrix(),
+    camera.viewport.toGlobal(screenWidth, screenHeight),
   );
 
-  axisX.color = new BABYLON.Color3(1, 0, 0);
-  axisY.color = new BABYLON.Color3(0, 1, 0);
-  axisZ.color = new BABYLON.Color3(0, 0, 1);
+  return {
+    x: vector.x,
+    y: vector.y,
+    screenWidth,
+    screenHeight,
+  };
+}
+
+export function worldToGUI(worldPosition: BABYLON.Vector3, scene: BABYLON.Scene) {
+  const screenPosition = worldToScreen(worldPosition, scene);
+
+  return {
+    x: (screenPosition.x - screenPosition.screenWidth / 2).toFixed(1),
+    y: (screenPosition.y - screenPosition.screenHeight / 2).toFixed(1),
+  };
 }

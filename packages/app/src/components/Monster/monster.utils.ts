@@ -14,9 +14,7 @@ enum FrogAnimationKey {
 
 type AnimationKeyType = typeof SpiderAnimationKey | typeof FrogAnimationKey;
 
-const monsterAnimationKeys: Record<MonsterKind, AnimationKeyType> = {
+export const monsterAnimationKeys: Record<MonsterKind, AnimationKeyType> = {
   [CharacterKind.Spider]: SpiderAnimationKey,
   [CharacterKind.Frog]: FrogAnimationKey,
 };
-
-export { monsterAnimationKeys };
