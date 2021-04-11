@@ -69,6 +69,7 @@
 
   function createCharacterLabel() {
     if (rootMesh && gui) {
+      label?.dispose();
       label = createLinkedLabel(`${name} • ${level}`, kind, rootMesh);
       gui.addControl(label);
     }
@@ -145,16 +146,18 @@
     }
   }
 
-  $: position = character.position;
-  $: [posX, posY, posZ] = position;
+  $: posX = character.position.x;
+  $: posY = character.position.y;
+  $: posZ = character.position.z;
   $: {
     if (isRootMeshReady) {
       updatePosition(posX, posY, posZ);
     }
   }
 
-  $: rotation = character.rotation;
-  $: [rotX, rotY, rotZ] = rotation;
+  $: rotX = character.rotation.x;
+  $: rotY = character.rotation.y;
+  $: rotZ = character.rotation.z;
   $: {
     if (isRootMeshReady) {
       updateRotation(rotX, rotY, rotZ);
@@ -180,7 +183,7 @@
       // update GUI when target infos changes
       setGUITargetInfos({
         id,
-        position: new BABYLON.Vector3(...[posX, posY, posZ]),
+        position: new BABYLON.Vector3(posX, posY, posZ),
         kind,
         name,
         level,

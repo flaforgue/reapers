@@ -19,3 +19,15 @@ export type CharacterInfos = {
 export const focusElement = writable(FocusElement.Game);
 export const playerName = writable('disterflo');
 export const targetInfos = writable<CharacterInfos | null>(null);
+export const playerInfos = writable<CharacterInfos>({
+  id: '',
+  kind: CharacterKind.Player,
+  name: '',
+  level: 1,
+  life: {
+    min: 0,
+    max: 1,
+    value: 1,
+  },
+  position: BABYLON.Vector3.Zero(),
+});

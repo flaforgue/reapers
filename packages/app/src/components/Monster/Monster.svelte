@@ -1,7 +1,7 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
-  import { CharacterDTO, MonsterKind } from '@reapers/game-client';
+  import { CharacterDTO, MonsterDTO, MonsterKind } from '@reapers/game-client';
   import { disposeArray } from '../../utils';
   import { onDestroy } from 'svelte';
   import { monsterAnimationKeys } from './monster.utils';
@@ -53,6 +53,21 @@
       currentAnimationKey = animationKeys.Idle;
     }
   }
+
+  // let destinationMesh: BABYLON.Mesh | undefined;
+  // $: destination = (monster as MonsterDTO).destination;
+  // $: destX = destination?.x ?? 0;
+  // $: destY = destination?.y ?? 0;
+  // $: destZ = destination?.z ?? 0;
+  // $: {
+  //   if (destX || destY || destZ) {
+  //     destinationMesh?.dispose();
+  //     destinationMesh = BABYLON.MeshBuilder.CreateBox('destination', {
+  //       size: 0.3,
+  //     });
+  //     destinationMesh.position = new BABYLON.Vector3(destX, destY, destZ);
+  //   }
+  // }
 
   onDestroy(() => {
     disposeArray(animationGroups);

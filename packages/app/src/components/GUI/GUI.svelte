@@ -1,17 +1,28 @@
 <script lang="ts">
-  import { targetInfos } from '../../stores';
+  import { targetInfos, playerInfos } from '../../stores';
 </script>
 
 <div class="GUI">
+  <!-- playerInfos.svelte, to finish -->
+  <div class="playerInfos">
+    <div class="life">
+      <div
+        class="currentLife"
+        style="width: {($playerInfos.life.value / $playerInfos.life.max) * 100}%"
+      />
+    </div>
+  </div>
+  <!-- TargetInfos.svelte, to split -->
   {#if $targetInfos}
     <div class="targetInfosContainer">
       <div class="name">
         {$targetInfos.name} (Lv. {$targetInfos.level})
       </div>
 
+      <!-- ProgressBar.svelte, to split -->
       <div class="life">
         <div
-          class="current-life"
+          class="currentLife"
           style="width: {($targetInfos.life.value / $targetInfos.life.max) * 100}%"
         />
       </div>
@@ -35,7 +46,7 @@
   }
 
   .GUI .life,
-  .GUI .current-life {
+  .GUI .currentLife {
     border-radius: var(--default-border-radius);
   }
 
@@ -46,10 +57,17 @@
     margin-top: 0.25rem;
   }
 
-  .GUI .current-life {
+  .GUI .currentLife {
     width: 100%;
     height: 100%;
     background-color: var(--color-orange);
     transition: width var(--default-transition-duration) ease-out;
+  }
+
+  .GUI .playerInfos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--color-black);
   }
 </style>

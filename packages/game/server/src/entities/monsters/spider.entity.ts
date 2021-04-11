@@ -5,13 +5,12 @@ import MonsterEntity from './monster.entity';
 
 export default class SpiderEntity extends MonsterEntity {
   protected readonly _kind: CharacterKind = CharacterKind.Spider;
-  protected _speedFactor = new BABYLON.Vector3(1.5, 1.5, 1.5);
 
   public constructor(
     scene: BABYLON.Scene,
     level: number,
-    position: number[],
-    rotation: number[],
+    position: BABYLON.Vector3,
+    rotation: BABYLON.Vector3,
   ) {
     super(
       CharacterKind.Spider,
@@ -27,6 +26,7 @@ export default class SpiderEntity extends MonsterEntity {
       ),
       position,
       rotation,
+      new BABYLON.Vector3(2, 2, 2),
     );
     this._mesh.checkCollisions = true;
     this._mesh.ellipsoid = new BABYLON.Vector3(0.5, 0.1, 0.5);

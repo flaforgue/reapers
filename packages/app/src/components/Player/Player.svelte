@@ -51,11 +51,17 @@
         particleSystem = createParticleSystem(scene, player.attackLinearSpeed);
       }
 
-      particleSystem.emitter = new BABYLON.Vector3(...player.position).add(
-        new BABYLON.Vector3(0, 0.25, 0),
-      );
+      particleSystem.emitter = new BABYLON.Vector3(
+        player.position.x,
+        player.position.y,
+        player.position.z,
+      ).add(new BABYLON.Vector3(0, 0.25, 0));
 
-      const directionToTarget = new BABYLON.Vector3(...targetPosition)
+      const directionToTarget = new BABYLON.Vector3(
+        targetPosition.x,
+        targetPosition.y,
+        targetPosition.z,
+      )
         .subtract(particleSystem.emitter)
         .normalize();
 
@@ -98,9 +104,9 @@
     }
   }
 
-  $: rotZ = player.rotation[1];
+  $: rotY = player.rotation.y;
   $: {
-    updateCameraAlpha(rotZ);
+    updateCameraAlpha(rotY);
   }
 
   $: isRootMeshReady = Boolean(rootMeshes[0]);

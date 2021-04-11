@@ -7,8 +7,8 @@ export default class AttackEntity extends BaseEntity {
   public readonly damageAmount: number;
   public readonly timeToHit: number;
   public readonly timeToCast: number;
+  public readonly parent: CharacterEntity;
 
-  protected readonly _parent: CharacterEntity;
   protected readonly _target: CharacterEntity;
   protected readonly _attackHitScheduler: ActionScheduler;
   protected readonly _attackCastedScheduler: ActionScheduler;
@@ -23,19 +23,19 @@ export default class AttackEntity extends BaseEntity {
     },
   ) {
     super();
-    this._parent = parent;
+    this.parent = parent;
     this._target = target;
     this.damageAmount = attack.damageAmount;
 
     this.timeToCast = attack.timeToCast;
     this._attackCastedScheduler = new ActionScheduler(() => {
-      this._parent.isAttacking = false;
+      this.parent.isAttacking = false;
     }, this.timeToCast);
 
     this.timeToHit = attack.timeToHit;
     this._attackHitScheduler = new ActionScheduler(() => {
-      this._target.life.remove(this.damageAmount);
-      this._parent.removeCurrentAttack(this.id);
+      this._target.receiveAttack(this);
+      this.parent.removeCurrentAttack(this.id);
     }, this.timeToCast + this.timeToHit);
   }
 
@@ -44,7 +44,7 @@ export default class AttackEntity extends BaseEntity {
   }
 
   public get targetPosition() {
-    return this._target.meshPosition.asArray();
+    return this._target.meshPosition;
   }
 
   public get targetKind() {

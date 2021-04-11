@@ -1,6 +1,7 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 import { CharacterKind } from '../..';
 import BaseDTO from './base.dto';
+import Vector3DTO from './vector3.dto';
 
 @Exclude()
 export default class AttackDTO extends BaseDTO {
@@ -11,7 +12,12 @@ export default class AttackDTO extends BaseDTO {
   targetKind: CharacterKind = CharacterKind.Player;
 
   @Expose()
-  targetPosition: number[] = [0, 0, 0];
+  @Type(() => Vector3DTO)
+  public targetPosition: Vector3DTO = {
+    x: 0,
+    y: 0,
+    z: 0,
+  };
 
   @Expose()
   timeToHit: number = 0;

@@ -4,10 +4,10 @@ import { GameDTO, GameEvents, plainToClass } from '@reapers/game-shared';
 import config from '../config';
 import PlayerEntity from './player.entity';
 import WorldEntity from './world.entity';
-import SpiderEntity from './monsters/spider.entity';
+import SpiderEntity from './monsters/frog.entity';
+import FrogEntity from './monsters/spider.entity';
 import BaseEntity from './shared/base.entity';
 import MonsterGeneratorEntity from './monster-generator.entity';
-import FrogEntity from './monsters/frog.entity';
 import CharacterEntity from './shared/character.entity';
 import { removeFromArrayById } from './shared/utils';
 
@@ -63,14 +63,14 @@ export default class GameEntity extends BaseEntity {
           instanceClass: SpiderEntity,
           radius: 25,
           interval: 3,
-          nbMaxInstances: 20,
+          nbMaxInstances: 10,
           level: {
             min: 1,
             max: 5,
           },
         },
         addToCharactersById,
-        [5, 0, 0],
+        new BABYLON.Vector3(5, 0, 0),
       ),
       new MonsterGeneratorEntity(
         this._scene,
@@ -85,7 +85,7 @@ export default class GameEntity extends BaseEntity {
           },
         },
         addToCharactersById,
-        [0, 0, 5],
+        new BABYLON.Vector3(0, 0, 5),
       ),
     ];
 
@@ -132,7 +132,6 @@ export default class GameEntity extends BaseEntity {
   private _update() {
     this._frameIndex = (this._frameIndex + 1) % config.fps;
     const gameDto = plainToClass(GameDTO, this, {
-      exposeDefaultValues: true,
       excludeExtraneousValues: true,
       strategy: 'excludeAll',
     });
@@ -158,7 +157,7 @@ export default class GameEntity extends BaseEntity {
       throw new Error('Game is full');
     }
 
-    const player = new PlayerEntity(socket, this._scene, name, [0, 0, 0]);
+    const player = new PlayerEntity(socket, this._scene, name);
     this._players.push(player);
     this._charactersById[player.id] = player;
     console.info(

@@ -20,8 +20,8 @@ type MonsterGeneratorConfig = {
 type MonsterConstructor<T extends MonsterEntity = MonsterEntity> = new (
   scene: BABYLON.Scene,
   level: number,
-  position: number[],
-  rotation: number[],
+  position: BABYLON.Vector3,
+  rotation: BABYLON.Vector3,
 ) => T;
 
 type MonsterGeneratedCallback = (c: CharacterEntity) => void;
@@ -35,8 +35,8 @@ export default class MonsterGeneratorEntity extends PositionableEntity {
     scene: BABYLON.Scene,
     config: MonsterGeneratorConfig,
     onMonsterGenerated: MonsterGeneratedCallback,
-    position = [0, 0, 0],
-    rotation = [0, 0, 0],
+    position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
+    rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
   ) {
     super(new BABYLON.Mesh(EnvironmentKind.MonsterGenerator, scene), position, rotation);
     this._config = config;
@@ -66,8 +66,8 @@ export default class MonsterGeneratorEntity extends PositionableEntity {
     const monster = new this._config.instanceClass(
       this._mesh._scene,
       Math.round(Math.random() * levelRange) + this._config.level.min,
-      getRandomPosition(this._mesh.position, this._config.radius).asArray(),
-      getRandomRotation(this._mesh.position, this._config.radius).asArray(),
+      getRandomPosition(this._mesh.position, this._config.radius),
+      getRandomRotation(this._mesh.position, this._config.radius),
     );
 
     this._monsters.push(monster);

@@ -5,22 +5,21 @@ export default class PositionableEntity extends BaseEntity {
   public readonly halfHeight: number;
   protected readonly _mesh: BABYLON.Mesh;
 
-  public constructor(mesh: BABYLON.Mesh, position = [0, 0, 0], rotation = [0, 0, 0]) {
+  public constructor(
+    mesh: BABYLON.Mesh,
+    position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
+    rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
+  ) {
     super();
+
     this._mesh = mesh;
-
     this.halfHeight = this._mesh.getBoundingInfo().boundingBox.extendSize.y;
-    this._mesh.position = new BABYLON.Vector3(
-      position[0],
-      position[1] + this.halfHeight,
-      position[2],
-    );
-
-    this._mesh.rotation = new BABYLON.Vector3(...rotation);
+    this._mesh.position = position.add(new BABYLON.Vector3(0, this.halfHeight, 0));
+    this._mesh.rotation = rotation;
   }
 
   public get position() {
-    return this._mesh.position.add(new BABYLON.Vector3(0, -this.halfHeight, 0)).asArray();
+    return this._mesh.position.add(new BABYLON.Vector3(0, -this.halfHeight, 0));
   }
 
   public get meshPosition() {
@@ -28,7 +27,7 @@ export default class PositionableEntity extends BaseEntity {
   }
 
   public get rotation() {
-    return this._mesh.rotation.asArray();
+    return this._mesh.rotation;
   }
 
   public getDistanceTo(position: BABYLON.Vector3) {

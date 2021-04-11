@@ -36,7 +36,13 @@ io.on(GameEvents.System.Connection, (socket: SocketIO.Socket) => {
         registerSystemHandlers(socket, player, game);
         registerPlayerHandlers(socket, game, player);
 
-        socket.emit(GameEvents.Player.Created, plainToClass(CharacterDTO, player));
+        socket.emit(
+          GameEvents.Player.Created,
+          plainToClass(CharacterDTO, player, {
+            strategy: 'excludeAll',
+            excludeExtraneousValues: true,
+          }),
+        );
       } catch (e) {
         console.error(e);
       }

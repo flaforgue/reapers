@@ -35,7 +35,7 @@
   function localCastSpell() {
     if (!player?.isAttacking && $targetInfos?.position && player) {
       const distanceToTarget = BABYLON.Vector3.Distance(
-        new BABYLON.Vector3(...player.position),
+        new BABYLON.Vector3(player.position.x, player.position.y, player.position.z),
         $targetInfos.position,
       );
 

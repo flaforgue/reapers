@@ -18,8 +18,8 @@ export default class PlayerEntity extends CharacterEntity {
     socket: SocketIO.Socket,
     scene: BABYLON.Scene,
     name: string,
-    position?: number[],
-    rotation?: number[],
+    position?: BABYLON.Vector3,
+    rotation?: BABYLON.Vector3,
   ) {
     super(
       name,

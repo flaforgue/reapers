@@ -24,7 +24,6 @@ export default class CharacterEntity extends PositionableEntity {
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
   public rotationDirection: RotationDirection = RotationDirection.None;
 
-  protected readonly _speedFactor = new BABYLON.Vector3(1, 1, 1);
   protected readonly _shouldMoveWithCollisions: boolean = true;
   protected readonly _kind: CharacterKind = CharacterKind.Player;
   protected readonly _attackDuration: number = 0.75; // in seconds
@@ -36,15 +35,16 @@ export default class CharacterEntity extends PositionableEntity {
     name: string,
     level: number,
     mesh: BABYLON.Mesh,
-    position?: number[],
-    rotation?: number[],
+    position?: BABYLON.Vector3,
+    rotation?: BABYLON.Vector3,
+    speedFactor = new BABYLON.Vector3(1, 1, 1),
   ) {
     super(mesh, position, rotation);
     this._speed = new BABYLON.Vector3(
       config.moveStep,
       config.moveStep,
       config.moveStep,
-    ).multiply(this._speedFactor);
+    ).multiply(speedFactor);
     this._low_speed = this._speed.multiply(
       new BABYLON.Vector3(Math.SQRT1_2, Math.SQRT1_2, Math.SQRT1_2),
     );
@@ -117,17 +117,17 @@ export default class CharacterEntity extends PositionableEntity {
     let amountForward = 0;
 
     if (this.frontMoveDirection === FrontMoveDirection.Forward) {
-      amountForward = config.moveStep;
+      amountForward = this._speed.x;
     } else if (this.frontMoveDirection === FrontMoveDirection.Backward) {
-      amountForward = config.moveStep * -1;
+      amountForward = this._speed.x * -1;
     } else {
       isMovingFront = false;
     }
 
     if (this.sideMoveDirection === SideMoveDirection.Right) {
-      amountRight = config.moveStep;
+      amountRight = this._speed.x;
     } else if (this.sideMoveDirection === SideMoveDirection.Left) {
-      amountRight = config.moveStep * -1;
+      amountRight = this._speed.x * -1;
     } else {
       isMovingSide = false;
     }
@@ -188,5 +188,9 @@ export default class CharacterEntity extends PositionableEntity {
 
   public removeCurrentAttack(attackId: string) {
     removeFromArrayById(this._currentAttacks, attackId);
+  }
+
+  public receiveAttack(attack: AttackEntity) {
+    this.life.remove(attack.damageAmount);
   }
 }

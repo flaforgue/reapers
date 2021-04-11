@@ -89,7 +89,11 @@ export function createAttackLabel(attack: AttackDTO, scene: BABYLON.Scene) {
   const label = createFreeLabel(
     attack.damageAmount.toString(),
     attack.targetKind,
-    new BABYLON.Vector3(...attack.targetPosition),
+    new BABYLON.Vector3(
+      attack.targetPosition.x,
+      attack.targetPosition.y,
+      attack.targetPosition.z,
+    ),
     scene,
   );
 
@@ -99,9 +103,11 @@ export function createAttackLabel(attack: AttackDTO, scene: BABYLON.Scene) {
 export function createTargetInfos(
   character: CharacterDTO | CharacterInfos,
 ): CharacterInfos {
-  const position = Array.isArray(character.position)
-    ? new BABYLON.Vector3(...character.position)
-    : character.position;
+  const position = new BABYLON.Vector3(
+    character.position.x,
+    character.position.y,
+    character.position.z,
+  );
 
   return {
     id: character.id,
