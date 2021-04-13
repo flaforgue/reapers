@@ -41,6 +41,9 @@ export default class CharacterDTO extends PositionableDTO {
   public isAttacking: boolean = false;
 
   @Expose()
+  public canMove: boolean = true;
+
+  @Expose()
   public isAlive: boolean = true;
 
   @Expose()

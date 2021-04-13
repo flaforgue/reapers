@@ -34,7 +34,7 @@ export default class PositionableEntity extends BaseEntity {
     return BABYLON.Vector3.Distance(this._mesh.position, position);
   }
 
-  public dispose() {
+  public destroy() {
     this._mesh.dispose();
   }
 }

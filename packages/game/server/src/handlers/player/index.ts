@@ -24,7 +24,7 @@ export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
   socket.on(
     GameEvents.Player.FrontMoveDirectionUpdated,
     (direction: FrontMoveDirection) => {
-      if (!player.isAttacking && isValidFrontMoveDirection(direction)) {
+      if (player.canMove && isValidFrontMoveDirection(direction)) {
         player.frontMoveDirection = direction;
       }
     },
@@ -33,7 +33,7 @@ export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
   socket.on(
     GameEvents.Player.SideMoveDirectionUpdated,
     (direction: SideMoveDirection) => {
-      if (!player.isAttacking && isValidSideMoveDirection(direction)) {
+      if (player.canMove && isValidSideMoveDirection(direction)) {
         player.sideMoveDirection = direction;
       }
     },
@@ -42,14 +42,14 @@ export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
   socket.on(
     GameEvents.Player.RotationDirectionUpdated,
     (direction: RotationDirection) => {
-      if (!player.isAttacking && isValidRotationDirection(direction)) {
+      if (player.canMove && isValidRotationDirection(direction)) {
         player.rotationDirection = direction;
       }
     },
   );
 
   socket.on(GameEvents.Player.SpellCasted, (id: string) => {
-    if (!player.isAttacking) {
+    if (player.canMove) {
       const target = charactersByIds[id];
 
       if (target) {

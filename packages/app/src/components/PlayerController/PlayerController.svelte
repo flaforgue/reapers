@@ -27,13 +27,13 @@
     | undefined;
 
   function localUpdateRotationDirection(direction: RotationDirection) {
-    if (!player?.isAttacking) {
+    if (player?.canMove) {
       updateRotationDirection(direction);
     }
   }
 
   function localCastSpell() {
-    if (!player?.isAttacking && $targetInfos?.position && player) {
+    if (player?.canMove && $targetInfos?.position && player) {
       const distanceToTarget = BABYLON.Vector3.Distance(
         new BABYLON.Vector3(player.position.x, player.position.y, player.position.z),
         new BABYLON.Vector3(
@@ -52,7 +52,7 @@
   }
 
   function keyboardEventHandler({ type, event }: BABYLON.KeyboardInfo) {
-    if (!player?.isAttacking && type === BABYLON.KeyboardEventTypes.KEYDOWN) {
+    if (player?.canMove && type === BABYLON.KeyboardEventTypes.KEYDOWN) {
       switch (event.key) {
         case Key.z:
           updateFrontMoveDirection(FrontMoveDirection.Forward);

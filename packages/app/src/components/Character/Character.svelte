@@ -249,6 +249,8 @@
   $: {
     if (!isAlive) {
       switchAnimation(characterAnimationKeys.death);
+    } else {
+      switchAnimation(characterAnimationKeys.idle);
     }
   }
 

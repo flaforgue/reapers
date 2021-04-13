@@ -3,6 +3,7 @@ import * as BABYLON from 'babylonjs';
 import { CharacterKind, GameDTO, GameEvents } from '@reapers/game-shared';
 import CharacterEntity from './shared/character.entity';
 import BoundedValue from './shared/bounded-value';
+import config from '../config';
 
 export default class PlayerEntity extends CharacterEntity {
   public readonly attackRange = 10;
@@ -49,6 +50,18 @@ export default class PlayerEntity extends CharacterEntity {
 
   public updateAndEmitGameState(gameDto: GameDTO) {
     this._socket.volatile.emit(GameEvents.Game.Updated, gameDto);
-    this.update();
+
+    if (this.isAlive) {
+      this.update();
+    }
+  }
+
+  protected _die() {
+    this.life.setToMax();
+    this._isAlive = true;
+    this._mesh.position = config.playerInitialPosition.add(
+      new BABYLON.Vector3(0, this.halfHeight, 0),
+    );
+    this._mesh.rotation = BABYLON.Vector3.Zero();
   }
 }

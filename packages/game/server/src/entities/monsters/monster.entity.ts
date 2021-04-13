@@ -63,7 +63,7 @@ export default class MonsterEntity extends CharacterEntity {
     if (this._target) {
       this._updateDestinationFromTargetScheduler.update();
 
-      if (this._isAtDestination() && !this.isAttacking) {
+      if (this._isAtDestination() && this.canMove) {
         this._attack(this._target, this.attackRange);
       }
     } else if (this._isAtDestination()) {
@@ -77,7 +77,7 @@ export default class MonsterEntity extends CharacterEntity {
       this._moveActionScheduler.update();
     }
 
-    if (!this._isAtDestination() && !this.isAttacking) {
+    if (!this._isAtDestination() && this.canMove) {
       this.setRotation(this._getRotationToDestination());
       this.frontMoveDirection = FrontMoveDirection.Forward;
     }
@@ -106,6 +106,10 @@ export default class MonsterEntity extends CharacterEntity {
       this._target = attack.parent;
       this.destination = this._target.meshPosition;
     }
+  }
+
+  protected _die() {
+    this.destroy();
   }
 
   private _goBackToInitialPosition() {

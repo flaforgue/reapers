@@ -1,3 +1,5 @@
+import * as BABYLON from 'babylonjs';
+
 const fps = 60;
 
 export default {
@@ -8,7 +10,7 @@ export default {
   nbMaxPlayers: 100,
   fps,
   moveStep: 0.07,
-  // moveStep: 0.7,
   rotationStep: 0.035,
   gravity: -2,
+  playerInitialPosition: BABYLON.Vector3.Zero(),
 };

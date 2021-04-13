@@ -4,7 +4,7 @@
   import { onDestroy } from 'svelte';
   import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
   import { disposeArray } from '../../utils';
-  import { AnimationKey, createParticleSystem } from './player.utils';
+  import { AnimationKey, createParticleSystem, resetCamera } from './player.utils';
   import Character from '../Character/Character.svelte';
   import { playerInfos } from '../../stores';
 
@@ -72,12 +72,13 @@
   }
 
   function updateCameraAlpha(rotZ: number) {
+    const isAlreadyResetting = camera?.animations?.length;
     /*
      * When attacking, the game server calls lookAt on player to look at the target
      * in that case player.isAttacking = true and we don't want the camera to rotate
      */
-    if (camera && !player.isAttacking) {
-      camera.alpha = (rotZ - Math.PI / 2) * -1;
+    if (camera?.metadata?.isDirty && !isAlreadyResetting && !player.isAttacking) {
+      resetCamera(camera, rotZ);
     }
   }
 

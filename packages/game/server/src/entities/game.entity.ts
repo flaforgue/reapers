@@ -131,7 +131,7 @@ export default class GameEntity extends BaseEntity {
     for (let i = 0; i < this._players.length; i++) {
       if (this._players[i].isDeleting) {
         this._players.splice(i, 1);
-      } else if (this._players[i].isAlive) {
+      } else {
         this._players[i].updateAndEmitGameState(gameDto);
       }
     }
@@ -157,7 +157,7 @@ export default class GameEntity extends BaseEntity {
       socket,
       this._scene,
       name,
-      BABYLON.Vector3.Zero(),
+      config.playerInitialPosition,
       BABYLON.Vector3.Zero(),
     );
     this._players.push(player);
@@ -174,6 +174,6 @@ export default class GameEntity extends BaseEntity {
       `Player ${player.id} left (${this._players.length}/${config.nbMaxPlayers})`,
     );
 
-    player.dispose();
+    player.destroy();
   }
 }

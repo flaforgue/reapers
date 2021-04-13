@@ -30,9 +30,10 @@ export default class CharacterEntity extends PositionableEntity {
   protected readonly _shouldMoveWithCollisions: boolean = true;
   protected readonly _kind: CharacterKind = CharacterKind.Player;
 
+  protected _isAlive = true;
+
   private readonly _currentAttacks: AttackEntity[] = [];
 
-  private _isAlive = true;
   private _isDeleting = false;
   private _low_speed: BABYLON.Vector3;
   private _speed: BABYLON.Vector3;
@@ -86,6 +87,10 @@ export default class CharacterEntity extends PositionableEntity {
 
   public get isDeleting() {
     return this._isDeleting;
+  }
+
+  public get canMove() {
+    return this._isAlive && !this.isAttacking;
   }
 
   protected _createLifeBoudedValue() {
@@ -225,19 +230,21 @@ export default class CharacterEntity extends PositionableEntity {
     this.life.remove(attack.damageAmount);
 
     if (!this._isDeleting && this.life.value <= 0) {
-      this.die();
+      this.dieAsync();
     }
   }
 
-  public die() {
+  public dieAsync() {
     this._isAlive = false;
-    setTimeout(() => {
-      this.dispose();
-    }, 1000);
+    setTimeout(() => this._die(), 2000);
   }
 
-  public dispose() {
-    super.dispose();
+  protected _die() {
+    console.warn('No _die implementation', this.kind);
+  }
+
+  public destroy() {
+    super.destroy();
     this._isDeleting = true;
     delete charactersByIds[this.id];
   }

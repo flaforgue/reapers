@@ -80,6 +80,9 @@ export function createCamera(scene: BABYLON.Scene) {
   camera.lowerBetaLimit = Math.PI / 5;
   camera.attachControl(true);
   camera.panningSensibility = 0;
+  camera.metadata = {
+    isDirty: false,
+  };
 
   return camera;
 }
