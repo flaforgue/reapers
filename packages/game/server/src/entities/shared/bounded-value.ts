@@ -30,4 +30,8 @@ export default class BoundedValue {
   public remove(value: number) {
     this._value = Math.max(this._value - value, this._min);
   }
+
+  public setToMax() {
+    this._value = this._max;
+  }
 }

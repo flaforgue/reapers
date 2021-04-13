@@ -171,8 +171,9 @@ export default class GameEntity extends BaseEntity {
     console.info(
       `Player ${player.id} left (${this._players.length}/${config.nbMaxPlayers})`,
     );
-    player.dispose();
+    delete this._charactersById[player.id];
     removeFromArrayById(this._players, player.id);
+    player.dispose();
   }
 
   public findCharacterById(id: string): CharacterEntity | null {

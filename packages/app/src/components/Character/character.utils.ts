@@ -48,15 +48,18 @@ export function createLinkedLabel(
 }
 
 function createFreeLabel(
-  value: string,
+  labelOptions: {
+    value: string;
+    color?: string;
+  },
   kind: CharacterKind,
   position: BABYLON.Vector3,
   scene: BABYLON.Scene,
 ) {
   const height = labelPositions[kind];
-  const label = new GUI.TextBlock('label', value);
+  const label = new GUI.TextBlock('label', labelOptions.value);
 
-  label.color = '#fff';
+  label.color = labelOptions?.color ?? '#fff';
   label.fontSize = 32;
   label.shadowOffsetX = 3;
   label.shadowOffsetY = 3;
@@ -85,9 +88,16 @@ function createFreeLabel(
   return label;
 }
 
-export function createAttackLabel(attack: AttackDTO, scene: BABYLON.Scene) {
+export function createAttackLabel(
+  attack: AttackDTO,
+  color: string,
+  scene: BABYLON.Scene,
+) {
   const label = createFreeLabel(
-    attack.damageAmount.toString(),
+    {
+      value: attack.damageAmount.toString(),
+      color,
+    },
     attack.targetKind,
     new BABYLON.Vector3(
       attack.targetPosition.x,
@@ -98,25 +108,6 @@ export function createAttackLabel(attack: AttackDTO, scene: BABYLON.Scene) {
   );
 
   return label;
-}
-
-export function createTargetInfos(
-  character: CharacterDTO | CharacterInfos,
-): CharacterInfos {
-  const position = new BABYLON.Vector3(
-    character.position.x,
-    character.position.y,
-    character.position.z,
-  );
-
-  return {
-    id: character.id,
-    kind: character.kind,
-    level: character.level,
-    name: character.name,
-    life: character.life,
-    position,
-  };
 }
 
 export function createHighlightMesh(

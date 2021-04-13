@@ -10,11 +10,11 @@ import PositionableDTO from './positionable.dto';
 @Exclude()
 export default class BoundedValueDTO {
   @Expose()
-  public min = 0;
+  public min = 1;
 
   @Expose()
-  public max = 100;
+  public max = 1;
 
   @Expose()
-  public value = 100;
+  public value = 1;
 }

@@ -16,6 +16,7 @@ export default class MonsterEntity extends CharacterEntity {
   private readonly _updateDestinationFromTargetScheduler: ActionScheduler;
   private _destination: BABYLON.Vector3;
   private _target: CharacterEntity | null = null;
+  private _isGoingBackToInitialPosition = false;
 
   public constructor(
     name: string,
@@ -33,8 +34,10 @@ export default class MonsterEntity extends CharacterEntity {
       this.destination = getRandomPosition(this._initialPosition, walkingArea);
     }, 5);
     this._updateDestinationFromTargetScheduler = new ActionScheduler(() => {
-      if (this._target) {
+      if (this._target?.isActive) {
         this.destination = this._target.meshPosition;
+      } else {
+        this._goBackToInitialPosition();
       }
     }, 0.5);
   }
@@ -50,21 +53,21 @@ export default class MonsterEntity extends CharacterEntity {
   public update() {
     if (this._target) {
       this._updateDestinationFromTargetScheduler.update();
-    }
 
-    if (this._isAtDestination()) {
-      if (this._target) {
-        if (!this.isAttacking) {
-          // :todo attack does not seem to apply
-          this._attack(this._target, this.attackRange);
-        }
-      } else {
-        this._moveActionScheduler.update();
+      if (this._isAtDestination() && !this.isAttacking) {
+        this._attack(this._target, this.attackRange);
       }
-
+    } else if (this._isAtDestination()) {
+      if (this._isGoingBackToInitialPosition) {
+        this._isGoingBackToInitialPosition = false;
+        this.life.setToMax();
+      }
       this.frontMoveDirection = FrontMoveDirection.None;
       this.rotationDirection = RotationDirection.None;
-    } else {
+      this._moveActionScheduler.update();
+    }
+
+    if (!this._isAtDestination() && !this.isAttacking) {
       this.setRotation(this._getRotationToDestination());
       this.frontMoveDirection = FrontMoveDirection.Forward;
     }
@@ -89,8 +92,15 @@ export default class MonsterEntity extends CharacterEntity {
   public receiveAttack(attack: AttackEntity) {
     super.receiveAttack(attack);
 
-    console.log('setting destination to', attack.parent.meshPosition);
-    this.destination = attack.parent.meshPosition;
-    this._target = attack.parent;
+    if (!this._isGoingBackToInitialPosition) {
+      this._target = attack.parent;
+      this.destination = this._target.meshPosition;
+    }
+  }
+
+  private _goBackToInitialPosition() {
+    this._target = null;
+    this._destination = this._initialPosition;
+    this._isGoingBackToInitialPosition = true;
   }
 }

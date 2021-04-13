@@ -4,6 +4,9 @@ import BoundedValue from '../shared/bounded-value';
 import MonsterEntity from './monster.entity';
 
 export default class SpiderEntity extends MonsterEntity {
+  public readonly attackLinearSpeed: number = 0;
+  public readonly attackTimeToCast: number = 0.6;
+
   protected readonly _kind: CharacterKind = CharacterKind.Spider;
 
   public constructor(
@@ -32,7 +35,11 @@ export default class SpiderEntity extends MonsterEntity {
     this._mesh.ellipsoid = new BABYLON.Vector3(0.5, 0.1, 0.5);
   }
 
-  protected _createLifeBoudedValue(): BoundedValue {
-    return new BoundedValue(0, 100 + 9 * this.level);
+  protected _createLifeBoudedValue() {
+    return new BoundedValue(0, 100 + 5 * this.level);
+  }
+
+  protected _createAttackDamageAmount() {
+    return 11 + this.level;
   }
 }

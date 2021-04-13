@@ -15,7 +15,7 @@ export default class CharacterEntity extends PositionableEntity {
   public readonly level: number;
   public readonly life: BoundedValue;
   public readonly attackRange: number = 1;
-  public readonly attackDamageAmount: number = 0;
+  public readonly attackDamageAmount: number;
   public readonly attackLinearSpeed: number = 1;
   public readonly attackTimeToCast: number = 0.1;
 
@@ -30,6 +30,7 @@ export default class CharacterEntity extends PositionableEntity {
   private readonly _speed: BABYLON.Vector3;
   private readonly _low_speed: BABYLON.Vector3;
   private readonly _currentAttacks: AttackEntity[] = [];
+  private _isActive = true;
 
   public constructor(
     name: string,
@@ -51,6 +52,11 @@ export default class CharacterEntity extends PositionableEntity {
     this.name = name;
     this.level = level;
     this.life = this._createLifeBoudedValue();
+    this.attackDamageAmount = this._createAttackDamageAmount();
+  }
+
+  public get isActive() {
+    return this._isActive;
   }
 
   public get kind() {
@@ -63,6 +69,10 @@ export default class CharacterEntity extends PositionableEntity {
 
   protected _createLifeBoudedValue() {
     return new BoundedValue();
+  }
+
+  protected _createAttackDamageAmount() {
+    return 0;
   }
 
   public update() {
@@ -181,7 +191,7 @@ export default class CharacterEntity extends PositionableEntity {
       new AttackEntity(this, target, {
         damageAmount: this.attackDamageAmount,
         timeToCast: this.attackTimeToCast,
-        timeToHit: distanceToTarget / this.attackLinearSpeed,
+        timeToHit: this.attackLinearSpeed ? distanceToTarget / this.attackLinearSpeed : 0,
       }),
     );
   }
@@ -192,5 +202,10 @@ export default class CharacterEntity extends PositionableEntity {
 
   public receiveAttack(attack: AttackEntity) {
     this.life.remove(attack.damageAmount);
+  }
+
+  public dispose() {
+    super.dispose();
+    this._isActive = false;
   }
 }

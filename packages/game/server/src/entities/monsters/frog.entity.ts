@@ -4,6 +4,9 @@ import BoundedValue from '../shared/bounded-value';
 import MonsterEntity from './monster.entity';
 
 export default class FrogEntity extends MonsterEntity {
+  public readonly attackLinearSpeed: number = 0;
+  public readonly attackTimeToCast: number = 0.7;
+
   protected readonly _kind: CharacterKind = CharacterKind.Frog;
 
   public constructor(
@@ -33,6 +36,10 @@ export default class FrogEntity extends MonsterEntity {
   }
 
   protected _createLifeBoudedValue(): BoundedValue {
-    return new BoundedValue(0, 100 + 5 * this.level);
+    return new BoundedValue(0, 100 + 8 * this.level);
+  }
+
+  protected _createAttackDamageAmount() {
+    return 8 + this.level;
   }
 }

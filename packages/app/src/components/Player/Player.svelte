@@ -1,12 +1,12 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
-  import { AbstractMesh } from '@babylonjs/core';
   import { onDestroy } from 'svelte';
-  import { AttackDTO, CharacterDTO } from '@reapers/game-client';
+  import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
   import { disposeArray } from '../../utils';
   import { AnimationKey, createParticleSystem } from './player.utils';
   import Character from '../Character/Character.svelte';
+  import { playerInfos } from '../../stores';
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
   export let baseHighlightMesh: BABYLON.Mesh | undefined;
@@ -15,13 +15,17 @@
   export let gui: GUI.AdvancedDynamicTexture | undefined;
   export let shadowGenerator: BABYLON.CascadedShadowGenerator | undefined;
 
+  const characterAnimationKeys = {
+    attack: AnimationKey.Punch,
+    idle: AnimationKey.Idle,
+    walk: AnimationKey.Walk,
+    death: AnimationKey.Defeat,
+  };
+
   let rootMeshes: BABYLON.Mesh[] = [];
   let skeletons: BABYLON.Skeleton[] = [];
-  let particleSystem: BABYLON.ParticleSystem | undefined;
   let animationGroups: BABYLON.AnimationGroup[] = [];
-  let currentAnimationKey = AnimationKey.Idle;
-
-  const attackAnimationKey = AnimationKey.Punch;
+  let particleSystem: BABYLON.ParticleSystem | undefined;
 
   function instantiateModels() {
     const entries = assetContainer?.instantiateModelsToScene((sourceName) => {
@@ -32,16 +36,10 @@
     rootMeshes = (entries?.rootNodes ?? []) as BABYLON.Mesh[];
     animationGroups = entries?.animationGroups ?? [];
     animationGroups[AnimationKey.Walk].speedRatio = 2;
-    animationGroups[attackAnimationKey].targetedAnimations[0].animation.addEvent(
-      new BABYLON.AnimationEvent(player.attackTimeToCast, function () {
-        currentAnimationKey = AnimationKey.Idle;
-      }),
-    );
-
-    shadowGenerator?.addShadowCaster(rootMeshes[0] as AbstractMesh);
+    shadowGenerator?.addShadowCaster(rootMeshes[0] as BABYLON.AbstractMesh);
   }
 
-  function castSpell(currentAttack: AttackDTO) {
+  function attack(currentAttack: AttackDTO) {
     const scene = rootMeshes[0]?.getScene();
 
     if (currentAttack && scene && player?.position) {
@@ -73,21 +71,18 @@
     }
   }
 
-  function castSpellAsync() {
-    if (player.currentAttack) {
-      const currentAttackClone = Object.assign({}, player.currentAttack);
-      setTimeout(
-        () => castSpell(currentAttackClone),
-        player.currentAttack.timeToCast * 1000,
-      );
-    }
-  }
-
   function updateCameraAlpha(rotZ: number) {
-    // !player.isAttacking because we don't want to rotate because of the lookAt caused by attack
+    /*
+     * When attacking, the game server calls lookAt on player to look at the target
+     * in that case player.isAttacking = true and we don't want the camera to rotate
+     */
     if (camera && !player.isAttacking) {
       camera.alpha = (rotZ - Math.PI / 2) * -1;
     }
+  }
+
+  function updatePlayerInfos() {
+    $playerInfos = player;
   }
 
   $: isAssetContainerReady = Boolean(assetContainer);
@@ -109,27 +104,18 @@
     updateCameraAlpha(rotY);
   }
 
-  $: isRootMeshReady = Boolean(rootMeshes[0]);
-  $: frontMoveDirection = player.frontMoveDirection;
-  $: sideMoveDirection = player.sideMoveDirection;
+  $: isActivePlayer = player.id === $activePlayerId;
+  $: playerName = player.name;
+  $: playerLevel = player.level;
+  $: lifeMin = player.life.min;
+  $: lifeMax = player.life.max;
+  $: lifeValue = player.life.value;
   $: {
-    if (isRootMeshReady && (frontMoveDirection || sideMoveDirection)) {
-      currentAnimationKey = AnimationKey.Walk;
-    } else {
-      currentAnimationKey = AnimationKey.Idle;
-    }
-  }
+    // this variable is used to trigger svelte reactivity
+    const reactivityDeps = lifeMin || lifeMax || lifeValue || playerName || playerLevel;
 
-  $: currentAttackId = player?.currentAttack?.id;
-  $: {
-    if (currentAttackId) {
-      currentAnimationKey = attackAnimationKey;
-    }
-  }
-
-  $: {
-    if (currentAttackId) {
-      castSpellAsync();
+    if (isActivePlayer && reactivityDeps) {
+      updatePlayerInfos();
     }
   }
 
@@ -149,8 +135,8 @@
   rootMesh={rootMeshes[0]}
   character={player}
   {animationGroups}
-  {currentAnimationKey}
-  {attackAnimationKey}
+  {attack}
+  {characterAnimationKeys}
   {baseHighlightMesh}
   {gui}
 />

@@ -1,25 +1,28 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
-  import { activePlayerId, CharacterDTO } from '@reapers/game-client';
+  import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
   import type { CharacterInfos } from '../../stores';
   import { targetInfos } from '../../stores';
   import { onDestroy } from 'svelte';
   import {
     createLinkedLabel,
-    createTargetInfos,
     createHighlightMesh,
     createAttackLabel,
     animateAttackLabel,
   } from './character.utils';
+
+  type CharacterAnimationKey = 'attack' | 'death' | 'idle' | 'walk';
 
   export let character: CharacterDTO = new CharacterDTO();
   export let gui: GUI.AdvancedDynamicTexture | undefined;
   export let baseHighlightMesh: BABYLON.Mesh | undefined;
   export let rootMesh: BABYLON.Mesh | undefined;
   export let animationGroups: BABYLON.AnimationGroup[] = [];
-  export let currentAnimationKey: number;
-  export let attackAnimationKey: number;
+  export let characterAnimationKeys: Record<CharacterAnimationKey, number>;
+  export let attack: (attack: AttackDTO) => void = () => {
+    console.warn('props attack uses default empty value');
+  };
 
   let label: GUI.TextBlock | undefined;
   let highlightMesh: BABYLON.Mesh | undefined;
@@ -37,16 +40,17 @@
     }
   }
 
-  function switchAnimation(animationKey: number) {
+  function switchAnimation(animationKey: number, isAttack = false) {
     currentAnimation?.reset()?.stop();
 
     const newAnimation = animationGroups[animationKey];
-    const isAttackAnimation = animationKey === attackAnimationKey;
-    const to = isAttackAnimation ? character.attackTimeToCast : newAnimation.to;
 
     if (newAnimation) {
+      const to = isAttack ? character.attackTimeToCast : newAnimation.to;
+      const isLoop = !isAttack;
+
       currentAnimation = newAnimation.start(
-        !isAttackAnimation,
+        isLoop,
         newAnimation.speedRatio,
         newAnimation.from,
         to,
@@ -63,8 +67,8 @@
     }
   }
 
-  function setGUITargetInfos(character: CharacterDTO | CharacterInfos) {
-    $targetInfos = createTargetInfos(character);
+  function updateGUITargetInfos() {
+    $targetInfos = character;
   }
 
   function createCharacterLabel() {
@@ -83,7 +87,7 @@
         new BABYLON.ExecuteCodeAction(
           { trigger: BABYLON.ActionManager.OnPickTrigger },
           function () {
-            setGUITargetInfos(character);
+            updateGUITargetInfos();
 
             if (!highlightMesh && baseHighlightMesh && rootMesh) {
               highlightMesh = createHighlightMesh(baseHighlightMesh, rootMesh, kind);
@@ -114,10 +118,33 @@
     }
   }
 
+  function registerAnimationsEvents() {
+    animationGroups[
+      characterAnimationKeys.attack
+    ].targetedAnimations[0].animation.addEvent(
+      new BABYLON.AnimationEvent(character.attackTimeToCast, function () {
+        switchAnimation(characterAnimationKeys.idle);
+      }),
+    );
+  }
+
   function createCurrentAttackLabelAsync() {
-    if (character.id === $activePlayerId && character.currentAttack && rootMesh && gui) {
+    const isPlayerAttackParent = character.id === $activePlayerId;
+    const isPlayerAttackTarget = character?.currentAttack?.targetId === $activePlayerId;
+
+    if (
+      character.currentAttack &&
+      (isPlayerAttackParent || isPlayerAttackTarget) &&
+      rootMesh &&
+      gui
+    ) {
       const currentAttackClone = Object.assign({}, character.currentAttack);
-      const attackLabel = createAttackLabel(currentAttackClone, rootMesh.getScene());
+      const color = isPlayerAttackParent ? '#fff' : '#f63';
+      const attackLabel = createAttackLabel(
+        currentAttackClone,
+        color,
+        rootMesh.getScene(),
+      );
 
       setTimeout(() => {
         if (gui && rootMesh) {
@@ -133,16 +160,21 @@
     }
   }
 
+  function attackAsync() {
+    if (character.currentAttack) {
+      const currentAttackClone = Object.assign({}, character.currentAttack);
+      setTimeout(
+        () => attack(currentAttackClone),
+        character.currentAttack.timeToCast * 1000,
+      );
+    }
+  }
+
   $: isRootMeshReady = Boolean(rootMesh);
   $: {
     if (isRootMeshReady) {
       registerRootMeshActions();
-    }
-  }
-
-  $: {
-    if (isRootMeshReady) {
-      switchAnimation(currentAnimationKey);
+      registerAnimationsEvents();
     }
   }
 
@@ -164,6 +196,16 @@
     }
   }
 
+  $: frontMoveDirection = character.frontMoveDirection;
+  $: sideMoveDirection = character.sideMoveDirection;
+  $: {
+    if (isRootMeshReady && (frontMoveDirection || sideMoveDirection)) {
+      switchAnimation(characterAnimationKeys.walk);
+    } else {
+      switchAnimation(characterAnimationKeys.idle);
+    }
+  }
+
   $: name = character.name;
   $: level = character.level;
   $: kind = character.kind;
@@ -174,25 +216,16 @@
   }
 
   $: isTarget = $targetInfos?.id === character.id;
-  $: id = character.id;
-  $: minLife = character.life.min;
-  $: maxLife = character.life.max;
-  $: valueLife = character.life.value;
+  $: lifeMin = character.life.min;
+  $: lifeMax = character.life.max;
+  $: lifeValue = character.life.value;
   $: {
-    if (isTarget) {
-      // update GUI when target infos changes
-      setGUITargetInfos({
-        id,
-        position: new BABYLON.Vector3(posX, posY, posZ),
-        kind,
-        name,
-        level,
-        life: {
-          min: minLife,
-          max: maxLife,
-          value: valueLife,
-        },
-      });
+    // this variable is used to trigger svelte reactivity
+    const reactivityDeps =
+      posX || posY || posZ || kind || name || level || lifeMin || lifeMax || lifeValue;
+
+    if (isTarget && reactivityDeps) {
+      updateGUITargetInfos();
     } else if (highlightMesh) {
       highlightMesh.dispose();
       highlightMesh = undefined;
@@ -202,7 +235,9 @@
   $: currentAttackId = character?.currentAttack?.id;
   $: {
     if (currentAttackId) {
+      switchAnimation(characterAnimationKeys.attack, true);
       createCurrentAttackLabelAsync();
+      attackAsync();
     }
   }
 

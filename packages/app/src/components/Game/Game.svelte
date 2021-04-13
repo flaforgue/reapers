@@ -3,7 +3,13 @@
   import * as GUI from '@babylonjs/gui';
   import { onMount } from 'svelte';
   import { useGame, game, activePlayerId, CharacterKind } from '@reapers/game-client';
-  import { FocusElement, focusElement, playerName, targetInfos } from '../../stores';
+  import {
+    FocusElement,
+    focusElement,
+    playerInfos,
+    playerName,
+    targetInfos,
+  } from '../../stores';
   import { servers } from '../../configs/servers.config';
   import { Key } from '../../configs/keycodes.config';
   import World from '../World/World.svelte';
