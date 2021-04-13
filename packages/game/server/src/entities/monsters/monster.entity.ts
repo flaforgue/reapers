@@ -6,6 +6,7 @@ import { FrontMoveDirection, RotationDirection } from '@reapers/game-shared';
 import AttackEntity from '../shared/attack.entity';
 
 const walkingArea = 5;
+const maxDistanceFromInitialPosition = 50;
 export default class MonsterEntity extends CharacterEntity {
   public readonly attackRange = 1;
 
@@ -22,11 +23,10 @@ export default class MonsterEntity extends CharacterEntity {
     name: string,
     level: number,
     mesh: BABYLON.Mesh,
-    position: BABYLON.Vector3,
-    rotation: BABYLON.Vector3,
-    speedFactor = new BABYLON.Vector3(1.2, 1.2, 1.2),
+    position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
+    rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
   ) {
-    super(name, level, mesh, position, rotation, speedFactor);
+    super(name, level, mesh, position, rotation);
 
     this._initialPosition = this._mesh.position.clone();
     this._destination = this._initialPosition.clone();
@@ -34,7 +34,7 @@ export default class MonsterEntity extends CharacterEntity {
       this.destination = getRandomPosition(this._initialPosition, walkingArea);
     }, 5);
     this._updateDestinationFromTargetScheduler = new ActionScheduler(() => {
-      if (this._target?.isActive) {
+      if (this._target?.isAlive) {
         this.destination = this._target.meshPosition;
       } else {
         this._goBackToInitialPosition();
@@ -51,6 +51,15 @@ export default class MonsterEntity extends CharacterEntity {
   }
 
   public update() {
+    const distanceFromInitialPosition = BABYLON.Vector3.Distance(
+      this._mesh.position,
+      this._initialPosition,
+    );
+
+    if (distanceFromInitialPosition >= maxDistanceFromInitialPosition) {
+      this._goBackToInitialPosition();
+    }
+
     if (this._target) {
       this._updateDestinationFromTargetScheduler.update();
 
@@ -60,6 +69,7 @@ export default class MonsterEntity extends CharacterEntity {
     } else if (this._isAtDestination()) {
       if (this._isGoingBackToInitialPosition) {
         this._isGoingBackToInitialPosition = false;
+        this.speedFactor.divide(2);
         this.life.setToMax();
       }
       this.frontMoveDirection = FrontMoveDirection.None;
@@ -99,8 +109,11 @@ export default class MonsterEntity extends CharacterEntity {
   }
 
   private _goBackToInitialPosition() {
-    this._target = null;
-    this._destination = this._initialPosition;
-    this._isGoingBackToInitialPosition = true;
+    if (!this._isGoingBackToInitialPosition) {
+      this._target = null;
+      this._destination = this._initialPosition;
+      this._isGoingBackToInitialPosition = true;
+      this.speedFactor.multiply(2);
+    }
   }
 }

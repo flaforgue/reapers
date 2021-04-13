@@ -4,7 +4,6 @@ import PositionableEntity from './shared/positionable.entity';
 import MonsterEntity from './monsters/monster.entity';
 import ActionScheduler from './shared/action-scheduler';
 import { getRandomPosition, getRandomRotation } from './shared/utils';
-import CharacterEntity from './shared/character.entity';
 
 type MonsterGeneratorConfig = {
   instanceClass: MonsterConstructor;
@@ -24,23 +23,20 @@ type MonsterConstructor<T extends MonsterEntity = MonsterEntity> = new (
   rotation: BABYLON.Vector3,
 ) => T;
 
-type MonsterGeneratedCallback = (c: CharacterEntity) => void;
 export default class MonsterGeneratorEntity extends PositionableEntity {
   private readonly _createMonsterScheduler: ActionScheduler;
   private readonly _config: MonsterGeneratorConfig;
   private _monsters: MonsterEntity[] = [];
-  private _onMonsterGenerated: MonsterGeneratedCallback;
 
   public constructor(
     scene: BABYLON.Scene,
     config: MonsterGeneratorConfig,
-    onMonsterGenerated: MonsterGeneratedCallback,
     position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
     rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
   ) {
     super(new BABYLON.Mesh(EnvironmentKind.MonsterGenerator, scene), position, rotation);
+
     this._config = config;
-    this._onMonsterGenerated = onMonsterGenerated;
     this._createMonsterScheduler = new ActionScheduler(
       () => this.createMonster(),
       config.interval,
@@ -57,7 +53,11 @@ export default class MonsterGeneratorEntity extends PositionableEntity {
     }
 
     for (let i = 0; i < this._monsters.length; i++) {
-      this._monsters[i].update();
+      if (this._monsters[i].isDeleting) {
+        this._monsters.splice(i, 1);
+      } else if (this._monsters[i].isAlive) {
+        this._monsters[i].update();
+      }
     }
   }
 
@@ -71,6 +71,5 @@ export default class MonsterGeneratorEntity extends PositionableEntity {
     );
 
     this._monsters.push(monster);
-    this._onMonsterGenerated(monster);
   }
 }

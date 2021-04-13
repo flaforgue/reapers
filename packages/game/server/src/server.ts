@@ -6,10 +6,6 @@ import config from './config';
 import { GameEvents, plainToClass, CharacterDTO } from '@reapers/game-shared';
 import { GameEntity } from './entities';
 
-process.once('SIGUSR2', function () {
-  process.kill(process.pid, 'SIGUSR2');
-});
-
 const port = config.port;
 const app = express();
 const httpServer = http.createServer(app);
@@ -20,7 +16,18 @@ const io = new SocketIO.Server(httpServer, {
   },
 });
 const game = new GameEntity(io.sockets);
-console.info('New game created', game.id);
+
+process.once('SIGUSR2', function () {
+  httpServer.close(function () {
+    process.kill(process.pid, 'SIGUSR2');
+  });
+});
+
+process.on('SIGINT', function () {
+  httpServer.close(function () {
+    process.kill(process.pid, 'SIGINT');
+  });
+});
 
 io.on(GameEvents.System.Connection, (socket: SocketIO.Socket) => {
   if (

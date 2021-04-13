@@ -6,6 +6,7 @@ import {
   RotationDirection,
 } from '@reapers/game-shared';
 import { GameEntity, PlayerEntity } from '../../entities';
+import charactersByIds from '../../globals/characters-by-ids';
 
 function isValidFrontMoveDirection(direction: unknown) {
   return Boolean(FrontMoveDirection[Number(direction)]);
@@ -49,7 +50,7 @@ export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
 
   socket.on(GameEvents.Player.SpellCasted, (id: string) => {
     if (!player.isAttacking) {
-      const target = game.findCharacterById(id);
+      const target = charactersByIds[id];
 
       if (target) {
         player.attackIfInRange(target);

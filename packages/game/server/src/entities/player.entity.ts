@@ -18,8 +18,8 @@ export default class PlayerEntity extends CharacterEntity {
     socket: SocketIO.Socket,
     scene: BABYLON.Scene,
     name: string,
-    position?: BABYLON.Vector3,
-    rotation?: BABYLON.Vector3,
+    position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
+    rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
   ) {
     super(
       name,
@@ -36,6 +36,8 @@ export default class PlayerEntity extends CharacterEntity {
       position,
       rotation,
     );
+
+    this.speedFactor.current = 1;
     this._socket = socket;
     this._mesh.ellipsoid = new BABYLON.Vector3(0.25, 0.45, 0.25);
     this._mesh.checkCollisions = true;

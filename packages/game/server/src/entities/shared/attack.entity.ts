@@ -9,9 +9,10 @@ export default class AttackEntity extends BaseEntity {
   public readonly timeToCast: number;
   public readonly parent: CharacterEntity;
 
-  protected readonly _target: CharacterEntity;
-  protected readonly _attackHitScheduler: ActionScheduler;
-  protected readonly _attackCastedScheduler: ActionScheduler;
+  private readonly _target: CharacterEntity;
+  private readonly _attackHitScheduler: ActionScheduler;
+  private readonly _attackCastedScheduler: ActionScheduler;
+  private _isDeleting = false;
 
   public constructor(
     parent: CharacterEntity,
@@ -34,8 +35,11 @@ export default class AttackEntity extends BaseEntity {
 
     this.timeToHit = attack.timeToHit;
     this._attackHitScheduler = new ActionScheduler(() => {
-      this._target.receiveAttack(this);
-      this.parent.removeCurrentAttack(this.id);
+      if (this.parent.isAlive) {
+        this._target.receiveAttack(this);
+      }
+
+      this._isDeleting = true;
     }, this.timeToCast + this.timeToHit);
   }
 
@@ -49,6 +53,14 @@ export default class AttackEntity extends BaseEntity {
 
   public get targetKind() {
     return this._target.kind;
+  }
+
+  public get isTargetAlive() {
+    return this._target.isAlive;
+  }
+
+  public get isDeleting() {
+    return this._isDeleting;
   }
 
   public update() {

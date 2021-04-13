@@ -12,6 +12,9 @@ export default class AttackDTO extends BaseDTO {
   targetKind: CharacterKind = CharacterKind.Player;
 
   @Expose()
+  isTargetAlive: boolean = true;
+
+  @Expose()
   @Type(() => Vector3DTO)
   public targetPosition: Vector3DTO = {
     x: 0,

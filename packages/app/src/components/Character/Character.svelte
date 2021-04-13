@@ -40,14 +40,16 @@
     }
   }
 
-  function switchAnimation(animationKey: number, isAttack = false) {
+  function switchAnimation(animationKey: number) {
     currentAnimation?.reset()?.stop();
 
     const newAnimation = animationGroups[animationKey];
+    const isAttack = animationKey === characterAnimationKeys.attack;
+    const isDeath = animationKey === characterAnimationKeys.death;
 
     if (newAnimation) {
       const to = isAttack ? character.attackTimeToCast : newAnimation.to;
-      const isLoop = !isAttack;
+      const isLoop = !isAttack && !isDeath;
 
       currentAnimation = newAnimation.start(
         isLoop,
@@ -68,7 +70,11 @@
   }
 
   function updateGUITargetInfos() {
-    $targetInfos = character;
+    if (isAlive) {
+      $targetInfos = character;
+    } else {
+      $targetInfos = null;
+    }
   }
 
   function createCharacterLabel() {
@@ -128,17 +134,11 @@
     );
   }
 
-  function createCurrentAttackLabelAsync() {
+  function createCurrentAttackLabelAsync(currentAttackClone: AttackDTO) {
     const isPlayerAttackParent = character.id === $activePlayerId;
-    const isPlayerAttackTarget = character?.currentAttack?.targetId === $activePlayerId;
+    const isPlayerAttackTarget = currentAttackClone.targetId === $activePlayerId;
 
-    if (
-      character.currentAttack &&
-      (isPlayerAttackParent || isPlayerAttackTarget) &&
-      rootMesh &&
-      gui
-    ) {
-      const currentAttackClone = Object.assign({}, character.currentAttack);
+    if ((isPlayerAttackParent || isPlayerAttackTarget) && rootMesh && gui) {
       const color = isPlayerAttackParent ? '#fff' : '#f63';
       const attackLabel = createAttackLabel(
         currentAttackClone,
@@ -147,7 +147,7 @@
       );
 
       setTimeout(() => {
-        if (gui && rootMesh) {
+        if (character.isAlive && currentAttackClone.isTargetAlive && gui && rootMesh) {
           gui.addControl(attackLabel);
           animateAttackLabel(attackLabel, rootMesh.getScene());
         }
@@ -163,10 +163,14 @@
   function attackAsync() {
     if (character.currentAttack) {
       const currentAttackClone = Object.assign({}, character.currentAttack);
-      setTimeout(
-        () => attack(currentAttackClone),
-        character.currentAttack.timeToCast * 1000,
-      );
+
+      createCurrentAttackLabelAsync(currentAttackClone);
+
+      setTimeout(() => {
+        if (character.isAlive && currentAttackClone.isTargetAlive) {
+          attack(currentAttackClone);
+        }
+      }, character.currentAttack.timeToCast * 1000);
     }
   }
 
@@ -216,13 +220,23 @@
   }
 
   $: isTarget = $targetInfos?.id === character.id;
+  $: isAlive = character.isAlive;
   $: lifeMin = character.life.min;
   $: lifeMax = character.life.max;
   $: lifeValue = character.life.value;
   $: {
     // this variable is used to trigger svelte reactivity
     const reactivityDeps =
-      posX || posY || posZ || kind || name || level || lifeMin || lifeMax || lifeValue;
+      isAlive ||
+      posX ||
+      posY ||
+      posZ ||
+      kind ||
+      name ||
+      level ||
+      lifeMin ||
+      lifeMax ||
+      lifeValue;
 
     if (isTarget && reactivityDeps) {
       updateGUITargetInfos();
@@ -232,11 +246,16 @@
     }
   }
 
+  $: {
+    if (!isAlive) {
+      switchAnimation(characterAnimationKeys.death);
+    }
+  }
+
   $: currentAttackId = character?.currentAttack?.id;
   $: {
     if (currentAttackId) {
-      switchAnimation(characterAnimationKeys.attack, true);
-      createCurrentAttackLabelAsync();
+      switchAnimation(characterAnimationKeys.attack);
       attackAsync();
     }
   }

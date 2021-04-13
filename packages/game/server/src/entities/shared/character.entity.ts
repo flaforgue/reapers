@@ -9,7 +9,8 @@ import config from '../../config';
 import PositionableEntity from './positionable.entity';
 import BoundedValue from './bounded-value';
 import AttackEntity from './attack.entity';
-import { removeFromArrayById } from './utils';
+import VariableValue from './variable-value';
+import charactersByIds from '../../globals/characters-by-ids';
 export default class CharacterEntity extends PositionableEntity {
   public readonly name: string;
   public readonly level: number;
@@ -18,34 +19,50 @@ export default class CharacterEntity extends PositionableEntity {
   public readonly attackDamageAmount: number;
   public readonly attackLinearSpeed: number = 1;
   public readonly attackTimeToCast: number = 0.1;
+  public readonly speedFactor: VariableValue;
 
   public isAttacking: boolean = false;
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
   public rotationDirection: RotationDirection = RotationDirection.None;
 
+  protected readonly _attackDuration: number = 0.75; // in seconds
   protected readonly _shouldMoveWithCollisions: boolean = true;
   protected readonly _kind: CharacterKind = CharacterKind.Player;
-  protected readonly _attackDuration: number = 0.75; // in seconds
-  private readonly _speed: BABYLON.Vector3;
-  private readonly _low_speed: BABYLON.Vector3;
+
   private readonly _currentAttacks: AttackEntity[] = [];
-  private _isActive = true;
+
+  private _isAlive = true;
+  private _isDeleting = false;
+  private _low_speed: BABYLON.Vector3;
+  private _speed: BABYLON.Vector3;
 
   public constructor(
     name: string,
     level: number,
     mesh: BABYLON.Mesh,
-    position?: BABYLON.Vector3,
-    rotation?: BABYLON.Vector3,
-    speedFactor = new BABYLON.Vector3(1, 1, 1),
+    position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
+    rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
   ) {
     super(mesh, position, rotation);
+
+    charactersByIds[this.id] = this;
+
+    this.speedFactor = new VariableValue(1, (newCurrent: number) => {
+      this._speed = new BABYLON.Vector3(
+        config.moveStep,
+        config.moveStep,
+        config.moveStep,
+      ).multiply(new BABYLON.Vector3().setAll(newCurrent));
+      this._low_speed = this._speed.multiply(
+        new BABYLON.Vector3(Math.SQRT1_2, Math.SQRT1_2, Math.SQRT1_2),
+      );
+    });
     this._speed = new BABYLON.Vector3(
       config.moveStep,
       config.moveStep,
       config.moveStep,
-    ).multiply(speedFactor);
+    ).multiply(new BABYLON.Vector3().setAll(this.speedFactor.current));
     this._low_speed = this._speed.multiply(
       new BABYLON.Vector3(Math.SQRT1_2, Math.SQRT1_2, Math.SQRT1_2),
     );
@@ -55,8 +72,8 @@ export default class CharacterEntity extends PositionableEntity {
     this.attackDamageAmount = this._createAttackDamageAmount();
   }
 
-  public get isActive() {
-    return this._isActive;
+  public get isAlive() {
+    return this._isAlive;
   }
 
   public get kind() {
@@ -65,6 +82,10 @@ export default class CharacterEntity extends PositionableEntity {
 
   public get currentAttack() {
     return this._currentAttacks[this._currentAttacks.length - 1] ?? null;
+  }
+
+  public get isDeleting() {
+    return this._isDeleting;
   }
 
   protected _createLifeBoudedValue() {
@@ -85,7 +106,11 @@ export default class CharacterEntity extends PositionableEntity {
     this._updateRotation();
 
     for (let i = 0; i < this._currentAttacks.length; i++) {
-      this._currentAttacks[i].update();
+      if (this._currentAttacks[i].isDeleting) {
+        this._currentAttacks.splice(i, 1);
+      } else {
+        this._currentAttacks[i].update();
+      }
     }
   }
 
@@ -196,16 +221,24 @@ export default class CharacterEntity extends PositionableEntity {
     );
   }
 
-  public removeCurrentAttack(attackId: string) {
-    removeFromArrayById(this._currentAttacks, attackId);
-  }
-
   public receiveAttack(attack: AttackEntity) {
     this.life.remove(attack.damageAmount);
+
+    if (!this._isDeleting && this.life.value <= 0) {
+      this.die();
+    }
+  }
+
+  public die() {
+    this._isAlive = false;
+    setTimeout(() => {
+      this.dispose();
+    }, 1000);
   }
 
   public dispose() {
     super.dispose();
-    this._isActive = false;
+    this._isDeleting = true;
+    delete charactersByIds[this.id];
   }
 }

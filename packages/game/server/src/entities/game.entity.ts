@@ -8,8 +8,6 @@ import SpiderEntity from './monsters/frog.entity';
 import FrogEntity from './monsters/spider.entity';
 import BaseEntity from './shared/base.entity';
 import MonsterGeneratorEntity from './monster-generator.entity';
-import CharacterEntity from './shared/character.entity';
-import { removeFromArrayById } from './shared/utils';
 
 enum GameState {
   Started,
@@ -26,11 +24,9 @@ export default class GameEntity extends BaseEntity {
   private readonly _engine: BABYLON.Engine;
   private readonly _scene: BABYLON.Scene;
 
-  // for performance reasons
-  private _charactersById: Record<string, CharacterEntity> = {};
-
   public constructor(namespace: SocketIO.Namespace) {
     super();
+
     this._namespace = namespace;
     this._engine = new BABYLON.NullEngine({
       deterministicLockstep: true,
@@ -41,6 +37,7 @@ export default class GameEntity extends BaseEntity {
     });
     this._scene = new BABYLON.Scene(this._engine);
     this._scene.collisionsEnabled = true;
+
     new BABYLON.ArcRotateCamera(
       'Camera',
       0,
@@ -50,12 +47,7 @@ export default class GameEntity extends BaseEntity {
       this._scene,
     );
 
-    this._world = new WorldEntity(this._scene, 50, 50);
-
-    const addToCharactersById = (character: CharacterEntity) => {
-      this._charactersById[character.id] = character;
-    };
-
+    this._world = new WorldEntity(this._scene, 100, 100);
     this._monsterGenerators = [
       new MonsterGeneratorEntity(
         this._scene,
@@ -69,8 +61,8 @@ export default class GameEntity extends BaseEntity {
             max: 5,
           },
         },
-        addToCharactersById,
         new BABYLON.Vector3(5, 0, 0),
+        BABYLON.Vector3.Zero(),
       ),
       new MonsterGeneratorEntity(
         this._scene,
@@ -84,8 +76,8 @@ export default class GameEntity extends BaseEntity {
             max: 5,
           },
         },
-        addToCharactersById,
         new BABYLON.Vector3(0, 0, 5),
+        BABYLON.Vector3.Zero(),
       ),
     ];
 
@@ -137,7 +129,11 @@ export default class GameEntity extends BaseEntity {
     });
 
     for (let i = 0; i < this._players.length; i++) {
-      this._players[i].updateAndEmitGameState(gameDto);
+      if (this._players[i].isDeleting) {
+        this._players.splice(i, 1);
+      } else if (this._players[i].isAlive) {
+        this._players[i].updateAndEmitGameState(gameDto);
+      }
     }
 
     for (let i = 0; i < this._monsterGenerators.length; i++) {
@@ -157,9 +153,15 @@ export default class GameEntity extends BaseEntity {
       throw new Error('Game is full');
     }
 
-    const player = new PlayerEntity(socket, this._scene, name);
+    const player = new PlayerEntity(
+      socket,
+      this._scene,
+      name,
+      BABYLON.Vector3.Zero(),
+      BABYLON.Vector3.Zero(),
+    );
     this._players.push(player);
-    this._charactersById[player.id] = player;
+
     console.info(
       `Player ${name} - ${player.id} created (${this._players.length}/${config.nbMaxPlayers})`,
     );
@@ -171,12 +173,7 @@ export default class GameEntity extends BaseEntity {
     console.info(
       `Player ${player.id} left (${this._players.length}/${config.nbMaxPlayers})`,
     );
-    delete this._charactersById[player.id];
-    removeFromArrayById(this._players, player.id);
-    player.dispose();
-  }
 
-  public findCharacterById(id: string): CharacterEntity | null {
-    return this._charactersById[id] ?? null;
+    player.dispose();
   }
 }
