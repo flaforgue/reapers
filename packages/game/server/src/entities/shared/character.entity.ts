@@ -246,6 +246,7 @@ export default class CharacterEntity extends PositionableEntity {
   public destroy() {
     super.destroy();
     this._isDeleting = true;
+    this._isAlive = false;
     delete charactersByIds[this.id];
   }
 }
