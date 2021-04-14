@@ -1,5 +1,5 @@
-import CharacterEntity from '../entities/shared/character.entity';
+import Character from '../core/character';
 
-const charactersByIds: Record<string, CharacterEntity> = {};
+const charactersByIds: Record<string, Character> = {};
 
 export default charactersByIds;

@@ -1,12 +1,11 @@
 import * as BABYLON from 'babylonjs';
 import { EnvironmentKind } from '@reapers/game-shared';
-import PositionableEntity from './shared/positionable.entity';
-import MonsterEntity from './monsters/monster.entity';
+import Positionable from './positionable';
+import Monster from './monsters/monster';
 import ActionScheduler from './shared/action-scheduler';
-import { getRandomPosition, getRandomRotation } from './shared/utils';
+import { getRandomPosition, getRandomRotation } from '../utils';
 
 type MonsterGeneratorConfig = {
-  instanceClass: MonsterConstructor;
   radius: number;
   interval: number;
   nbMaxInstances: number;
@@ -16,27 +15,37 @@ type MonsterGeneratorConfig = {
   };
 };
 
-type MonsterConstructor<T extends MonsterEntity = MonsterEntity> = new (
+type MonsterConstructor<T extends Monster = Monster> = new (
   scene: BABYLON.Scene,
   level: number,
   position: BABYLON.Vector3,
   rotation: BABYLON.Vector3,
 ) => T;
 
-export default class MonsterGeneratorEntity extends PositionableEntity {
+export default class MonsterGenerator extends Positionable {
   private readonly _createMonsterScheduler: ActionScheduler;
   private readonly _config: MonsterGeneratorConfig;
-  private _monsters: MonsterEntity[] = [];
+  private readonly _instanceClass: MonsterConstructor;
+  private _monsters: Monster[] = [];
 
   public constructor(
     scene: BABYLON.Scene,
-    config: MonsterGeneratorConfig,
+    instanceClass: MonsterConstructor,
     position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
-    rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
+    config: MonsterGeneratorConfig = {
+      radius: 10,
+      interval: 5,
+      nbMaxInstances: 10,
+      level: {
+        min: 1,
+        max: 5,
+      },
+    },
   ) {
-    super(new BABYLON.Mesh(EnvironmentKind.MonsterGenerator, scene), position, rotation);
+    super(new BABYLON.Mesh(EnvironmentKind.MonsterGenerator, scene), position);
 
     this._config = config;
+    this._instanceClass = instanceClass;
     this._createMonsterScheduler = new ActionScheduler(
       () => this.createMonster(),
       config.interval,
@@ -63,11 +72,11 @@ export default class MonsterGeneratorEntity extends PositionableEntity {
 
   public createMonster() {
     const levelRange = this._config.level.max - this._config.level.min;
-    const monster = new this._config.instanceClass(
+    const monster = new this._instanceClass(
       this._mesh._scene,
       Math.round(Math.random() * levelRange) + this._config.level.min,
-      getRandomPosition(this._mesh.position, this._config.radius),
-      getRandomRotation(this._mesh.rotation, this._config.radius),
+      getRandomPosition(this.position, this._config.radius),
+      getRandomRotation(this.rotation, this._config.radius),
     );
 
     this._monsters.push(monster);

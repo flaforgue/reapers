@@ -2,27 +2,22 @@ import SocketIO from 'socket.io';
 import * as BABYLON from 'babylonjs';
 import { GameDTO, GameEvents, plainToClass } from '@reapers/game-shared';
 import config from '../config';
-import PlayerEntity from './player.entity';
-import WorldEntity from './world.entity';
-import SpiderEntity from './monsters/frog.entity';
-import FrogEntity from './monsters/spider.entity';
-import BaseEntity from './shared/base.entity';
-import MonsterGeneratorEntity from './monster-generator.entity';
+import Player from './player';
+import World from './world';
+import Spider from './monsters/spider';
+import Frog from './monsters/frog';
+import Identifiable from './identifiable';
+import MonsterGenerator from './monster-generator';
 
-enum GameState {
-  Started,
-  Stopped,
-}
-
-export default class GameEntity extends BaseEntity {
-  private _namespace: SocketIO.Namespace;
-  private _state = GameState.Stopped;
-  private _world: WorldEntity;
-  private _players: PlayerEntity[] = [];
-  private _monsterGenerators: MonsterGeneratorEntity[] = [];
-  private _frameIndex = 0;
+export default class Game extends Identifiable {
+  private readonly _namespace: SocketIO.Namespace;
+  private readonly _world: World;
   private readonly _engine: BABYLON.Engine;
   private readonly _scene: BABYLON.Scene;
+
+  private _isRunning = false;
+  private _players: Player[] = [];
+  private _monsterGenerators: MonsterGenerator[] = [];
 
   public constructor(namespace: SocketIO.Namespace) {
     super();
@@ -38,6 +33,7 @@ export default class GameEntity extends BaseEntity {
     this._scene = new BABYLON.Scene(this._engine);
     this._scene.collisionsEnabled = true;
 
+    // Required even for BABYLON.NullEngine
     new BABYLON.ArcRotateCamera(
       'Camera',
       0,
@@ -47,44 +43,18 @@ export default class GameEntity extends BaseEntity {
       this._scene,
     );
 
-    this._world = new WorldEntity(this._scene, 100, 100);
+    this._world = new World(this._scene, 100, 100);
     this._monsterGenerators = [
-      new MonsterGeneratorEntity(
-        this._scene,
-        {
-          instanceClass: SpiderEntity,
-          radius: 25,
-          interval: 3,
-          nbMaxInstances: 10,
-          level: {
-            min: 1,
-            max: 5,
-          },
-        },
-        new BABYLON.Vector3(5, 0, 0),
-        BABYLON.Vector3.Zero(),
-      ),
-      new MonsterGeneratorEntity(
-        this._scene,
-        {
-          instanceClass: FrogEntity,
-          radius: 25,
-          interval: 4,
-          nbMaxInstances: 20,
-          level: {
-            min: 1,
-            max: 5,
-          },
-        },
-        new BABYLON.Vector3(0, 0, 5),
-        BABYLON.Vector3.Zero(),
-      ),
+      new MonsterGenerator(this._scene, Spider, new BABYLON.Vector3(5, 0, 0)),
+      // new MonsterGenerator(this._scene, Frog, new BABYLON.Vector3(0, 0, 5)),
     ];
 
     this._scene.executeWhenReady(() => {
+      this._isRunning = true;
+
       this._engine.runRenderLoop(() => {
         try {
-          if (this._state === GameState.Started) {
+          if (this._isRunning) {
             this._update();
             this._scene.render();
           }
@@ -92,8 +62,6 @@ export default class GameEntity extends BaseEntity {
           console.error(err);
         }
       });
-
-      this._state = GameState.Started;
     });
   }
 
@@ -109,20 +77,11 @@ export default class GameEntity extends BaseEntity {
     return this._world;
   }
 
-  public get state() {
-    return this._state;
-  }
-
-  public get frameIndex() {
-    return this._frameIndex;
-  }
-
   public get isFull() {
-    return this._players.length >= config.nbMaxPlayers;
+    return this._players.length >= config.game.nbMaxPlayers;
   }
 
   private _update() {
-    this._frameIndex = (this._frameIndex + 1) % config.fps;
     const gameDto = plainToClass(GameDTO, this, {
       excludeExtraneousValues: true,
       strategy: 'excludeAll',
@@ -142,8 +101,8 @@ export default class GameEntity extends BaseEntity {
   }
 
   public stopGameLoop() {
-    if (this._state === GameState.Started) {
-      this._state = GameState.Stopped;
+    if (this._isRunning) {
+      this._isRunning = false;
       this._namespace.emit(GameEvents.Game.Stopped);
     }
   }
@@ -153,25 +112,24 @@ export default class GameEntity extends BaseEntity {
       throw new Error('Game is full');
     }
 
-    const player = new PlayerEntity(
+    const player = new Player(
       socket,
       this._scene,
       name,
-      config.playerInitialPosition,
-      BABYLON.Vector3.Zero(),
+      config.game.playerInitialPosition.clone(),
     );
     this._players.push(player);
 
     console.info(
-      `Player ${name} - ${player.id} created (${this._players.length}/${config.nbMaxPlayers})`,
+      `Player ${name} - ${player.id} created (${this._players.length}/${config.game.nbMaxPlayers})`,
     );
 
     return player;
   }
 
-  public removePlayer(player: PlayerEntity) {
+  public removePlayer(player: Player) {
     console.info(
-      `Player ${player.id} left (${this._players.length}/${config.nbMaxPlayers})`,
+      `Player ${player.id} left (${this._players.length}/${config.game.nbMaxPlayers})`,
     );
 
     player.destroy();

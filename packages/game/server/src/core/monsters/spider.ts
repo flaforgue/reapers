@@ -1,9 +1,9 @@
 import { CharacterKind } from '@reapers/game-shared';
 import * as BABYLON from 'babylonjs';
 import BoundedValue from '../shared/bounded-value';
-import MonsterEntity from './monster.entity';
+import Monster from './monster';
 
-export default class SpiderEntity extends MonsterEntity {
+export default class Spider extends Monster {
   public readonly attackLinearSpeed: number = 0;
   public readonly attackTimeToCast: number = 0.6;
 
@@ -12,28 +12,12 @@ export default class SpiderEntity extends MonsterEntity {
   public constructor(
     scene: BABYLON.Scene,
     level: number,
-    position: BABYLON.Vector3,
-    rotation: BABYLON.Vector3,
+    position?: BABYLON.Vector3,
+    rotation?: BABYLON.Vector3,
   ) {
-    super(
-      CharacterKind.Spider,
-      level,
-      BABYLON.MeshBuilder.CreateBox(
-        CharacterKind.Spider,
-        {
-          height: 0.25,
-          width: 0.5,
-          depth: 0.5,
-        },
-        scene,
-      ),
-      position,
-      rotation,
-    );
+    super(CharacterKind.Spider, level, new BABYLON.Mesh('', scene), position, rotation);
 
     this.speedFactor.current = 2;
-    this._mesh.checkCollisions = true;
-    this._mesh.ellipsoid = new BABYLON.Vector3(0.5, 0.1, 0.5);
   }
 
   protected _createLifeBoudedValue() {

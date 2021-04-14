@@ -27,15 +27,15 @@ export const GameEvents = {
 };
 
 export enum FrontMoveDirection {
-  None,
-  Forward,
-  Backward,
+  None = 0,
+  Forward = 1,
+  Backward = -1,
 }
 
 export enum SideMoveDirection {
-  None,
-  Left,
-  Right,
+  None = 0,
+  Right = 1,
+  Left = -1,
 }
 
 export enum CharacterKind {

@@ -18,7 +18,7 @@
     "lint": "tsc --noEmit && eslint \"**/*.ts\" --quiet --fix",
     "start": "yarn build && node dist/server.js",
     "dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn watch-ts\" \"yarn watch-node\"",
-    "watch-node": "nodemon dist/server.js || nodemon dist/server.js",
+    "watch-node": "nodemon --delay 2500ms dist/server.js",
     "watch-ts": "tsc -w"
   },
   "dependencies": {

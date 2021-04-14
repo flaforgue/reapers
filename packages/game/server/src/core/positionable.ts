@@ -1,8 +1,7 @@
 import * as BABYLON from 'babylonjs';
-import BaseEntity from './base.entity';
+import Identifiable from './identifiable';
 
-export default class PositionableEntity extends BaseEntity {
-  public readonly halfHeight: number;
+export default class Positionable extends Identifiable {
   protected readonly _mesh: BABYLON.Mesh;
 
   public constructor(
@@ -13,16 +12,11 @@ export default class PositionableEntity extends BaseEntity {
     super();
 
     this._mesh = mesh;
-    this.halfHeight = this._mesh.getBoundingInfo().boundingBox.extendSize.y;
-    this._mesh.position = position.add(new BABYLON.Vector3(0, this.halfHeight, 0));
+    this._mesh.position = position;
     this._mesh.rotation = rotation;
   }
 
   public get position() {
-    return this._mesh.position.add(new BABYLON.Vector3(0, -this.halfHeight, 0));
-  }
-
-  public get meshPosition() {
     return this._mesh.position;
   }
 
@@ -31,7 +25,7 @@ export default class PositionableEntity extends BaseEntity {
   }
 
   public getDistanceTo(position: BABYLON.Vector3) {
-    return BABYLON.Vector3.Distance(this._mesh.position, position);
+    return BABYLON.Vector3.Distance(this.position, position);
   }
 
   public destroy() {

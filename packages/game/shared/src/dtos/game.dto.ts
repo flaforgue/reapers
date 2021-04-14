@@ -16,7 +16,4 @@ export default class GameDTO {
   @Expose()
   @Type(() => WorldDTO)
   public world: WorldDTO = new WorldDTO();
-
-  @Expose()
-  public frameIndex = 0;
 }

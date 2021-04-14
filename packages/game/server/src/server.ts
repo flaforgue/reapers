@@ -4,7 +4,7 @@ import express from 'express';
 import { registerPlayerHandlers, registerSystemHandlers } from './handlers';
 import config from './config';
 import { GameEvents, plainToClass, CharacterDTO } from '@reapers/game-shared';
-import { GameEntity } from './entities';
+import Game from './core/game';
 
 const port = config.port;
 const app = express();
@@ -16,12 +16,12 @@ const io = new SocketIO.Server(httpServer, {
   },
 });
 
-const game = new GameEntity(io.sockets);
+const game = new Game(io.sockets);
 
 io.on(GameEvents.System.Connection, (socket: SocketIO.Socket) => {
   if (
-    io.sockets.sockets.size < config.nbMaxPlayers &&
-    game.players.length < config.nbMaxPlayers
+    io.sockets.sockets.size < config.game.nbMaxPlayers &&
+    game.players.length < config.game.nbMaxPlayers
   ) {
     console.info(`New connection: ${socket.id} (now ${io.sockets.sockets.size})`);
 
@@ -44,7 +44,7 @@ io.on(GameEvents.System.Connection, (socket: SocketIO.Socket) => {
       }
     });
   } else {
-    console.warn(`Already ${io.sockets.sockets.size} on ${config.nbMaxPlayers}`);
+    console.warn(`Already ${io.sockets.sockets.size} on ${config.game.nbMaxPlayers}`);
     socket.disconnect();
   }
 });

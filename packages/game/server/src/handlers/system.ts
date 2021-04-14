@@ -1,8 +1,9 @@
 import { Socket } from 'socket.io';
 import { GameEvents, CharacterDTO, plainToClass } from '@reapers/game-shared';
-import { GameEntity, PlayerEntity } from '../../entities';
+import Game from '../core/game';
+import Player from '../core/player';
 
-export default (socket: Socket, player: PlayerEntity, game: GameEntity) => {
+export default (socket: Socket, player: Player, game: Game) => {
   socket.on(GameEvents.System.Disconnect, (reason) => {
     console.info(`Player disconnected: ${reason}`);
     game.removePlayer(player);

@@ -1,5 +1,4 @@
 import * as BABYLON from 'babylonjs';
-import BaseEntity from './base.entity';
 
 function getRandomVector3(origin: BABYLON.Vector3, distances: BABYLON.Vector3) {
   return new BABYLON.Vector3(
@@ -16,3 +15,11 @@ export function getRandomPosition(origin: BABYLON.Vector3, distance: number) {
 export function getRandomRotation(origin: BABYLON.Vector3, distance: number) {
   return getRandomVector3(origin, new BABYLON.Vector3(0, distance, 0));
 }
+
+// export function getRotationYTo(from: BABYLON.Vector3, to: BABYLON.Vector3) {
+//   const axis1 = from.subtract(to);
+//   const axis2 = BABYLON.Vector3.Cross(axis1, BABYLON.Vector3.Up());
+//   const axis3 = BABYLON.Vector3.Cross(axis1, axis2);
+
+//   return BABYLON.Vector3.RotationFromAxis(axis1, axis2, axis3).y + Math.PI / 2;
+// }

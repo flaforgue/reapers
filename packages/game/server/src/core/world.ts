@@ -1,8 +1,8 @@
 import * as BABYLON from 'babylonjs';
 import { EnvironmentKind } from '@reapers/game-shared';
-import PositionableEntity from './shared/positionable.entity';
+import Positionable from './positionable';
 
-export default class WorldEntity extends PositionableEntity {
+export default class World extends Positionable {
   public readonly width: number;
   public readonly depth: number;
 
@@ -14,8 +14,10 @@ export default class WorldEntity extends PositionableEntity {
         scene,
       ),
     );
+
     this.depth = depth;
     this.width = width;
     this._mesh.checkCollisions = true;
+    this._mesh.collisionMask = 1;
   }
 }

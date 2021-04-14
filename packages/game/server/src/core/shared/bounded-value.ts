@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 export default class BoundedValue {
   private _min = 0;
   private _max = 0;

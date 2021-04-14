@@ -10,8 +10,10 @@ export default class VariableValue {
     sideEffectHandler: VariableValueSideEffectHandler = () => {},
   ) {
     this._initial = initial;
-    this._current = this._initial;
     this._onValueChanged = sideEffectHandler;
+
+    this._current = this._initial;
+    this._onValueChanged(this._current);
   }
 
   public get initial() {

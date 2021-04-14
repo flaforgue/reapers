@@ -86,7 +86,7 @@
     loadAssets();
     baseHighlightMesh = createBaseActiveMesh(gameScene);
 
-    // showAxis(10, gameScene);
+    showAxis(1, gameScene);
     // gameScene.debugLayer.show({
     //   embedMode: true,
     // });

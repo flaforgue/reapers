@@ -1,22 +1,21 @@
-import * as BABYLON from 'babylonjs';
 import ActionScheduler from './action-scheduler';
-import BaseEntity from './base.entity';
-import CharacterEntity from './character.entity';
+import Identifiable from '../identifiable';
+import Character from '../character';
 
-export default class AttackEntity extends BaseEntity {
+export default class Attack extends Identifiable {
   public readonly damageAmount: number;
   public readonly timeToHit: number;
   public readonly timeToCast: number;
-  public readonly parent: CharacterEntity;
+  public readonly parent: Character;
 
-  private readonly _target: CharacterEntity;
+  private readonly _target: Character;
   private readonly _attackHitScheduler: ActionScheduler;
   private readonly _attackCastedScheduler: ActionScheduler;
   private _isDeleting = false;
 
   public constructor(
-    parent: CharacterEntity,
-    target: CharacterEntity,
+    parent: Character,
+    target: Character,
     attack: {
       damageAmount: number;
       timeToCast: number; // time to cast the attack
@@ -24,6 +23,7 @@ export default class AttackEntity extends BaseEntity {
     },
   ) {
     super();
+
     this.parent = parent;
     this._target = target;
     this.damageAmount = attack.damageAmount;
@@ -35,10 +35,7 @@ export default class AttackEntity extends BaseEntity {
 
     this.timeToHit = attack.timeToHit;
     this._attackHitScheduler = new ActionScheduler(() => {
-      if (this.parent.isAlive) {
-        this._target.receiveAttack(this);
-      }
-
+      this._target.receiveAttack(this);
       this._isDeleting = true;
     }, this.timeToCast + this.timeToHit);
   }
@@ -48,7 +45,7 @@ export default class AttackEntity extends BaseEntity {
   }
 
   public get targetPosition() {
-    return this._target.meshPosition;
+    return this._target.position;
   }
 
   public get targetKind() {

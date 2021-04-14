@@ -7,9 +7,11 @@ export default {
   web: {
     url: 'http://localhost:8080',
   },
-  nbMaxPlayers: 100,
-  fps,
-  moveStep: 0.07,
-  gravity: -2,
-  playerInitialPosition: BABYLON.Vector3.Zero(),
+  game: {
+    nbMaxPlayers: 100,
+    fps,
+    moveStep: 0.07,
+    gravity: -2,
+    playerInitialPosition: BABYLON.Vector3.Zero(),
+  },
 };

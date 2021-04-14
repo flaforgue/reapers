@@ -7,47 +7,35 @@ import {
   GameEvents,
   SideMoveDirection,
 } from '@reapers/game-shared';
-import CharacterEntity from './shared/character.entity';
+import Character from './character';
 import BoundedValue from './shared/bounded-value';
 import config from '../config';
 
-export default class PlayerEntity extends CharacterEntity {
+export default class Player extends Character {
   public readonly attackRange = 10;
   public readonly attackDamageAmount: number = 10;
   public readonly attackLinearSpeed: number = 30;
   public readonly attackTimeToCast: number = 0.45;
 
-  private readonly _socket: SocketIO.Socket;
-
   protected readonly _kind: CharacterKind = CharacterKind.Player;
+  protected readonly _shouldMoveWithCollisions: boolean = true;
+
+  private readonly _socket: SocketIO.Socket;
 
   public constructor(
     socket: SocketIO.Socket,
     scene: BABYLON.Scene,
     name: string,
-    position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
-    rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
+    position?: BABYLON.Vector3,
+    rotation?: BABYLON.Vector3,
   ) {
-    super(
-      name,
-      1,
-      BABYLON.MeshBuilder.CreateBox(
-        CharacterKind.Player,
-        {
-          height: 1,
-          width: 0.5,
-          depth: 0.5,
-        },
-        scene,
-      ),
-      position,
-      rotation,
-    );
+    super(name, 1, new BABYLON.Mesh('', scene), position, rotation);
 
+    this._mesh.checkCollisions = true;
+    this._mesh.ellipsoid = new BABYLON.Vector3(0.25, 1, 0.25);
+    this._mesh.ellipsoidOffset = new BABYLON.Vector3(0, 1, 0);
     this.speedFactor.current = 1;
     this._socket = socket;
-    this._mesh.ellipsoid = new BABYLON.Vector3(0.25, 0.45, 0.25);
-    this._mesh.checkCollisions = true;
   }
 
   protected _createLifeBoudedValue(): BoundedValue {
@@ -63,15 +51,13 @@ export default class PlayerEntity extends CharacterEntity {
   }
 
   protected _die() {
-    this.life.setToMax();
-    this._isAlive = true;
     this.speedFactor.reset();
     this.isAttacking = false;
     this.frontMoveDirection = FrontMoveDirection.None;
     this.sideMoveDirection = SideMoveDirection.None;
-    this._mesh.position = config.playerInitialPosition.add(
-      new BABYLON.Vector3(0, this.halfHeight, 0),
-    );
+    this.life.setToMax();
+    this._isAlive = true;
     this.setRotationY(0);
+    this._mesh.position = config.game.playerInitialPosition.clone();
   }
 }
