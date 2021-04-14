@@ -1,6 +1,12 @@
 import SocketIO from 'socket.io';
 import * as BABYLON from 'babylonjs';
-import { CharacterKind, GameDTO, GameEvents } from '@reapers/game-shared';
+import {
+  CharacterKind,
+  FrontMoveDirection,
+  GameDTO,
+  GameEvents,
+  SideMoveDirection,
+} from '@reapers/game-shared';
 import CharacterEntity from './shared/character.entity';
 import BoundedValue from './shared/bounded-value';
 import config from '../config';
@@ -59,7 +65,10 @@ export default class PlayerEntity extends CharacterEntity {
   protected _die() {
     this.life.setToMax();
     this._isAlive = true;
-    console.log('_isAlive', true);
+    this.speedFactor.reset();
+    this.isAttacking = false;
+    this.frontMoveDirection = FrontMoveDirection.None;
+    this.sideMoveDirection = SideMoveDirection.None;
     this._mesh.position = config.playerInitialPosition.add(
       new BABYLON.Vector3(0, this.halfHeight, 0),
     );

@@ -30,8 +30,7 @@ export default class CharacterEntity extends PositionableEntity {
 
   protected _isAlive = true;
 
-  private readonly _currentAttacks: AttackEntity[] = [];
-
+  private _currentAttacks: AttackEntity[] = [];
   private _isDeleting = false;
   private _low_speed: BABYLON.Vector3;
   private _speed: BABYLON.Vector3;
@@ -223,7 +222,8 @@ export default class CharacterEntity extends PositionableEntity {
 
   public dieAsync() {
     this._isAlive = false;
-    console.log('_isAlive', false);
+    this._currentAttacks = [];
+
     setTimeout(() => this._die(), 2000);
   }
 

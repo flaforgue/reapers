@@ -59,7 +59,6 @@ export default class MonsterEntity extends CharacterEntity {
     }
 
     if (this._target) {
-      // console.log('monster has target');
       if (this._target.isAlive) {
         this._updateDestinationFromTargetScheduler.update();
 
@@ -117,7 +116,6 @@ export default class MonsterEntity extends CharacterEntity {
   private _goBackToInitialPosition() {
     if (!this._isGoingBackToInitialPosition) {
       this._target = null;
-      console.log('monster target null');
       this._destination = this._initialPosition;
       this._isGoingBackToInitialPosition = true;
       this.speedFactor.multiply(2);
