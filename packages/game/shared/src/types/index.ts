@@ -10,7 +10,7 @@ enum PlayerEvent {
   Joined = 'PlayerEvent.Joined',
   FrontMoveDirectionUpdated = 'PlayerEvent.FrontMoveDirectionUpdated',
   SideMoveDirectionUpdated = 'PlayerEvent.SideMoveDirectionUpdated',
-  RotationDirectionUpdated = 'PlayerEvent.RotationDirectionUpdated',
+  RotationUpdated = 'PlayerEvent.RotationUpdated',
   SpellCasted = 'PlayerEvent.SpellCasted',
 }
 
@@ -25,12 +25,6 @@ export const GameEvents = {
   Player: PlayerEvent,
   System: SystemEvent,
 };
-
-export enum RotationDirection {
-  None,
-  Left,
-  Right,
-}
 
 export enum FrontMoveDirection {
   None,

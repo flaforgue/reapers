@@ -4,9 +4,9 @@
   import { onDestroy } from 'svelte';
   import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
   import { disposeArray } from '../../utils';
-  import { AnimationKey, createParticleSystem, resetCamera } from './player.utils';
+  import { AnimationKey, createParticleSystem } from './player.utils';
   import Character from '../Character/Character.svelte';
-  import { playerInfos } from '../../stores';
+  import { playerInfos, targetInfos } from '../../stores';
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
   export let baseHighlightMesh: BABYLON.Mesh | undefined;
@@ -71,17 +71,6 @@
     }
   }
 
-  function updateCameraAlpha(rotZ: number) {
-    const isAlreadyResetting = camera?.animations?.length;
-    /*
-     * When attacking, the game server calls lookAt on player to look at the target
-     * in that case player.isAttacking = true and we don't want the camera to rotate
-     */
-    if (camera?.metadata?.isDirty && !isAlreadyResetting && !player.isAttacking) {
-      resetCamera(camera, rotZ);
-    }
-  }
-
   function updatePlayerInfos() {
     $playerInfos = player;
   }
@@ -100,11 +89,6 @@
     }
   }
 
-  $: rotY = player.rotation.y;
-  $: {
-    updateCameraAlpha(rotY);
-  }
-
   $: isActivePlayer = player.id === $activePlayerId;
   $: playerName = player.name;
   $: playerLevel = player.level;
@@ -117,6 +101,13 @@
 
     if (isActivePlayer && reactivityDeps) {
       updatePlayerInfos();
+    }
+  }
+
+  $: isAlive = player.isAlive;
+  $: {
+    if (!isAlive) {
+      $targetInfos = null;
     }
   }
 

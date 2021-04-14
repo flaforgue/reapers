@@ -2,7 +2,6 @@ import * as BABYLON from 'babylonjs';
 import {
   FrontMoveDirection,
   SideMoveDirection,
-  RotationDirection,
   CharacterKind,
 } from '@reapers/game-shared';
 import config from '../../config';
@@ -24,7 +23,6 @@ export default class CharacterEntity extends PositionableEntity {
   public isAttacking: boolean = false;
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
-  public rotationDirection: RotationDirection = RotationDirection.None;
 
   protected readonly _attackDuration: number = 0.75; // in seconds
   protected readonly _shouldMoveWithCollisions: boolean = true;
@@ -108,8 +106,6 @@ export default class CharacterEntity extends PositionableEntity {
       this._moveWithoutCollisions();
     }
 
-    this._updateRotation();
-
     for (let i = 0; i < this._currentAttacks.length; i++) {
       if (this._currentAttacks[i].isDeleting) {
         this._currentAttacks.splice(i, 1);
@@ -180,24 +176,8 @@ export default class CharacterEntity extends PositionableEntity {
     this._mesh.movePOV(amountRight, amountUp, amountForward);
   }
 
-  private _updateRotation() {
-    let rotationAmount = 0;
-
-    if (this.rotationDirection === RotationDirection.Left) {
-      rotationAmount = config.rotationStep * -1;
-    } else if (this.rotationDirection === RotationDirection.Right) {
-      rotationAmount = config.rotationStep;
-    }
-
-    this._mesh.rotation = new BABYLON.Vector3(
-      0,
-      (this._mesh.rotation.y + rotationAmount) % (2 * Math.PI),
-      0,
-    );
-  }
-
-  public setRotation(rotationY: number) {
-    this._mesh.rotation.y = rotationY;
+  public setRotationY(rotationY: number) {
+    this._mesh.rotation.y = rotationY % (2 * Math.PI);
   }
 
   public attackIfInRange(target: CharacterEntity) {
@@ -212,7 +192,14 @@ export default class CharacterEntity extends PositionableEntity {
   }
 
   protected _attack(target: CharacterEntity, distanceToTarget: number) {
-    this._mesh.lookAt(target.meshPosition, Math.PI);
+    this._mesh.lookAt(
+      new BABYLON.Vector3(
+        target.meshPosition.x,
+        this.meshPosition.y,
+        target.meshPosition.z,
+      ),
+      Math.PI,
+    );
 
     this.frontMoveDirection = FrontMoveDirection.None;
     this.sideMoveDirection = SideMoveDirection.None;
@@ -236,6 +223,7 @@ export default class CharacterEntity extends PositionableEntity {
 
   public dieAsync() {
     this._isAlive = false;
+    console.log('_isAlive', false);
     setTimeout(() => this._die(), 2000);
   }
 

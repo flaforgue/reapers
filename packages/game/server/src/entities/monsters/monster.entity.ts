@@ -2,7 +2,7 @@ import * as BABYLON from 'babylonjs';
 import CharacterEntity from '../shared/character.entity';
 import ActionScheduler from '../shared/action-scheduler';
 import { getRandomPosition } from '../shared/utils';
-import { FrontMoveDirection, RotationDirection } from '@reapers/game-shared';
+import { FrontMoveDirection } from '@reapers/game-shared';
 import AttackEntity from '../shared/attack.entity';
 
 const walkingArea = 5;
@@ -36,8 +36,6 @@ export default class MonsterEntity extends CharacterEntity {
     this._updateDestinationFromTargetScheduler = new ActionScheduler(() => {
       if (this._target?.isAlive) {
         this.destination = this._target.meshPosition;
-      } else {
-        this._goBackToInitialPosition();
       }
     }, 0.5);
   }
@@ -61,10 +59,15 @@ export default class MonsterEntity extends CharacterEntity {
     }
 
     if (this._target) {
-      this._updateDestinationFromTargetScheduler.update();
+      // console.log('monster has target');
+      if (this._target.isAlive) {
+        this._updateDestinationFromTargetScheduler.update();
 
-      if (this._isAtDestination() && this.canMove) {
-        this._attack(this._target, this.attackRange);
+        if (this._isAtDestination() && this.canMove) {
+          this._attack(this._target, this.attackRange);
+        }
+      } else {
+        this._goBackToInitialPosition();
       }
     } else if (this._isAtDestination()) {
       if (this._isGoingBackToInitialPosition) {
@@ -73,12 +76,11 @@ export default class MonsterEntity extends CharacterEntity {
         this.life.setToMax();
       }
       this.frontMoveDirection = FrontMoveDirection.None;
-      this.rotationDirection = RotationDirection.None;
       this._moveActionScheduler.update();
     }
 
     if (!this._isAtDestination() && this.canMove) {
-      this.setRotation(this._getRotationToDestination());
+      this.setRotationY(this._getRotationYToDestination());
       this.frontMoveDirection = FrontMoveDirection.Forward;
     }
 
@@ -91,7 +93,7 @@ export default class MonsterEntity extends CharacterEntity {
     return distance <= this.attackRange;
   }
 
-  private _getRotationToDestination() {
+  private _getRotationYToDestination() {
     const axis1 = this._mesh.position.subtract(this.destination);
     const axis2 = BABYLON.Vector3.Cross(axis1, new BABYLON.Vector3(0, 1, 0));
     const axis3 = BABYLON.Vector3.Cross(axis1, axis2);
@@ -115,6 +117,7 @@ export default class MonsterEntity extends CharacterEntity {
   private _goBackToInitialPosition() {
     if (!this._isGoingBackToInitialPosition) {
       this._target = null;
+      console.log('monster target null');
       this._destination = this._initialPosition;
       this._isGoingBackToInitialPosition = true;
       this.speedFactor.multiply(2);

@@ -78,11 +78,8 @@ export function createCamera(scene: BABYLON.Scene) {
   camera.upperRadiusLimit = 14;
   camera.upperBetaLimit = Math.PI / 2.5;
   camera.lowerBetaLimit = Math.PI / 5;
-  camera.attachControl(true);
   camera.panningSensibility = 0;
-  camera.metadata = {
-    isDirty: false,
-  };
+  camera.allowUpsideDown = false;
 
   return camera;
 }

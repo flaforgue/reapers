@@ -1,10 +1,5 @@
 import { Socket } from 'socket.io';
-import {
-  GameEvents,
-  SideMoveDirection,
-  FrontMoveDirection,
-  RotationDirection,
-} from '@reapers/game-shared';
+import { GameEvents, SideMoveDirection, FrontMoveDirection } from '@reapers/game-shared';
 import { GameEntity, PlayerEntity } from '../../entities';
 import charactersByIds from '../../globals/characters-by-ids';
 
@@ -14,10 +9,6 @@ function isValidFrontMoveDirection(direction: unknown) {
 
 function isValidSideMoveDirection(direction: unknown) {
   return Boolean(SideMoveDirection[Number(direction)]);
-}
-
-function isValidRotationDirection(direction: unknown) {
-  return Boolean(RotationDirection[Number(direction)]);
 }
 
 export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
@@ -39,14 +30,11 @@ export default (socket: Socket, game: GameEntity, player: PlayerEntity) => {
     },
   );
 
-  socket.on(
-    GameEvents.Player.RotationDirectionUpdated,
-    (direction: RotationDirection) => {
-      if (player.canMove && isValidRotationDirection(direction)) {
-        player.rotationDirection = direction;
-      }
-    },
-  );
+  socket.on(GameEvents.Player.RotationUpdated, (rotationY: number) => {
+    if (player.canMove) {
+      player.setRotationY(rotationY);
+    }
+  });
 
   socket.on(GameEvents.Player.SpellCasted, (id: string) => {
     if (player.canMove) {

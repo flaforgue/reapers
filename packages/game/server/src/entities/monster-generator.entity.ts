@@ -67,7 +67,7 @@ export default class MonsterGeneratorEntity extends PositionableEntity {
       this._mesh._scene,
       Math.round(Math.random() * levelRange) + this._config.level.min,
       getRandomPosition(this._mesh.position, this._config.radius),
-      getRandomRotation(this._mesh.position, this._config.radius),
+      getRandomRotation(this._mesh.rotation, this._config.radius),
     );
 
     this._monsters.push(monster);

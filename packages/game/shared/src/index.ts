@@ -17,7 +17,6 @@ import {
   GameEvents,
   FrontMoveDirection,
   SideMoveDirection,
-  RotationDirection,
 } from './types';
 
 export {
@@ -33,7 +32,6 @@ export {
   GameEvents,
   FrontMoveDirection,
   SideMoveDirection,
-  RotationDirection,
   WorldDTO,
   plainToClass,
 };

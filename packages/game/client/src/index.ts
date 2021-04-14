@@ -12,7 +12,6 @@ import {
   GameEvents,
   FrontMoveDirection,
   SideMoveDirection,
-  RotationDirection,
   WorldDTO,
 } from '@reapers/game-shared';
 
@@ -37,8 +36,8 @@ function updateSideMoveDirection(direction: SideMoveDirection) {
   socket?.emit(GameEvents.Player.SideMoveDirectionUpdated, direction);
 }
 
-function updateRotationDirection(direction: RotationDirection) {
-  socket?.emit(GameEvents.Player.RotationDirectionUpdated, direction);
+function updateRotation(rotationY: number) {
+  socket?.emit(GameEvents.Player.RotationUpdated, rotationY);
 }
 
 function castSpell(targetId: string) {
@@ -63,7 +62,7 @@ function useGame(serverUrl: string) {
     leaveGame,
     updateFrontMoveDirection,
     updateSideMoveDirection,
-    updateRotationDirection,
+    updateRotation,
     castSpell,
   };
 }
@@ -84,5 +83,4 @@ export {
   GameEvents,
   FrontMoveDirection,
   SideMoveDirection,
-  RotationDirection,
 };

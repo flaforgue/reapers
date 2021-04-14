@@ -3,32 +3,28 @@
   import {
     SideMoveDirection,
     FrontMoveDirection,
-    RotationDirection,
     CharacterDTO,
   } from '@reapers/game-client';
   import { onDestroy } from 'svelte';
   import { targetInfos } from '../../stores';
   import { Key } from '../../configs/keycodes.config';
-  import {
-    isFrontMoveDirection,
-    isSideMoveDirection,
-    isRotationDirection,
-  } from './PlayerController.utils';
+  import { isFrontMoveDirection, isSideMoveDirection } from './PlayerController.utils';
 
   export let updateFrontMoveDirection: (direction: FrontMoveDirection) => void;
   export let updateSideMoveDirection: (direction: SideMoveDirection) => void;
-  export let updateRotationDirection: (direction: RotationDirection) => void;
+  export let updateRotation: (rotY: number) => void;
   export let castSpell: (targetId: string) => void;
   export let player: CharacterDTO | undefined;
+  export let camera: BABYLON.ArcRotateCamera | undefined;
   export let scene: BABYLON.Scene | undefined;
 
   let keyboardEventObserver:
     | BABYLON.Nullable<BABYLON.Observer<BABYLON.KeyboardInfo>>
     | undefined;
 
-  function localUpdateRotationDirection(direction: RotationDirection) {
+  function localUpdateRotation(rotY: number) {
     if (player?.canMove) {
-      updateRotationDirection(direction);
+      updateRotation(rotY);
     }
   }
 
@@ -66,12 +62,6 @@
         case Key.e:
           updateSideMoveDirection(SideMoveDirection.Right);
           break;
-        case Key.d:
-          localUpdateRotationDirection(RotationDirection.Right);
-          break;
-        case Key.q:
-          localUpdateRotationDirection(RotationDirection.Left);
-          break;
         case Key.Space:
           localCastSpell();
           break;
@@ -83,14 +73,37 @@
         updateFrontMoveDirection(FrontMoveDirection.None);
       } else if (isSideMoveDirection(event.key)) {
         updateSideMoveDirection(SideMoveDirection.None);
-      } else if (isRotationDirection(event.key)) {
-        updateRotationDirection(RotationDirection.None);
       }
+    }
+  }
+
+  function attachCameraObservables() {
+    if (camera) {
+      (camera.inputs.attached
+        .keyboard as BABYLON.ArcRotateCameraKeyboardMoveInput).angularSpeed = 0.005;
+      camera.attachControl(true);
+      camera.keysLeft = [68];
+      camera.keysRight = [81];
+      camera.onViewMatrixChangedObservable.add(function (eventData) {
+        const newAlpha = (eventData as BABYLON.ArcRotateCamera).alpha;
+        const newRotation = Math.PI / 2 - newAlpha;
+
+        if (Math.abs(newRotation - (player?.rotation?.y ?? 0)) >= 0.07) {
+          localUpdateRotation(newRotation);
+        }
+      });
     }
   }
 
   $: {
     keyboardEventObserver = scene?.onKeyboardObservable?.add(keyboardEventHandler);
+  }
+
+  $: cameraId = camera?.id;
+  $: {
+    if (cameraId) {
+      attachCameraObservables();
+    }
   }
 
   onDestroy(() => {

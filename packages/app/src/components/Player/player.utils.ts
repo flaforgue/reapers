@@ -126,30 +126,3 @@ export function createParticleSystem(scene: BABYLON.Scene, attackLinearSpeed: nu
 
   return mainParticleSystem;
 }
-
-export function resetCamera(camera: BABYLON.ArcRotateCamera, rotZ: number) {
-  const animation = new BABYLON.Animation(
-    'resetCameraAnimation',
-    'alpha',
-    100,
-    BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
-  );
-  animation.setKeys([
-    {
-      frame: 0,
-      value: camera.alpha,
-    },
-    {
-      frame: 100,
-      value: (rotZ - Math.PI / 2) * -1,
-    },
-  ]);
-
-  camera.animations = [animation];
-
-  camera.getScene().beginAnimation(camera, 0, 100, false, 8, () => {
-    camera.animations = [];
-    camera.metadata.isDirty = false;
-  });
-}

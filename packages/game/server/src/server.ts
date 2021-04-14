@@ -15,19 +15,8 @@ const io = new SocketIO.Server(httpServer, {
     methods: ['GET', 'POST'],
   },
 });
+
 const game = new GameEntity(io.sockets);
-
-process.once('SIGUSR2', function () {
-  httpServer.close(function () {
-    process.kill(process.pid, 'SIGUSR2');
-  });
-});
-
-process.on('SIGINT', function () {
-  httpServer.close(function () {
-    process.kill(process.pid, 'SIGINT');
-  });
-});
 
 io.on(GameEvents.System.Connection, (socket: SocketIO.Socket) => {
   if (

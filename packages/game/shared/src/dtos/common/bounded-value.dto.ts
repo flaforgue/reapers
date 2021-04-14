@@ -1,11 +1,4 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import {
-  FrontMoveDirection,
-  SideMoveDirection,
-  RotationDirection,
-  CharacterKind,
-} from '../../types';
-import PositionableDTO from './positionable.dto';
 
 @Exclude()
 export default class BoundedValueDTO {

@@ -24,6 +24,7 @@
     createScene,
     showAxis,
   } from './game.utils';
+  import { Scene } from '@babylonjs/core';
 
   let engine: BABYLON.Engine | undefined;
   let gameCamera: BABYLON.ArcRotateCamera | undefined;
@@ -71,7 +72,7 @@
     leaveGame,
     updateSideMoveDirection,
     updateFrontMoveDirection,
-    updateRotationDirection,
+    updateRotation,
     castSpell,
   } = useGame(servers.game.url);
 
@@ -90,13 +91,16 @@
     //   embedMode: true,
     // });
 
-    engine?.hideLoadingUI();
-    engine?.runRenderLoop(function () {
-      try {
-        gameScene?.render();
-      } catch (err) {
-        console.error(err);
-      }
+    engine.displayLoadingUI();
+    gameScene.executeWhenReady(function () {
+      engine?.hideLoadingUI();
+      engine?.runRenderLoop(function () {
+        try {
+          gameScene?.render();
+        } catch (err) {
+          console.error(err);
+        }
+      });
     });
 
     function handleResize() {
@@ -164,9 +168,10 @@
       <PlayerController
         scene={gameScene}
         {player}
+        camera={gameCamera}
         {updateFrontMoveDirection}
         {updateSideMoveDirection}
-        {updateRotationDirection}
+        {updateRotation}
         {castSpell}
       />
     {/if}
