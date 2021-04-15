@@ -4,6 +4,7 @@ import ActionScheduler from '../shared/action-scheduler';
 import { getRandomPosition } from '../../utils';
 import { FrontMoveDirection } from '@reapers/game-shared';
 import Attack from '../shared/attack';
+import MonsterGenerator from '../monster-generator';
 
 const walkingArea = 5;
 const maxDistanceFromInitialPosition = 50;
@@ -14,6 +15,7 @@ export default class Monster extends Character {
   private readonly _initialPosition: BABYLON.Vector3;
   private readonly _randomMoveScheduler: ActionScheduler;
   private readonly _updateDestinationFromTargetScheduler: ActionScheduler;
+  private readonly _generator: MonsterGenerator;
 
   private _destination: BABYLON.Vector3;
   private _target: Character | null = null;
@@ -23,11 +25,13 @@ export default class Monster extends Character {
     name: string,
     level: number,
     mesh: BABYLON.Mesh,
+    generator: MonsterGenerator,
     position?: BABYLON.Vector3,
     rotation?: BABYLON.Vector3,
   ) {
     super(name, level, mesh, position, rotation);
 
+    this._generator = generator;
     this._initialPosition = this.position.clone();
     this._destination = this._initialPosition.clone();
 
@@ -99,6 +103,7 @@ export default class Monster extends Character {
   }
 
   protected _die() {
+    this._generator.nbMonsters--;
     this.destroy();
   }
 

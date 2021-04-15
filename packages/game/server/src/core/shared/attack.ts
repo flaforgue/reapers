@@ -11,7 +11,7 @@ export default class Attack extends Identifiable {
   private readonly _target: Character;
   private readonly _attackHitScheduler: ActionScheduler;
   private readonly _attackCastedScheduler: ActionScheduler;
-  private _isDeleting = false;
+  private _isDestroyed = false;
 
   public constructor(
     parent: Character,
@@ -36,7 +36,7 @@ export default class Attack extends Identifiable {
     this.timeToHit = attack.timeToHit;
     this._attackHitScheduler = new ActionScheduler(() => {
       this._target.receiveAttack(this);
-      this._isDeleting = true;
+      this._isDestroyed = true;
     }, this.timeToCast + this.timeToHit);
   }
 
@@ -56,8 +56,8 @@ export default class Attack extends Identifiable {
     return this._target.isAlive;
   }
 
-  public get isDeleting() {
-    return this._isDeleting;
+  public get isDestroyed() {
+    return this._isDestroyed;
   }
 
   public update() {

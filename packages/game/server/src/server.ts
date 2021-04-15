@@ -19,10 +19,7 @@ const io = new SocketIO.Server(httpServer, {
 const game = new Game(io.sockets);
 
 io.on(GameEvents.System.Connection, (socket: SocketIO.Socket) => {
-  if (
-    io.sockets.sockets.size < config.game.nbMaxPlayers &&
-    game.players.length < config.game.nbMaxPlayers
-  ) {
+  if (io.sockets.sockets.size < config.game.nbMaxPlayers && !game.isFull) {
     console.info(`New connection: ${socket.id} (now ${io.sockets.sockets.size})`);
 
     socket.once(GameEvents.Player.Joined, (name: string) => {

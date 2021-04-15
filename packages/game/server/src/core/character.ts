@@ -9,7 +9,6 @@ import Positionable from './positionable';
 import BoundedValue from './shared/bounded-value';
 import Attack from './shared/attack';
 import VariableValue from './shared/variable-value';
-import charactersByIds from '../globals/characters-by-ids';
 export default class Character extends Positionable {
   public readonly name: string;
   public readonly level: number;
@@ -31,7 +30,7 @@ export default class Character extends Positionable {
   protected _isAlive = true;
 
   private _currentAttacks: Attack[] = [];
-  private _isDeleting = false;
+  private _isDestroyed = false;
   private _speed = config.game.moveStep;
   private _low_speed = this._speed * Math.SQRT1_2;
 
@@ -43,8 +42,6 @@ export default class Character extends Positionable {
     rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
   ) {
     super(mesh, position, rotation);
-
-    charactersByIds[this.id] = this;
 
     this.name = name;
     this.level = level;
@@ -68,8 +65,8 @@ export default class Character extends Positionable {
     return this._currentAttacks[this._currentAttacks.length - 1] ?? null;
   }
 
-  public get isDeleting() {
-    return this._isDeleting;
+  public get isDestroyed() {
+    return this._isDestroyed;
   }
 
   public get canMove() {
@@ -99,7 +96,7 @@ export default class Character extends Positionable {
     }
 
     for (let i = 0; i < this._currentAttacks.length; i++) {
-      if (this._currentAttacks[i].isDeleting) {
+      if (this._currentAttacks[i].isDestroyed) {
         this._currentAttacks.splice(i, 1);
       } else {
         this._currentAttacks[i].update();
@@ -188,7 +185,6 @@ export default class Character extends Positionable {
     super.destroy();
 
     this._isAlive = false;
-    this._isDeleting = true;
-    delete charactersByIds[this.id];
+    this._isDestroyed = true;
   }
 }

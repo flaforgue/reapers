@@ -42,12 +42,14 @@ export default class Player extends Character {
     return new BoundedValue(0, 100 + 10 * this.level);
   }
 
-  public updateAndEmitGameState(gameDto: GameDTO) {
-    this._socket.volatile.emit(GameEvents.Game.Updated, gameDto);
-
+  public update() {
     if (this.isAlive) {
-      this.update();
+      super.update();
     }
+  }
+
+  public emitGameState(gameDto: GameDTO) {
+    this._socket.volatile.emit(GameEvents.Game.Updated, gameDto);
   }
 
   protected _die() {

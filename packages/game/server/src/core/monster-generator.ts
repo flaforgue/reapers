@@ -9,76 +9,67 @@ type MonsterGeneratorConfig = {
   radius: number;
   interval: number;
   nbMaxInstances: number;
-  level: {
-    min: number;
-    max: number;
-  };
+  levelMin: number;
+  levelMax: number;
 };
 
 type MonsterConstructor<T extends Monster = Monster> = new (
   scene: BABYLON.Scene,
   level: number,
+  generator: MonsterGenerator,
   position: BABYLON.Vector3,
   rotation: BABYLON.Vector3,
 ) => T;
 
+const defaultConfig = {
+  radius: 10,
+  interval: 5,
+  nbMaxInstances: 10,
+  levelMin: 1,
+  levelMax: 5,
+};
 export default class MonsterGenerator extends Positionable {
   private readonly _createMonsterScheduler: ActionScheduler;
   private readonly _config: MonsterGeneratorConfig;
   private readonly _instanceClass: MonsterConstructor;
-  private _monsters: Monster[] = [];
+
+  public nbMonsters = 0;
 
   public constructor(
     scene: BABYLON.Scene,
     instanceClass: MonsterConstructor,
     position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
-    config: MonsterGeneratorConfig = {
-      radius: 10,
-      interval: 5,
-      nbMaxInstances: 10,
-      level: {
-        min: 1,
-        max: 5,
-      },
-    },
+    config: Partial<MonsterGeneratorConfig> = {},
   ) {
     super(new BABYLON.Mesh(EnvironmentKind.MonsterGenerator, scene), position);
 
-    this._config = config;
+    this._config = {
+      ...defaultConfig,
+      ...config,
+    };
     this._instanceClass = instanceClass;
     this._createMonsterScheduler = new ActionScheduler(
       () => this.createMonster(),
-      config.interval,
+      this._config.interval,
     );
   }
 
-  public get monsters() {
-    return this._monsters;
-  }
-
   public update() {
-    if (this._monsters.length < this._config.nbMaxInstances) {
-      this._createMonsterScheduler.update();
-    }
-
-    for (let i = 0; i < this._monsters.length; i++) {
-      if (this._monsters[i].isDeleting) {
-        this._monsters.splice(i, 1);
-      } else if (this._monsters[i].isAlive) {
-        this._monsters[i].update();
-      }
+    if (this.nbMonsters < this._config.nbMaxInstances) {
+      return this._createMonsterScheduler.update();
     }
   }
 
   public createMonster() {
-    const levelRange = this._config.level.max - this._config.level.min;
-    const monster = new this._instanceClass(
+    const levelRange = this._config.levelMax - this._config.levelMin;
+    this.nbMonsters++;
+
+    return new this._instanceClass(
       this._mesh._scene,
-      Math.round(Math.random() * levelRange) + this._config.level.min,
+      Math.round(Math.random() * levelRange) + this._config.levelMin,
+      this,
       getRandomPosition(this.position, this._config.radius),
       getRandomRotation(this.rotation, this._config.radius),
     );
-
-    this._monsters.push(monster);
   }
 }

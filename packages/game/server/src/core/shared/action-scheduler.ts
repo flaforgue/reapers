@@ -2,7 +2,7 @@ import config from '../../config';
 
 export default class ActionScheduler {
   private readonly _secondsToComplete: number;
-  private readonly _actionHandler: () => void;
+  private readonly _actionHandler: () => unknown;
 
   private _progress = 0;
 
@@ -15,8 +15,8 @@ export default class ActionScheduler {
     this._progress += 1 / config.game.fps;
 
     if (this._progress >= this._secondsToComplete) {
-      this._actionHandler();
       this._progress = 0;
+      return this._actionHandler();
     }
   }
 }

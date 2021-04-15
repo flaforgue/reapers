@@ -8,15 +8,17 @@ import Spider from './monsters/spider';
 import Frog from './monsters/frog';
 import Identifiable from './identifiable';
 import MonsterGenerator from './monster-generator';
+import Monster from './monsters/monster';
 
 export default class Game extends Identifiable {
   private readonly _namespace: SocketIO.Namespace;
   private readonly _world: World;
   private readonly _engine: BABYLON.Engine;
   private readonly _scene: BABYLON.Scene;
+  private readonly _charactersByIds: Record<string, Player | Monster> = {};
 
   private _isRunning = false;
-  private _players: Player[] = [];
+  private _nbPlayers = 0;
   private _monsterGenerators: MonsterGenerator[] = [];
 
   public constructor(namespace: SocketIO.Namespace) {
@@ -46,7 +48,7 @@ export default class Game extends Identifiable {
     this._world = new World(this._scene, 100, 100);
     this._monsterGenerators = [
       new MonsterGenerator(this._scene, Spider, new BABYLON.Vector3(5, 0, 0)),
-      // new MonsterGenerator(this._scene, Frog, new BABYLON.Vector3(0, 0, 5)),
+      new MonsterGenerator(this._scene, Frog, new BABYLON.Vector3(0, 0, 5)),
     ];
 
     this._scene.executeWhenReady(() => {
@@ -65,12 +67,8 @@ export default class Game extends Identifiable {
     });
   }
 
-  public get players() {
-    return this._players;
-  }
-
-  public get monsterGenerators() {
-    return this._monsterGenerators;
+  public get characters() {
+    return Object.values(this._charactersByIds);
   }
 
   public get world() {
@@ -78,7 +76,7 @@ export default class Game extends Identifiable {
   }
 
   public get isFull() {
-    return this._players.length >= config.game.nbMaxPlayers;
+    return this._nbPlayers >= config.game.nbMaxPlayers;
   }
 
   private _update() {
@@ -87,16 +85,24 @@ export default class Game extends Identifiable {
       strategy: 'excludeAll',
     });
 
-    for (let i = 0; i < this._players.length; i++) {
-      if (this._players[i].isDeleting) {
-        this._players.splice(i, 1);
+    for (const id in this._charactersByIds) {
+      if (this._charactersByIds[id].isDestroyed) {
+        delete this._charactersByIds[id];
       } else {
-        this._players[i].updateAndEmitGameState(gameDto);
+        this._charactersByIds[id].update();
+
+        if (this._charactersByIds[id] instanceof Player) {
+          (this._charactersByIds[id] as Player).emitGameState(gameDto);
+        }
       }
     }
 
     for (let i = 0; i < this._monsterGenerators.length; i++) {
-      this._monsterGenerators[i].update();
+      const monsterCreated = this._monsterGenerators[i].update() as Monster;
+
+      if (monsterCreated) {
+        this._charactersByIds[monsterCreated.id] = monsterCreated;
+      }
     }
   }
 
@@ -105,6 +111,10 @@ export default class Game extends Identifiable {
       this._isRunning = false;
       this._namespace.emit(GameEvents.Game.Stopped);
     }
+  }
+
+  public getCharacterById(id: string): Player | Monster | undefined {
+    return this._charactersByIds[id];
   }
 
   public addPlayer(socket: SocketIO.Socket, name: string) {
@@ -118,20 +128,22 @@ export default class Game extends Identifiable {
       name,
       config.game.playerInitialPosition.clone(),
     );
-    this._players.push(player);
+    this._nbPlayers++;
+    this._charactersByIds[player.id] = player;
 
     console.info(
-      `Player ${name} - ${player.id} created (${this._players.length}/${config.game.nbMaxPlayers})`,
+      `Player ${name} - ${player.id} created (${this._nbPlayers}/${config.game.nbMaxPlayers})`,
     );
 
     return player;
   }
 
   public removePlayer(player: Player) {
-    console.info(
-      `Player ${player.id} left (${this._players.length}/${config.game.nbMaxPlayers})`,
-    );
-
     player.destroy();
+    this._nbPlayers--;
+
+    console.info(
+      `Player ${player.id} left (${this._nbPlayers}/${config.game.nbMaxPlayers})`,
+    );
   }
 }
