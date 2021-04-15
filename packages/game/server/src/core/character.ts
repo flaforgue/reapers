@@ -129,10 +129,6 @@ export default class Character extends Positionable {
     );
   }
 
-  public setRotationY(rotationY: number) {
-    this._mesh.rotation.y = rotationY % (2 * Math.PI);
-  }
-
   public attackIfInRange(target: Character) {
     const distanceToTarget = this.getDistanceTo(target.position);
 

@@ -24,6 +24,10 @@ export default class Positionable extends Identifiable {
     return this._mesh.rotation;
   }
 
+  public setRotationY(rotationY: number) {
+    this._mesh.rotation.y = rotationY % (2 * Math.PI);
+  }
+
   public getDistanceTo(position: BABYLON.Vector3) {
     return BABYLON.Vector3.Distance(this.position, position);
   }
