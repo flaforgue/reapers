@@ -3,10 +3,10 @@
   import * as GUI from '@babylonjs/gui';
   import { onDestroy } from 'svelte';
   import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
-  import { disposeArray } from '../../utils';
+  import { disposeArray } from '../../../utils';
   import { AnimationKey, createParticleSystem } from './player.utils';
   import Character from '../Character/Character.svelte';
-  import { playerInfos, targetInfos } from '../../stores';
+  import { playerInfos, targetInfos } from '../../../stores';
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
   export let baseHighlightMesh: BABYLON.Mesh | undefined;

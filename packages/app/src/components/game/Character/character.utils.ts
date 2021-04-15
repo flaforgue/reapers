@@ -1,8 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
-import { AttackDTO, CharacterDTO, CharacterKind } from '@reapers/game-client';
-import { worldToGUI } from '../../utils';
-import type { CharacterInfos } from '../../stores';
+import { AttackDTO, CharacterKind } from '@reapers/game-client';
+import { worldToGUI } from '../../../utils';
 
 const labelPositions: Record<CharacterKind, number> = {
   [CharacterKind.Player]: 1.4,

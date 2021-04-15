@@ -1,4 +1,4 @@
-export const servers = {
+export default {
   game: {
     url: 'ws://localhost:4001',
   },

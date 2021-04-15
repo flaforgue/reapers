@@ -3,15 +3,9 @@
   import * as GUI from '@babylonjs/gui';
   import { onMount } from 'svelte';
   import { useGame, game, activePlayerId, CharacterKind } from '@reapers/game-client';
-  import {
-    FocusElement,
-    focusElement,
-    playerInfos,
-    playerName,
-    targetInfos,
-  } from '../../stores';
-  import { servers } from '../../configs/servers.config';
-  import { Key } from '../../configs/keycodes.config';
+  import { FocusElement, focusElement, playerName, targetInfos } from '../../../stores';
+  import serversConfig from '../../../configs/servers.config';
+  import { Key } from '../../../configs/keycodes.config';
   import World from '../World/World.svelte';
   import Player from '../Player/Player.svelte';
   import Monster from '../Monster/Monster.svelte';
@@ -24,7 +18,6 @@
     createScene,
     showAxis,
   } from './game.utils';
-  import { Scene } from '@babylonjs/core';
 
   let engine: BABYLON.Engine | undefined;
   let gameCamera: BABYLON.ArcRotateCamera | undefined;
@@ -74,7 +67,7 @@
     updateFrontMoveDirection,
     updateRotation,
     castSpell,
-  } = useGame(servers.game.url);
+  } = useGame(serversConfig.game.url);
 
   onMount(() => {
     joinGame($playerName);
@@ -155,38 +148,36 @@
   <canvas bind:this={gameCanvas} />
   <World world={$game.world} scene={gameScene} on:lightChanged={handleLightChanged} />
 
-  {#each $game.players as player}
-    <Player
-      {player}
-      {gui}
-      {baseHighlightMesh}
-      {shadowGenerator}
-      assetContainer={characterAssetContainers[player.kind]}
-      camera={player.id === $activePlayerId ? gameCamera : undefined}
-    />
-    {#if player.id === $activePlayerId}
-      <PlayerController
-        scene={gameScene}
-        {player}
-        camera={gameCamera}
-        {updateFrontMoveDirection}
-        {updateSideMoveDirection}
-        {updateRotation}
-        {castSpell}
-      />
-    {/if}
-  {/each}
-
-  {#each $game.monsterGenerators as monsterGenerator}
-    {#each monsterGenerator.monsters as monster}
-      <Monster
-        {monster}
+  {#each $game.characters as character (character.id)}
+    {#if character.kind === CharacterKind.Player}
+      <Player
+        player={character}
         {gui}
         {baseHighlightMesh}
         {shadowGenerator}
-        assetContainer={characterAssetContainers[monster.kind]}
+        assetContainer={characterAssetContainers[character.kind]}
+        camera={character.id === $activePlayerId ? gameCamera : undefined}
       />
-    {/each}
+      {#if character.id === $activePlayerId}
+        <PlayerController
+          scene={gameScene}
+          player={character}
+          camera={gameCamera}
+          {updateFrontMoveDirection}
+          {updateSideMoveDirection}
+          {updateRotation}
+          {castSpell}
+        />
+      {/if}
+    {:else}
+      <Monster
+        monster={character}
+        {gui}
+        {baseHighlightMesh}
+        {shadowGenerator}
+        assetContainer={characterAssetContainers[character.kind]}
+      />
+    {/if}
   {/each}
 </div>
 

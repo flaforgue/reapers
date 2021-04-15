@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { Key } from '../../../src/configs/keycodes.config';
+  import { Key } from '../../../configs/keycodes.config';
 
   export let isFocused = false;
   export let placeholder = '';

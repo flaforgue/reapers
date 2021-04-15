@@ -1,10 +1,9 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
-  import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
-  import type { CharacterInfos } from '../../stores';
-  import { targetInfos } from '../../stores';
   import { onDestroy } from 'svelte';
+  import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
+  import { targetInfos } from '../../../stores';
   import {
     createLinkedLabel,
     createHighlightMesh,

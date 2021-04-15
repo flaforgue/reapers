@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as BABYLON from '@babylonjs/core';
-  import { WorldDTO } from '@reapers/game-client';
   import { createEventDispatcher, onDestroy } from 'svelte';
+  import { WorldDTO } from '@reapers/game-client';
   import { createGround, createLight, createSkyBox, createSound } from './world.utils';
 
   type WorldEvents = {

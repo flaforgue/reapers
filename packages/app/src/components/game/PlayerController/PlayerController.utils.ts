@@ -1,5 +1,4 @@
-import * as BABYLON from '@babylonjs/core';
-import { Key } from '../../configs/keycodes.config';
+import { Key } from '../../../configs/keycodes.config';
 
 export function isFrontMoveDirection(value: string) {
   return ([Key.z, Key.s] as string[]).indexOf(value) != -1;

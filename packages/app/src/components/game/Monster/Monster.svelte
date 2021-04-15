@@ -1,9 +1,9 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
-  import { AttackDTO, CharacterDTO, MonsterKind } from '@reapers/game-client';
-  import { disposeArray } from '../../utils';
   import { onDestroy } from 'svelte';
+  import { AttackDTO, CharacterDTO, MonsterKind } from '@reapers/game-client';
+  import { disposeArray } from '../../../utils';
   import { createParticleSystem, monsterAnimationKeys } from './monster.utils';
   import Character from '../Character/Character.svelte';
 

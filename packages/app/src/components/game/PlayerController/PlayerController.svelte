@@ -1,13 +1,13 @@
 <script lang="ts">
   import * as BABYLON from '@babylonjs/core';
+  import { onDestroy } from 'svelte';
   import {
     SideMoveDirection,
     FrontMoveDirection,
     CharacterDTO,
   } from '@reapers/game-client';
-  import { onDestroy } from 'svelte';
-  import { targetInfos } from '../../stores';
-  import { Key } from '../../configs/keycodes.config';
+  import { targetInfos } from '../../../stores';
+  import { Key } from '../../../configs/keycodes.config';
   import { isFrontMoveDirection, isSideMoveDirection } from './PlayerController.utils';
 
   export let updateFrontMoveDirection: (direction: FrontMoveDirection) => void;

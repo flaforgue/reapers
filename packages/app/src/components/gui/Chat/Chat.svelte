@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { useChat, ChatRoom, messages } from '@reapers/chat-client';
-  import { servers } from '../../configs/servers.config';
   import { afterUpdate, onMount } from 'svelte';
-  import { FocusElement, focusElement, playerName } from '../../stores';
+  import { useChat, ChatRoom, messages } from '@reapers/chat-client';
+  import serversConfig from '../../../configs/servers.config';
+  import { FocusElement, focusElement, playerName } from '../../../stores';
   import Input from '../Input/Input.svelte';
 
   let newMessage = '';
   let div: HTMLDivElement;
   let currentRoom: ChatRoom = ChatRoom.General;
 
-  const { joinChat, leaveChat, sendMessage } = useChat(servers.chat.url);
+  const { joinChat, leaveChat, sendMessage } = useChat(serversConfig.chat.url);
 
   onMount(() => {
     joinChat($playerName);
@@ -64,7 +64,6 @@
 <style>
   .Chat {
     position: absolute;
-    z-index: var(--chat-z-index);
     font-size: 1rem;
     bottom: 0;
     left: 0;

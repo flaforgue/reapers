@@ -1,4 +1,4 @@
-export enum Key {
+enum Key {
   Space = ' ',
   Escape = 'Escape',
   Enter = 'Enter',
@@ -16,3 +16,5 @@ export enum Key {
   a = 'a',
   e = 'e',
 }
+
+export { Key };

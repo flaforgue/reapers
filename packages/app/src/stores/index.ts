@@ -7,15 +7,6 @@ export enum FocusElement {
   Game,
 }
 
-export type CharacterInfos = {
-  id: string;
-  kind: CharacterKind;
-  name: string;
-  level: number;
-  life: BoundedValueDTO;
-  position: BABYLON.Vector3;
-};
-
 export const focusElement = writable(FocusElement.Game);
 export const playerName = writable('disterflo');
 export const targetInfos = writable<CharacterDTO | null>(null);
