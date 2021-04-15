@@ -1,9 +1,8 @@
 import * as BABYLON from 'babylonjs';
-import { EnvironmentKind } from '@reapers/game-shared';
-import Positionable from './positionable';
 import Monster from './monsters/monster';
 import ActionScheduler from './shared/action-scheduler';
 import { getRandomPosition, getRandomRotation } from '../utils';
+import Positionable from './positionable';
 
 type MonsterGeneratorConfig = {
   radius: number;
@@ -41,7 +40,7 @@ export default class MonsterGenerator extends Positionable {
     position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
     config: Partial<MonsterGeneratorConfig> = {},
   ) {
-    super(new BABYLON.Mesh(EnvironmentKind.MonsterGenerator, scene), position);
+    super(new BABYLON.Mesh('', scene), 'MonsterGenerator', position);
 
     this._config = {
       ...defaultConfig,

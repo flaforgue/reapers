@@ -1,4 +1,5 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
+import PawnDTO from './pawns/pawn.dto';
 import PositionableDTO from './positionable.dto';
 
 @Exclude()
@@ -8,4 +9,8 @@ export default class WorldDTO extends PositionableDTO {
 
   @Expose()
   public depth = 0;
+
+  @Expose({ groups: ['full'] })
+  @Type(() => PawnDTO)
+  public trees: PawnDTO[] = [];
 }

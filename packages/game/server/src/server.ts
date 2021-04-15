@@ -3,7 +3,7 @@ import * as http from 'http';
 import express from 'express';
 import { registerPlayerHandlers, registerSystemHandlers } from './handlers';
 import config from './config';
-import { GameEvents, plainToClass, CharacterDTO } from '@reapers/game-shared';
+import { GameEvents, plainToClass, CharacterDTO, GameDTO } from '@reapers/game-shared';
 import Game from './core/game';
 
 const port = config.port;
@@ -34,6 +34,14 @@ io.on(GameEvents.System.Connection, (socket: SocketIO.Socket) => {
           plainToClass(CharacterDTO, player, {
             strategy: 'excludeAll',
             excludeExtraneousValues: true,
+          }),
+        );
+        socket.emit(
+          GameEvents.Game.Created,
+          plainToClass(GameDTO, game, {
+            strategy: 'excludeAll',
+            excludeExtraneousValues: true,
+            groups: ['full'],
           }),
         );
       } catch (e) {

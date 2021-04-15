@@ -7,9 +7,6 @@ import PositionableDTO from './positionable.dto';
 @Exclude()
 export default class CharacterDTO extends PositionableDTO {
   @Expose()
-  public name = '';
-
-  @Expose()
   public level = 1;
 
   @Expose()

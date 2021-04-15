@@ -132,6 +132,3 @@
   {baseHighlightMesh}
   {gui}
 />
-
-<style>
-</style>

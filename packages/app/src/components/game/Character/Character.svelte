@@ -266,6 +266,3 @@
     highlightMesh?.dispose();
   });
 </script>
-
-<style>
-</style>

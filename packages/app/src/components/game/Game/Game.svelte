@@ -2,7 +2,13 @@
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
   import { onMount } from 'svelte';
-  import { useGame, game, activePlayerId, CharacterKind } from '@reapers/game-client';
+  import {
+    useGame,
+    game,
+    activePlayerId,
+    CharacterKind,
+    PawnKind,
+  } from '@reapers/game-client';
   import { FocusElement, focusElement, playerName, targetInfos } from '../../../stores';
   import serversConfig from '../../../configs/servers.config';
   import { Key } from '../../../configs/keycodes.config';
@@ -23,13 +29,15 @@
   let gameCamera: BABYLON.ArcRotateCamera | undefined;
   let gameCanvas: HTMLCanvasElement | undefined;
   let gameScene: BABYLON.Scene | undefined;
-  let characterAssetContainers: Record<
-    CharacterKind,
-    BABYLON.AssetContainer | undefined
-  > = {
+  let assetContainers: Record<CharacterKind, BABYLON.AssetContainer | undefined> = {
     [CharacterKind.Player]: undefined,
     [CharacterKind.Spider]: undefined,
     [CharacterKind.Frog]: undefined,
+  };
+  let basePawnMeshes: Record<PawnKind, BABYLON.Mesh | undefined> = {
+    // [PawnKind.SpiderNest]: undefined,
+    [PawnKind.PineTree]: undefined,
+    // [PawnKind.Wall]: undefined,
   };
   let baseHighlightMesh: BABYLON.Mesh | undefined;
   let gui: GUI.AdvancedDynamicTexture | undefined;
@@ -41,11 +49,11 @@
     }
   }
 
-  function loadAssets() {
+  function loadAssets(gameScene: BABYLON.Scene) {
     for (let kind of Object.values(CharacterKind)) {
       BABYLON.SceneLoader.LoadAssetContainer(
-        '/models/',
-        `characters/${kind}.glb`,
+        '/models/characters/',
+        `${kind}.glb`,
         gameScene,
         (result) => {
           result.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
@@ -54,7 +62,27 @@
             result.animationGroups[i].reset().stop();
           }
 
-          characterAssetContainers[kind] = result;
+          assetContainers[kind] = result;
+        },
+      );
+    }
+
+    for (let kind of Object.values(PawnKind)) {
+      BABYLON.SceneLoader.LoadAssetContainer(
+        'models/pawns/',
+        `${kind}.glb`,
+        gameScene,
+        (result) => {
+          basePawnMeshes[kind] = BABYLON.Mesh.MergeMeshes(
+            result.meshes.filter((m) => m.getTotalVertices() > 0) as BABYLON.Mesh[],
+            true,
+            false,
+            undefined,
+            true,
+            true,
+          ) as BABYLON.Mesh;
+          // (basePawnMeshes[kind] as BABYLON.Mesh).setEnabled(false);
+          (basePawnMeshes[kind] as BABYLON.Mesh).alwaysSelectAsActiveMesh = true;
         },
       );
     }
@@ -76,7 +104,7 @@
     gameScene.onKeyboardObservable?.add(keyboardEventHandler);
     gameCamera = createCamera(gameScene);
     gui = createGUI();
-    loadAssets();
+    loadAssets(gameScene);
     baseHighlightMesh = createBaseActiveMesh(gameScene);
 
     showAxis(1, gameScene);
@@ -105,8 +133,12 @@
     return () => {
       leaveGame();
 
-      for (let kind in characterAssetContainers) {
-        characterAssetContainers[kind as CharacterKind]?.removeAllFromScene();
+      for (let kind in assetContainers) {
+        assetContainers[kind as CharacterKind]?.removeAllFromScene();
+      }
+
+      for (let kind in basePawnMeshes) {
+        basePawnMeshes[kind as PawnKind]?.dispose();
       }
 
       shadowGenerator?.dispose();
@@ -146,7 +178,12 @@
 
 <div class="Game">
   <canvas bind:this={gameCanvas} />
-  <World world={$game.world} scene={gameScene} on:lightChanged={handleLightChanged} />
+  <World
+    world={$game.world}
+    scene={gameScene}
+    {basePawnMeshes}
+    on:lightChanged={handleLightChanged}
+  />
 
   {#each $game.characters as character (character.id)}
     {#if character.kind === CharacterKind.Player}
@@ -155,7 +192,7 @@
         {gui}
         {baseHighlightMesh}
         {shadowGenerator}
-        assetContainer={characterAssetContainers[character.kind]}
+        assetContainer={assetContainers[character.kind]}
         camera={character.id === $activePlayerId ? gameCamera : undefined}
       />
       {#if character.id === $activePlayerId}
@@ -175,7 +212,7 @@
         {gui}
         {baseHighlightMesh}
         {shadowGenerator}
-        assetContainer={characterAssetContainers[character.kind]}
+        assetContainer={assetContainers[character.kind]}
       />
     {/if}
   {/each}

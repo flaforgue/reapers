@@ -3,15 +3,15 @@ import 'reflect-metadata';
 import { plainToClass } from 'class-transformer';
 import {
   AttackDTO,
-  MonsterGeneratorDTO,
   MonsterDTO,
   BoundedValueDTO,
   CharacterDTO,
   GameDTO,
   WorldDTO,
+  PawnDTO,
 } from './dtos';
 import {
-  EnvironmentKind,
+  PawnKind,
   CharacterKind,
   MonsterKind,
   GameEvents,
@@ -20,18 +20,18 @@ import {
 } from './types';
 
 export {
-  EnvironmentKind,
+  PawnKind,
   CharacterKind,
   MonsterKind,
   AttackDTO,
   BoundedValueDTO,
   CharacterDTO,
   MonsterDTO,
-  MonsterGeneratorDTO,
   GameDTO,
   GameEvents,
   FrontMoveDirection,
   SideMoveDirection,
   WorldDTO,
+  PawnDTO,
   plainToClass,
 };

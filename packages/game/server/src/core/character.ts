@@ -10,7 +10,6 @@ import BoundedValue from './shared/bounded-value';
 import Attack from './shared/attack';
 import VariableValue from './shared/variable-value';
 export default class Character extends Positionable {
-  public readonly name: string;
   public readonly level: number;
   public readonly life: BoundedValue;
   public readonly attackRange: number = 1;
@@ -41,9 +40,8 @@ export default class Character extends Positionable {
     position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
     rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
   ) {
-    super(mesh, position, rotation);
+    super(mesh, name, position, rotation);
 
-    this.name = name;
     this.level = level;
     this.life = this._createLifeBoudedValue();
     this.attackDamageAmount = this._createAttackDamageAmount();
@@ -135,13 +133,6 @@ export default class Character extends Positionable {
     if (distanceToTarget <= this.attackRange) {
       this._attack(target, distanceToTarget);
     }
-  }
-
-  protected _lookAtY(position: BABYLON.Vector3) {
-    this._mesh.lookAt(
-      new BABYLON.Vector3(position.x, this.position.y, position.z),
-      Math.PI,
-    );
   }
 
   protected _attack(target: Character, distanceToTarget: number) {

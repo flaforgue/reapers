@@ -49,8 +49,10 @@ export enum MonsterKind {
   Frog = 'Frog',
 }
 
-export enum EnvironmentKind {
-  Unknown = 'Unknown',
-  MonsterGenerator = 'MonsterGenerator',
-  World = 'World',
+export enum PawnKind {
+  PineTree = 'PineTree',
+  // CommonTree = 'CommonTree',
+  // DeadTree = 'DeadTree',
+  // Wall = 'Wall',
+  // SpiderNest = 'SpiderNest',
 }

@@ -3,7 +3,7 @@ import { writable } from 'svelte/store';
 import {
   CharacterKind,
   MonsterKind,
-  EnvironmentKind,
+  PawnKind,
   AttackDTO,
   BoundedValueDTO,
   CharacterDTO,
@@ -13,6 +13,7 @@ import {
   FrontMoveDirection,
   SideMoveDirection,
   WorldDTO,
+  PawnDTO,
 } from '@reapers/game-shared';
 
 const activePlayerId = writable<string>('');
@@ -52,6 +53,10 @@ function useGame(serverUrl: string) {
       activePlayerId.set(player.id);
     });
 
+    socket.on(GameEvents.Game.Created, (gameDTO: GameDTO) => {
+      game.set(gameDTO);
+    });
+
     socket.on(GameEvents.Game.Updated, (gameDTO: GameDTO) => {
       game.set(gameDTO);
     });
@@ -73,13 +78,14 @@ export {
   useGame,
   CharacterKind,
   MonsterKind,
-  EnvironmentKind,
+  PawnKind,
   AttackDTO,
   BoundedValueDTO,
   CharacterDTO,
   MonsterDTO,
   GameDTO,
   WorldDTO,
+  PawnDTO,
   GameEvents,
   FrontMoveDirection,
   SideMoveDirection,

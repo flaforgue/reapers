@@ -28,9 +28,9 @@ export default class Game extends Identifiable {
     this._engine = new BABYLON.NullEngine({
       deterministicLockstep: true,
       lockstepMaxSteps: 4,
-      renderHeight: 512,
-      renderWidth: 512,
-      textureSize: 512,
+      renderHeight: 1,
+      renderWidth: 1,
+      textureSize: 1,
     });
     this._scene = new BABYLON.Scene(this._engine);
     this._scene.collisionsEnabled = true;
@@ -47,8 +47,16 @@ export default class Game extends Identifiable {
 
     this._world = new World(this._scene, 100, 100);
     this._monsterGenerators = [
-      new MonsterGenerator(this._scene, Spider, new BABYLON.Vector3(5, 0, 0)),
-      new MonsterGenerator(this._scene, Frog, new BABYLON.Vector3(0, 0, 5)),
+      new MonsterGenerator(this._scene, Spider, new BABYLON.Vector3(5, 0, 0), {
+        radius: 10,
+        interval: 0,
+        nbMaxInstances: 10,
+      }),
+      new MonsterGenerator(this._scene, Frog, new BABYLON.Vector3(0, 0, 5), {
+        radius: 10,
+        interval: 0,
+        nbMaxInstances: 10,
+      }),
     ];
 
     this._scene.executeWhenReady(() => {
@@ -57,6 +65,7 @@ export default class Game extends Identifiable {
       this._engine.runRenderLoop(() => {
         try {
           if (this._isRunning) {
+            console.log(this._engine.getFps());
             this._update();
             this._scene.render();
           }

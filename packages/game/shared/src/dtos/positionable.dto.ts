@@ -5,6 +5,9 @@ import IdentifiableDTO from './identifiable.dto';
 @Exclude()
 export default class PositionableDTO extends IdentifiableDTO {
   @Expose()
+  public name = '';
+
+  @Expose()
   @Type(() => Vector3DTO)
   public position: Vector3DTO = {
     x: 0,
