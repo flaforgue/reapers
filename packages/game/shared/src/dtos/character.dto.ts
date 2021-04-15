@@ -1,7 +1,7 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import { FrontMoveDirection, SideMoveDirection, CharacterKind } from '../../types';
-import AttackDTO from './attack.dto';
-import BoundedValueDTO from './bounded-value.dto';
+import { FrontMoveDirection, SideMoveDirection, CharacterKind } from '../types';
+import AttackDTO from './common/attack.dto';
+import BoundedValueDTO from './common/bounded-value.dto';
 import PositionableDTO from './positionable.dto';
 
 @Exclude()

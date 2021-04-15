@@ -1,8 +1,9 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import Vector3DTO from './vector3.dto';
-import BaseDTO from './base.dto';
+import Vector3DTO from './common/vector3.dto';
+import IdentifiableDTO from './identifiable.dto';
+
 @Exclude()
-export default class PositionableDTO extends BaseDTO {
+export default class PositionableDTO extends IdentifiableDTO {
   @Expose()
   @Type(() => Vector3DTO)
   public position: Vector3DTO = {

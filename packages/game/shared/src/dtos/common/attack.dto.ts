@@ -1,10 +1,10 @@
 import { Exclude, Expose, Type } from 'class-transformer';
 import { CharacterKind } from '../..';
-import BaseDTO from './base.dto';
+import IdentifiableDTO from '../identifiable.dto';
 import Vector3DTO from './vector3.dto';
 
 @Exclude()
-export default class AttackDTO extends BaseDTO {
+export default class AttackDTO extends IdentifiableDTO {
   @Expose()
   targetId: string = '';
 

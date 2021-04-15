@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import CharacterDTO from './common/character.dto';
+import CharacterDTO from './character.dto';
 import Vector3DTO from './common/vector3.dto';
 
 @Exclude()

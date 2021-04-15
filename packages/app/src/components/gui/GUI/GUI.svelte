@@ -7,6 +7,7 @@
 
 <div class="GUI">
   <Chat />
+
   <PlayerInfos player={$playerInfos} />
 
   {#if $targetInfos}

@@ -1,5 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
-import PositionableDTO from './common/positionable.dto';
+import PositionableDTO from './positionable.dto';
 
 @Exclude()
 export default class WorldDTO extends PositionableDTO {
