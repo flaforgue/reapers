@@ -16,6 +16,7 @@ export default class Positionable extends Identifiable {
 
     this._mesh = mesh;
     this.name = name;
+    this._mesh.isVisible = false;
     this._mesh.position = position;
     this._mesh.rotation = rotation;
   }
