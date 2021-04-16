@@ -32,15 +32,12 @@ export default class Game extends Identifiable {
       renderWidth: 1,
       textureSize: 1,
     });
-    this._scene = new BABYLON.Scene(this._engine, {
-      useGeometryUniqueIdsMap: true,
-      useMaterialMeshMap: true,
-      useClonedMeshMap: true,
-    });
+    this._scene = new BABYLON.Scene(this._engine);
     this._scene.collisionsEnabled = true;
     this._scene.freezeActiveMeshes(true);
     this._scene.autoClear = false;
     this._scene.autoClearDepthAndStencil = false;
+    this._scene.blockMaterialDirtyMechanism = true;
 
     // Required even for BABYLON.NullEngine
     new BABYLON.ArcRotateCamera('Camera', 0, 0, 1, BABYLON.Vector3.Zero(), this._scene);

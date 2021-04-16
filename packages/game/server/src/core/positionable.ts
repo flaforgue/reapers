@@ -20,6 +20,7 @@ export default class Positionable extends Identifiable {
     this._mesh.rotation = rotation;
     this._mesh.isPickable = false;
     this._mesh.alwaysSelectAsActiveMesh = true;
+    this._mesh.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY;
   }
 
   public get position() {

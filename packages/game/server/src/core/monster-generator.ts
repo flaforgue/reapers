@@ -42,6 +42,8 @@ export default class MonsterGenerator extends Positionable {
   ) {
     super(new BABYLON.Mesh('', scene), 'MonsterGenerator', position);
 
+    this._mesh.freezeWorldMatrix();
+    this._mesh.doNotSyncBoundingInfo = true;
     this._config = {
       ...defaultConfig,
       ...config,

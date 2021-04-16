@@ -17,6 +17,7 @@ export default class World extends Positionable {
 
     this._mesh.checkCollisions = true;
     this._mesh.freezeWorldMatrix();
+    this._mesh.doNotSyncBoundingInfo = true;
     this.depth = depth;
     this.width = width;
     this._treeBaseMesh = this._createPawnBaseMesh(scene, 0.25, 5, 0.25);
@@ -40,8 +41,11 @@ export default class World extends Positionable {
     );
 
     baseMesh.setEnabled(false);
-    baseMesh.freezeWorldMatrix();
+    baseMesh.isPickable = false;
     baseMesh.alwaysSelectAsActiveMesh = false;
+    baseMesh.freezeWorldMatrix();
+    baseMesh.doNotSyncBoundingInfo = true;
+    baseMesh.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY;
 
     return baseMesh;
   }
@@ -52,7 +56,7 @@ export default class World extends Positionable {
       rotation: BABYLON.Vector3;
     }[] = [];
 
-    for (let p = 0; p < 10000; p++) {
+    for (let p = 0; p < 100; p++) {
       treesDatas.push({
         position: new BABYLON.Vector3(
           BABYLON.Scalar.RandomRange((-1 * this.width) / 2, this.width / 2),
