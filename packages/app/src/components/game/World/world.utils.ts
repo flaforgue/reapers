@@ -50,14 +50,17 @@ export function createGround(width: number, depth: number, scene: BABYLON.Scene)
     { width, height: depth },
     scene,
   );
+
   const texture = new BABYLON.Texture('/textures/grass.jpeg', scene);
   texture.uScale = 20;
   texture.vScale = 20;
+
   const groundMat = new BABYLON.StandardMaterial('groundMat', scene);
   groundMat.diffuseTexture = texture;
   ground.material = groundMat;
   ground.receiveShadows = true;
   ground.freezeWorldMatrix();
+  ground.freezeNormals();
 
   return ground;
 }

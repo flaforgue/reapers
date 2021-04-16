@@ -81,8 +81,12 @@
             true,
             true,
           ) as BABYLON.Mesh;
-          // (basePawnMeshes[kind] as BABYLON.Mesh).setEnabled(false);
           (basePawnMeshes[kind] as BABYLON.Mesh).alwaysSelectAsActiveMesh = true;
+          (basePawnMeshes[kind] as BABYLON.Mesh).isPickable = false;
+          (basePawnMeshes[kind] as BABYLON.Mesh).doNotSyncBoundingInfo = true;
+          (basePawnMeshes[kind] as BABYLON.Mesh).freezeWorldMatrix();
+          (basePawnMeshes[kind] as BABYLON.Mesh).freezeNormals();
+          basePawnMeshes[kind]?.material?.freeze();
         },
       );
     }
@@ -108,9 +112,9 @@
     baseHighlightMesh = createBaseActiveMesh(gameScene);
 
     showAxis(1, gameScene);
-    // gameScene.debugLayer.show({
-    //   embedMode: true,
-    // });
+    gameScene.debugLayer.show({
+      embedMode: true,
+    });
 
     engine.displayLoadingUI();
     gameScene.executeWhenReady(function () {

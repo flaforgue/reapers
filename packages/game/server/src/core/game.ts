@@ -42,7 +42,7 @@ export default class Game extends Identifiable {
     // Required even for BABYLON.NullEngine
     new BABYLON.ArcRotateCamera('Camera', 0, 0, 1, BABYLON.Vector3.Zero(), this._scene);
 
-    this._world = new World(this._scene, 100, 100);
+    this._world = new World(this._scene, 1000, 1000);
     this._monsterGenerators = [
       new MonsterGenerator(this._scene, Spider, new BABYLON.Vector3(5, 0, 0), {
         radius: 10,
