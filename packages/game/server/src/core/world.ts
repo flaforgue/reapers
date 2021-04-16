@@ -15,9 +15,10 @@ export default class World extends Positionable {
       'World',
     );
 
+    this._mesh.checkCollisions = true;
+    this._mesh.freezeWorldMatrix();
     this.depth = depth;
     this.width = width;
-    this._mesh.checkCollisions = true;
     this._treeBaseMesh = this._createPawnBaseMesh(scene, 0.25, 5, 0.25);
     this._createTrees();
   }
@@ -37,7 +38,10 @@ export default class World extends Positionable {
       },
       scene,
     );
+
     baseMesh.setEnabled(false);
+    baseMesh.freezeWorldMatrix();
+    baseMesh.alwaysSelectAsActiveMesh = false;
 
     return baseMesh;
   }

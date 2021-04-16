@@ -58,6 +58,7 @@ export default class Monster extends Character {
 
     if (distanceFromInitialPosition >= maxDistanceFromInitialPosition) {
       this._goBackToInitialPosition();
+      return;
     }
 
     if (this._target) {

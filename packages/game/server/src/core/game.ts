@@ -32,18 +32,18 @@ export default class Game extends Identifiable {
       renderWidth: 1,
       textureSize: 1,
     });
-    this._scene = new BABYLON.Scene(this._engine);
+    this._scene = new BABYLON.Scene(this._engine, {
+      useGeometryUniqueIdsMap: true,
+      useMaterialMeshMap: true,
+      useClonedMeshMap: true,
+    });
     this._scene.collisionsEnabled = true;
+    this._scene.freezeActiveMeshes(true);
+    this._scene.autoClear = false;
+    this._scene.autoClearDepthAndStencil = false;
 
     // Required even for BABYLON.NullEngine
-    new BABYLON.ArcRotateCamera(
-      'Camera',
-      0,
-      0.8,
-      100,
-      BABYLON.Vector3.Zero(),
-      this._scene,
-    );
+    new BABYLON.ArcRotateCamera('Camera', 0, 0, 1, BABYLON.Vector3.Zero(), this._scene);
 
     this._world = new World(this._scene, 100, 100);
     this._monsterGenerators = [
@@ -65,9 +65,9 @@ export default class Game extends Identifiable {
       this._engine.runRenderLoop(() => {
         try {
           if (this._isRunning) {
-            console.log(this._engine.getFps());
+            console.log(this._engine.getFps().toFixed());
             this._update();
-            this._scene.render();
+            this._scene.render(false, true);
           }
         } catch (err) {
           console.error(err);
@@ -97,12 +97,13 @@ export default class Game extends Identifiable {
     for (const id in this._charactersByIds) {
       if (this._charactersByIds[id].isDestroyed) {
         delete this._charactersByIds[id];
-      } else {
-        this._charactersByIds[id].update();
+        continue;
+      }
 
-        if (this._charactersByIds[id] instanceof Player) {
-          (this._charactersByIds[id] as Player).emitGameState(gameDto);
-        }
+      this._charactersByIds[id].update();
+
+      if (this._charactersByIds[id] instanceof Player) {
+        (this._charactersByIds[id] as Player).emitGameState(gameDto);
       }
     }
 

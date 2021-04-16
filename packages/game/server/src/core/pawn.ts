@@ -23,7 +23,10 @@ export default class Pawn extends Identifiable {
     this._instance.checkCollisions = true;
     this._instance.position = position;
     this._instance.rotation = rotation;
-    this._instance.isVisible = false;
+
+    this._instance.isPickable = false;
+    this._instance.alwaysSelectAsActiveMesh = true;
+    this._instance.freezeWorldMatrix();
   }
 
   public get kind() {
