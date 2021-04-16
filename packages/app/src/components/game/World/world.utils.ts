@@ -28,7 +28,9 @@ export function createSkyBox(scene: BABYLON.Scene, width: number, depth: number)
     },
     scene,
   );
-  var skyboxMaterial = new BABYLON.StandardMaterial('skyBox', scene);
+  skybox.infiniteDistance = true;
+
+  const skyboxMaterial = new BABYLON.StandardMaterial('skyBox', scene);
   skyboxMaterial.backFaceCulling = false;
   skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
     '/textures/skybox/skybox',
