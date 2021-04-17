@@ -115,3 +115,16 @@ export function createBaseActiveMesh(scene: BABYLON.Scene) {
 
   return activeMesh;
 }
+
+export function createShadowGenerator(light: BABYLON.DirectionalLight) {
+  const shadowGenerator = new BABYLON.CascadedShadowGenerator(1024, light);
+
+  shadowGenerator.shadowMaxZ = 50;
+  shadowGenerator.stabilizeCascades = true;
+  shadowGenerator.cascadeBlendPercentage = 0;
+  shadowGenerator.usePercentageCloserFiltering = true;
+  shadowGenerator.filteringQuality = BABYLON.ShadowGenerator.QUALITY_LOW;
+  shadowGenerator.setDarkness(0.3);
+
+  return shadowGenerator;
+}

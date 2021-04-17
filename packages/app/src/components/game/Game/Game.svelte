@@ -22,6 +22,7 @@
     createEngine,
     createGUI,
     createScene,
+    createShadowGenerator,
     showAxis,
   } from './game.utils';
 
@@ -112,9 +113,9 @@
     baseHighlightMesh = createBaseActiveMesh(gameScene);
 
     showAxis(1, gameScene);
-    gameScene.debugLayer.show({
-      embedMode: true,
-    });
+    // gameScene.debugLayer.show({
+    //   embedMode: true,
+    // });
 
     engine.displayLoadingUI();
     gameScene.executeWhenReady(function () {
@@ -162,21 +163,9 @@
   }
 
   function handleLightChanged(details: CustomEvent<BABYLON.DirectionalLight>) {
-    const maxZ = Math.max($game.world.width, $game.world.depth) * 2;
-
     shadowGenerator?.dispose();
-
-    if (gameCamera && maxZ > 0) {
-      gameCamera.maxZ = maxZ;
-    }
-
-    shadowGenerator = new BABYLON.CascadedShadowGenerator(1024, details.detail);
-    shadowGenerator.shadowMaxZ = maxZ;
-    shadowGenerator.stabilizeCascades = true;
-    shadowGenerator.cascadeBlendPercentage = 0;
-    shadowGenerator.usePercentageCloserFiltering = true;
-    shadowGenerator.filteringQuality = BABYLON.ShadowGenerator.QUALITY_LOW;
-    shadowGenerator.setDarkness(0.4);
+    shadowGenerator = createShadowGenerator(details.detail);
+    shadowGenerator.addShadowCaster(basePawnMeshes[PawnKind.PineTree] as BABYLON.Mesh);
   }
 </script>
 

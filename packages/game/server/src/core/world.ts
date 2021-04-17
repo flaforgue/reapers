@@ -57,7 +57,7 @@ export default class World extends Positionable {
       rotation: BABYLON.Vector3;
     }[] = [];
 
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 500; i++) {
       treesDatas.push({
         position: new BABYLON.Vector3(
           BABYLON.Scalar.RandomRange((-1 * this.width) / 2, this.width / 2),
