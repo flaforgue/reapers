@@ -20,35 +20,31 @@
   let skyBox: BABYLON.Mesh | undefined;
 
   function createTrees() {
-    if (scene) {
-      const instanceCount = world.trees.length;
-      const matricesData = new Float32Array(16 * instanceCount);
+    const instanceCount = world.trees.length;
+    const matricesData = new Float32Array(16 * instanceCount);
 
-      if (scene) {
-        for (let i = 0; i < world.trees.length; i++) {
-          BABYLON.Matrix.Compose(
-            new BABYLON.Vector3(1.5, 1.5, 1.5),
-            new BABYLON.Vector3(
-              world.trees[i].rotation.x,
-              world.trees[i].rotation.y,
-              world.trees[i].rotation.z,
-            ).toQuaternion(),
-            new BABYLON.Vector3(
-              world.trees[i].position.x,
-              world.trees[i].position.y,
-              world.trees[i].position.z,
-            ),
-          ).copyToArray(matricesData, i * 16);
-        }
-
-        (basePawnMeshes[PawnKind.PineTree] as BABYLON.Mesh).thinInstanceSetBuffer(
-          'matrix',
-          matricesData,
-          16,
-          true,
-        );
-      }
+    for (let i = 0; i < world.trees.length; i++) {
+      BABYLON.Matrix.Compose(
+        new BABYLON.Vector3(1.5, 1.5, 1.5),
+        new BABYLON.Vector3(
+          world.trees[i].rotation.x,
+          world.trees[i].rotation.y,
+          world.trees[i].rotation.z,
+        ).toQuaternion(),
+        new BABYLON.Vector3(
+          world.trees[i].position.x,
+          world.trees[i].position.y,
+          world.trees[i].position.z,
+        ),
+      ).copyToArray(matricesData, i * 16);
     }
+
+    (basePawnMeshes[PawnKind.PineTree] as BABYLON.Mesh).thinInstanceSetBuffer(
+      'matrix',
+      matricesData,
+      16,
+      true,
+    );
   }
 
   $: ({ width, depth } = world);
