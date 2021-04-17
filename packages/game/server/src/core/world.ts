@@ -55,6 +55,7 @@ export default class World extends Positionable {
     const treesDatas: {
       position: BABYLON.Vector3;
       rotation: BABYLON.Vector3;
+      scaling: BABYLON.Vector3;
     }[] = [];
 
     for (let i = 0; i < 500; i++) {
@@ -65,12 +66,18 @@ export default class World extends Positionable {
           BABYLON.Scalar.RandomRange((-1 * this.depth) / 2, this.depth / 2),
         ),
         rotation: new BABYLON.Vector3(0, BABYLON.Scalar.RandomRange(0, Math.PI), 0),
+        scaling: new BABYLON.Vector3().setAll(BABYLON.Scalar.RandomRange(1, 3)),
       });
     }
 
     for (let i = 0; i < treesDatas.length; i++) {
       this.trees.push(
-        new Pawn(this._treeBaseMesh, treesDatas[i].position, treesDatas[i].rotation),
+        new Pawn(
+          this._treeBaseMesh,
+          treesDatas[i].position,
+          treesDatas[i].rotation,
+          treesDatas[i].scaling,
+        ),
       );
     }
   }

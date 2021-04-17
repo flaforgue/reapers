@@ -25,7 +25,11 @@
 
     for (let i = 0; i < world.trees.length; i++) {
       BABYLON.Matrix.Compose(
-        new BABYLON.Vector3(1.5, 1.5, 1.5),
+        new BABYLON.Vector3(
+          world.trees[i].scaling.x,
+          world.trees[i].scaling.y,
+          world.trees[i].scaling.z,
+        ),
         new BABYLON.Vector3(
           world.trees[i].rotation.x,
           world.trees[i].rotation.y,
