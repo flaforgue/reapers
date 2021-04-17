@@ -47,7 +47,6 @@ export default class World extends Positionable {
     baseMesh.freezeWorldMatrix();
     baseMesh.freezeNormals();
     baseMesh.doNotSyncBoundingInfo = true;
-    baseMesh.cullingStrategy = BABYLON.AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY;
 
     return baseMesh;
   }
@@ -58,7 +57,7 @@ export default class World extends Positionable {
       rotation: BABYLON.Vector3;
     }[] = [];
 
-    for (let p = 0; p < 3000; p++) {
+    for (let i = 0; i < 10000; i++) {
       treesDatas.push({
         position: new BABYLON.Vector3(
           BABYLON.Scalar.RandomRange((-1 * this.width) / 2, this.width / 2),

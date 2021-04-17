@@ -28,8 +28,6 @@ export default class Pawn extends Identifiable {
     this._instance.alwaysSelectAsActiveMesh = true;
     this._instance.freezeWorldMatrix();
     this._instance.doNotSyncBoundingInfo = true;
-    this._instance.cullingStrategy =
-      BABYLON.AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY;
   }
 
   public get kind() {
