@@ -4,17 +4,12 @@
   import { onDestroy } from 'svelte';
   import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
   import { targetInfos } from '../../../stores';
-  import {
-    createHighlightMesh,
-    createAttackLabel,
-    animateAttackLabel,
-  } from './character.utils';
+  import { createAttackLabel, animateAttackLabel } from './character.utils';
 
   type CharacterAnimationKey = 'attack' | 'death' | 'idle' | 'walk';
 
   export let character: CharacterDTO = new CharacterDTO();
   export let gui: GUI.AdvancedDynamicTexture | undefined;
-  export let baseHighlightMesh: BABYLON.Mesh | undefined;
   export let rootMesh: BABYLON.Mesh | undefined;
   export let animationGroups: BABYLON.AnimationGroup[] = [];
   export let characterAnimationKeys: Record<CharacterAnimationKey, number>;
@@ -67,8 +62,11 @@
   }
 
   function updateGUITargetInfos() {
-    if (isAlive) {
-      $targetInfos = character;
+    if (isAlive && rootMesh) {
+      $targetInfos = {
+        ...character,
+        transformNode: rootMesh,
+      };
     } else {
       $targetInfos = null;
     }
@@ -83,12 +81,6 @@
           { trigger: BABYLON.ActionManager.OnPickTrigger },
           function () {
             updateGUITargetInfos();
-
-            if (!highlightMesh && baseHighlightMesh && rootMesh) {
-              highlightMesh = createHighlightMesh(baseHighlightMesh, rootMesh, kind);
-            }
-
-            highlightMesh?.getScene().beginAnimation(highlightMesh, 0, 100);
           },
         ),
       );

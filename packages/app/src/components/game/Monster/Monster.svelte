@@ -8,7 +8,6 @@
   import Character from '../Character/Character.svelte';
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
-  export let baseHighlightMesh: BABYLON.Mesh | undefined;
   export let monster: CharacterDTO;
   export let gui: GUI.AdvancedDynamicTexture | undefined;
   export let shadowGenerator: BABYLON.CascadedShadowGenerator | undefined;
@@ -40,7 +39,6 @@
       monster.scaling.y * monsterScalingFactor,
       monster.scaling.z * -1 * monsterScalingFactor,
     );
-    console.log(rootMeshes[0].scaling);
     animationGroups = entries?.animationGroups ?? [];
     animationGroups[animationKeys.Walk].speedRatio = 1.7;
     shadowGenerator?.addShadowCaster(rootMeshes[0] as BABYLON.AbstractMesh);
@@ -107,6 +105,5 @@
   {animationGroups}
   {attack}
   {characterAnimationKeys}
-  {baseHighlightMesh}
   {gui}
 />

@@ -18,7 +18,6 @@
   import Monster from '../Monster/Monster.svelte';
   import PlayerController from '../PlayerController/PlayerController.svelte';
   import {
-    createBaseActiveMesh,
     createCamera,
     createEngine,
     createGUI,
@@ -41,7 +40,6 @@
     [PawnKind.PineTree]: undefined,
     // [PawnKind.Wall]: undefined,
   };
-  let baseHighlightMesh: BABYLON.Mesh | undefined;
   let gui: GUI.AdvancedDynamicTexture | undefined;
   let shadowGenerator: BABYLON.CascadedShadowGenerator | undefined;
 
@@ -84,8 +82,8 @@
           (basePawnMeshes[kind] as BABYLON.Mesh).alwaysSelectAsActiveMesh = true;
           (basePawnMeshes[kind] as BABYLON.Mesh).isPickable = false;
           (basePawnMeshes[kind] as BABYLON.Mesh).doNotSyncBoundingInfo = true;
-          (basePawnMeshes[kind] as BABYLON.Mesh).freezeWorldMatrix();
-          (basePawnMeshes[kind] as BABYLON.Mesh).freezeNormals();
+          basePawnMeshes[kind]?.freezeWorldMatrix();
+          basePawnMeshes[kind]?.freezeNormals();
           basePawnMeshes[kind]?.material?.freeze();
         },
       );
@@ -109,7 +107,6 @@
     gameCamera = createCamera(gameScene);
     gui = createGUI();
     loadAssets(gameScene);
-    baseHighlightMesh = createBaseActiveMesh(gameScene);
 
     showAxis(1, gameScene);
     // gameScene.debugLayer.show({
@@ -182,7 +179,6 @@
       <Player
         player={character}
         {gui}
-        {baseHighlightMesh}
         {shadowGenerator}
         assetContainer={assetContainers[character.kind]}
         camera={character.id === $activePlayerId ? gameCamera : undefined}
@@ -202,7 +198,6 @@
       <Monster
         monster={character}
         {gui}
-        {baseHighlightMesh}
         {shadowGenerator}
         assetContainer={assetContainers[character.kind]}
       />

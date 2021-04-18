@@ -92,31 +92,6 @@ export function createGUI(): GUI.AdvancedDynamicTexture {
   return gui;
 }
 
-export function createBaseActiveMesh(scene: BABYLON.Scene): BABYLON.Mesh {
-  const activeMesh = BABYLON.MeshBuilder.CreateDisc('activeMesh', {
-    radius: 1,
-  });
-  const material = new BABYLON.StandardMaterial('activeMeshMat', scene);
-
-  activeMesh.setEnabled(false);
-  activeMesh.rotate(BABYLON.Axis.X, Math.PI / 2);
-  activeMesh.position = new BABYLON.Vector3(0, 0.001, 0);
-  material.diffuseColor = new BABYLON.Color3(1, 0.3, 0.1);
-  material.alpha = 0.5;
-  activeMesh.material = material;
-
-  const animation = new BABYLON.Animation(
-    'activeMesh animation',
-    'scaling',
-    100,
-    BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
-    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
-  );
-  activeMesh.animations.push(animation);
-
-  return activeMesh;
-}
-
 export function createShadowGenerator(
   light: BABYLON.DirectionalLight,
 ): BABYLON.CascadedShadowGenerator {

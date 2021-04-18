@@ -4,12 +4,6 @@ import { AttackDTO, CharacterKind } from '@reapers/game-client';
 import charactersConfig from '../../../configs/characters.config';
 import { worldToGUI } from '../../../utils';
 
-const activeMeshRadius: Record<CharacterKind, number> = {
-  [CharacterKind.Player]: 1.5,
-  [CharacterKind.Frog]: 2.5,
-  [CharacterKind.Spider]: 3.5,
-};
-
 function createFreeLabel(
   labelOptions: {
     value: string;
@@ -74,41 +68,6 @@ export function createAttackLabel(
   );
 
   return label;
-}
-
-export function createHighlightMesh(
-  baseMesh: BABYLON.Mesh,
-  parent: BABYLON.Mesh,
-  kind: CharacterKind,
-): BABYLON.Mesh {
-  const activeMesh = baseMesh.clone('Clone of activeMesh', parent);
-
-  activeMesh.setEnabled(true);
-  activeMesh.material = (baseMesh.material as BABYLON.StandardMaterial).clone(
-    'Clone of activeMeshMat',
-  );
-  activeMesh.animations = [...baseMesh.animations];
-  activeMesh.animations[0].setKeys([
-    {
-      frame: 0,
-      value: new BABYLON.Vector3().setAll(0),
-    },
-    {
-      frame: 10,
-      value: new BABYLON.Vector3().setAll(activeMeshRadius[kind]),
-    },
-    {
-      frame: 20,
-      value: new BABYLON.Vector3().setAll(activeMeshRadius[kind] * 0.7),
-    },
-    {
-      frame: 30,
-      value: new BABYLON.Vector3().setAll(activeMeshRadius[kind]),
-    },
-  ]);
-  activeMesh.getScene().beginAnimation(activeMesh, 0, 100);
-
-  return activeMesh;
 }
 
 // Enforced types are required to animate a GUI Element

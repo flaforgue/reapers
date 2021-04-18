@@ -5,10 +5,15 @@
     SideMoveDirection,
     FrontMoveDirection,
     CharacterDTO,
+    CharacterKind,
   } from '@reapers/game-client';
   import { targetInfos } from '../../../stores';
   import { Key } from '../../../configs/keycodes.config';
-  import { isFrontMoveDirection, isSideMoveDirection } from './PlayerController.utils';
+  import {
+    createHighlightMesh,
+    isFrontMoveDirection,
+    isSideMoveDirection,
+  } from './PlayerController.utils';
 
   export let updateFrontMoveDirection: (direction: FrontMoveDirection) => void;
   export let updateSideMoveDirection: (direction: SideMoveDirection) => void;
@@ -18,6 +23,13 @@
   export let camera: BABYLON.ArcRotateCamera | undefined;
   export let scene: BABYLON.Scene | undefined;
 
+  const activeMeshRadius: Record<CharacterKind, number> = {
+    [CharacterKind.Player]: 1.5,
+    [CharacterKind.Frog]: 2.5,
+    [CharacterKind.Spider]: 3.5,
+  };
+
+  let highlightMesh: BABYLON.Mesh | undefined;
   let keyboardEventObserver:
     | BABYLON.Nullable<BABYLON.Observer<BABYLON.KeyboardInfo>>
     | undefined;
@@ -95,8 +107,51 @@
     }
   }
 
+  function initController() {
+    if (scene) {
+      keyboardEventObserver = scene?.onKeyboardObservable?.add(keyboardEventHandler);
+      highlightMesh = createHighlightMesh(scene);
+    }
+  }
+
+  function setHighlightMeshParent(id: string | undefined) {
+    if (highlightMesh) {
+      highlightMesh.setEnabled(Boolean($targetInfos?.id));
+
+      if (highlightMesh.isEnabled() && $targetInfos) {
+        highlightMesh.setParent($targetInfos?.transformNode);
+        highlightMesh.position.x = 0;
+        highlightMesh.position.y = 0.001;
+        highlightMesh.position.z = 0;
+        highlightMesh.animations[0].setKeys([
+          {
+            frame: 0,
+            value: new BABYLON.Vector3().setAll(0),
+          },
+          {
+            frame: 10,
+            value: new BABYLON.Vector3().setAll(activeMeshRadius[$targetInfos.kind]),
+          },
+          {
+            frame: 20,
+            value: new BABYLON.Vector3().setAll(
+              activeMeshRadius[$targetInfos.kind] * 0.7,
+            ),
+          },
+          {
+            frame: 30,
+            value: new BABYLON.Vector3().setAll(activeMeshRadius[$targetInfos.kind]),
+          },
+        ]);
+        scene?.beginAnimation(highlightMesh, 0, 100);
+      }
+    }
+  }
+
   $: {
-    keyboardEventObserver = scene?.onKeyboardObservable?.add(keyboardEventHandler);
+    if (scene) {
+      initController();
+    }
   }
 
   $: cameraId = camera?.id;
@@ -106,7 +161,13 @@
     }
   }
 
+  $: targetInfosId = $targetInfos?.id;
+  $: {
+    setHighlightMeshParent(targetInfosId);
+  }
+
   onDestroy(() => {
     scene?.onKeyboardObservable?.remove(keyboardEventObserver ?? null);
+    highlightMesh?.dispose();
   });
 </script>

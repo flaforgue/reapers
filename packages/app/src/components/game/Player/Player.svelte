@@ -9,7 +9,6 @@
   import { playerInfos, targetInfos } from '../../../stores';
 
   export let assetContainer: BABYLON.AssetContainer | undefined;
-  export let baseHighlightMesh: BABYLON.Mesh | undefined;
   export let camera: BABYLON.ArcRotateCamera | undefined = undefined;
   export let player: CharacterDTO = new CharacterDTO();
   export let gui: GUI.AdvancedDynamicTexture | undefined;
@@ -74,11 +73,9 @@
   }
 
   function createPlayerLabel() {
-    console.log('createPlayerLabel');
     if (rootMeshes[0] && gui) {
       label?.dispose();
       label = createLinkedLabel(`${name} • ${level}`, kind, rootMeshes[0]);
-      console.log(label);
       gui.addControl(label);
     }
   }
@@ -152,6 +149,5 @@
   {animationGroups}
   {attack}
   {characterAnimationKeys}
-  {baseHighlightMesh}
   {gui}
 />
