@@ -36,3 +36,41 @@ export function createHighlightMesh(scene: BABYLON.Scene): BABYLON.Mesh {
 
   return highlightMesh;
 }
+
+export function createRangeParticleSytem(
+  scene: BABYLON.Scene,
+  range: number,
+): BABYLON.ParticleSystem {
+  const noiseTexture = new BABYLON.NoiseProceduralTexture('perlin', 256, scene);
+  noiseTexture.animationSpeedFactor = 5;
+  noiseTexture.persistence = 2;
+  noiseTexture.brightness = 0.5;
+  noiseTexture.octaves = 2;
+
+  const particleTexture = new BABYLON.Texture('/textures/flare.png', scene);
+  const particleColor = new BABYLON.Color4(0.2, 0.2, 0.85, 1);
+  const ps = new BABYLON.ParticleSystem('particles', 1000, scene);
+  ps.createDirectedCylinderEmitter(
+    range,
+    0.1,
+    0,
+    BABYLON.Vector3.Up(),
+    BABYLON.Vector3.Up(),
+  );
+  ps.particleTexture = particleTexture;
+  ps.color1 = particleColor;
+  ps.color2 = particleColor;
+  ps.colorDead = particleColor;
+  ps.noiseTexture = noiseTexture;
+  ps.noiseStrength = new BABYLON.Vector3(10, 10, 10);
+  ps.minEmitPower = 0.1;
+  ps.maxEmitPower = 0.5;
+  ps.manualEmitCount = 0;
+  ps.minLifeTime = 0.2;
+  ps.maxLifeTime = 0.4;
+  ps.addSizeGradient(0, 0.3);
+  ps.addSizeGradient(1, 0);
+  ps.start();
+
+  return ps;
+}

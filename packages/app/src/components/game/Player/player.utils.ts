@@ -97,7 +97,7 @@ function createTrailParticleSystem(
   return ps;
 }
 
-export function createParticleSystem(
+export function createAttackParticleSystem(
   scene: BABYLON.Scene,
   attackLinearSpeed: number,
 ): BABYLON.ParticleSystem {

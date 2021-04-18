@@ -4,7 +4,11 @@
   import { onDestroy } from 'svelte';
   import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
   import { disposeArray } from '../../../utils';
-  import { AnimationKey, createLinkedLabel, createParticleSystem } from './player.utils';
+  import {
+    AnimationKey,
+    createLinkedLabel,
+    createAttackParticleSystem,
+  } from './player.utils';
   import Character from '../Character/Character.svelte';
   import { playerInfos, targetInfos } from '../../../stores';
 
@@ -24,7 +28,7 @@
   let rootMeshes: BABYLON.Mesh[] = [];
   let skeletons: BABYLON.Skeleton[] = [];
   let animationGroups: BABYLON.AnimationGroup[] = [];
-  let particleSystem: BABYLON.ParticleSystem | undefined;
+  let attackParticleSystem: BABYLON.ParticleSystem | undefined;
   let label: GUI.TextBlock | undefined;
 
   function instantiateModels() {
@@ -46,11 +50,14 @@
     if (currentAttack && scene && player?.position) {
       const targetPosition = currentAttack.targetPosition;
 
-      if (!particleSystem) {
-        particleSystem = createParticleSystem(scene, player.attackLinearSpeed);
+      if (!attackParticleSystem) {
+        attackParticleSystem = createAttackParticleSystem(
+          scene,
+          player.attackLinearSpeed,
+        );
       }
 
-      particleSystem.emitter = new BABYLON.Vector3(
+      attackParticleSystem.emitter = new BABYLON.Vector3(
         player.position.x,
         player.position.y,
         player.position.z,
@@ -61,14 +68,14 @@
         targetPosition.y,
         targetPosition.z,
       )
-        .subtract(particleSystem.emitter)
+        .subtract(attackParticleSystem.emitter)
         .normalize();
 
-      particleSystem.direction1 = directionToTarget;
-      particleSystem.direction2 = directionToTarget;
-      particleSystem.minLifeTime = currentAttack.timeToHit;
-      particleSystem.maxLifeTime = currentAttack.timeToHit;
-      particleSystem.manualEmitCount = 3;
+      attackParticleSystem.direction1 = directionToTarget;
+      attackParticleSystem.direction2 = directionToTarget;
+      attackParticleSystem.minLifeTime = currentAttack.timeToHit;
+      attackParticleSystem.maxLifeTime = currentAttack.timeToHit;
+      attackParticleSystem.manualEmitCount = 3;
     }
   }
 
@@ -131,11 +138,11 @@
   }
 
   onDestroy(() => {
-    const particleSystems = (particleSystem?.subEmitters ?? []).map(
+    const particleSystems = (attackParticleSystem?.subEmitters ?? []).map(
       (s) => (s as BABYLON.SubEmitter).particleSystem,
     );
     disposeArray(particleSystems);
-    particleSystem?.dispose();
+    attackParticleSystem?.dispose();
     disposeArray(animationGroups);
     disposeArray(rootMeshes);
     disposeArray(skeletons);

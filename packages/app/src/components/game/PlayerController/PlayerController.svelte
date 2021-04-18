@@ -11,6 +11,7 @@
   import { Key } from '../../../configs/keycodes.config';
   import {
     createHighlightMesh,
+    createRangeParticleSytem,
     isFrontMoveDirection,
     isSideMoveDirection,
   } from './PlayerController.utils';
@@ -29,6 +30,7 @@
     [CharacterKind.Spider]: 3.5,
   };
 
+  let rangeParticleSystem: BABYLON.ParticleSystem | undefined;
   let highlightMesh: BABYLON.Mesh | undefined;
   let keyboardEventObserver:
     | BABYLON.Nullable<BABYLON.Observer<BABYLON.KeyboardInfo>>
@@ -53,8 +55,13 @@
 
       if (distanceToTarget <= player.attackRange) {
         castSpell($targetInfos.id);
-      } else {
-        console.info('Out of attack range');
+      } else if (rangeParticleSystem && !rangeParticleSystem.isAlive()) {
+        rangeParticleSystem.emitter = new BABYLON.Vector3(
+          player.position.x,
+          0.5,
+          player.position.z,
+        );
+        rangeParticleSystem.manualEmitCount = 100;
       }
     }
   }
@@ -108,9 +115,10 @@
   }
 
   function initController() {
-    if (scene) {
+    if (scene && player) {
       keyboardEventObserver = scene?.onKeyboardObservable?.add(keyboardEventHandler);
       highlightMesh = createHighlightMesh(scene);
+      rangeParticleSystem = createRangeParticleSytem(scene, player.attackRange);
     }
   }
 
@@ -148,8 +156,9 @@
     }
   }
 
+  $: isPlayerReady = Boolean(player?.id);
   $: {
-    if (scene) {
+    if (scene && isPlayerReady) {
       initController();
     }
   }
@@ -168,6 +177,7 @@
 
   onDestroy(() => {
     scene?.onKeyboardObservable?.remove(keyboardEventObserver ?? null);
+    rangeParticleSystem?.dispose();
     highlightMesh?.dispose();
   });
 </script>
