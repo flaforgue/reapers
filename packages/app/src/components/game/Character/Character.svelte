@@ -1,7 +1,6 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
-  import { onDestroy } from 'svelte';
   import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
   import { targetInfos } from '../../../stores';
   import { createAttackLabel, animateAttackLabel } from './character.utils';
@@ -17,7 +16,6 @@
     console.warn('props attack uses default empty value');
   };
 
-  let highlightMesh: BABYLON.Mesh | undefined;
   let currentAnimation: BABYLON.AnimationGroup | undefined;
 
   function updatePosition(x = 0, y = 0, z = 0) {
@@ -215,9 +213,6 @@
 
     if (isTarget && reactivityDeps) {
       updateGUITargetInfos();
-    } else if (highlightMesh) {
-      highlightMesh.dispose();
-      highlightMesh = undefined;
     }
   }
 
@@ -236,8 +231,4 @@
       attackAsync();
     }
   }
-
-  onDestroy(() => {
-    highlightMesh?.dispose();
-  });
 </script>

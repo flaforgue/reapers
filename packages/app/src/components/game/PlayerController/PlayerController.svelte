@@ -117,9 +117,9 @@
   function setHighlightMeshParent(id: string | undefined) {
     if (highlightMesh) {
       highlightMesh.setEnabled(Boolean($targetInfos?.id));
+      highlightMesh.setParent($targetInfos?.transformNode ?? null);
 
-      if (highlightMesh.isEnabled() && $targetInfos) {
-        highlightMesh.setParent($targetInfos?.transformNode);
+      if ($targetInfos) {
         highlightMesh.position.x = 0;
         highlightMesh.position.y = 0.001;
         highlightMesh.position.z = 0;
