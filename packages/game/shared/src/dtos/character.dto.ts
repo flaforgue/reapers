@@ -30,13 +30,13 @@ export default class CharacterDTO extends PositionableDTO {
   public currentAttack: AttackDTO | null = null;
 
   @Expose()
-  public isAttacking: boolean = false;
+  public isAttacking = false;
 
   @Expose()
-  public canMove: boolean = true;
+  public canMove = true;
 
   @Expose()
-  public isAlive: boolean = true;
+  public isAlive = true;
 
   @Expose()
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;

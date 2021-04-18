@@ -1,5 +1,4 @@
-import * as BABYLON from '@babylonjs/core';
-import { BoundedValueDTO, CharacterDTO, CharacterKind } from '@reapers/game-client';
+import { CharacterDTO } from '@reapers/game-client';
 import { writable } from 'svelte/store';
 
 export enum FocusElement {

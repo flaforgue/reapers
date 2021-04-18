@@ -24,12 +24,13 @@ export default class Monster extends Character {
   public constructor(
     name: string,
     level: number,
-    mesh: BABYLON.Mesh,
+    mesh: BABYLON.InstancedMesh,
     generator: MonsterGenerator,
     position?: BABYLON.Vector3,
     rotation?: BABYLON.Vector3,
+    scaling?: BABYLON.Vector3,
   ) {
-    super(name, level, mesh, position, rotation);
+    super(name, level, mesh, position, rotation, scaling);
 
     this._generator = generator;
     this._initialPosition = this.position.clone();
@@ -45,7 +46,7 @@ export default class Monster extends Character {
     }, 0.5);
   }
 
-  public get destination() {
+  public get destination(): BABYLON.Vector3 {
     return this._destination;
   }
 
@@ -53,7 +54,7 @@ export default class Monster extends Character {
     this._destination = new BABYLON.Vector3(dest.x, this._initialPosition.y, dest.z);
   }
 
-  public update() {
+  public update(): void {
     const distanceFromInitialPosition = this.getDistanceTo(this._initialPosition);
 
     if (distanceFromInitialPosition >= maxDistanceFromInitialPosition) {
@@ -90,11 +91,11 @@ export default class Monster extends Character {
     super.update();
   }
 
-  private _isAtDestination() {
+  private _isAtDestination(): boolean {
     return this.getDistanceTo(this.destination) <= this.attackRange;
   }
 
-  public receiveAttack(attack: Attack) {
+  public receiveAttack(attack: Attack): void {
     super.receiveAttack(attack);
 
     if (!this._isGoingBackToInitialPosition) {
@@ -103,12 +104,12 @@ export default class Monster extends Character {
     }
   }
 
-  protected _die() {
+  protected _die(): void {
     this._generator.nbMonsters--;
     this.destroy();
   }
 
-  private _goBackToInitialPosition() {
+  private _goBackToInitialPosition(): void {
     if (!this._isGoingBackToInitialPosition) {
       this._target = null;
       this._destination = this._initialPosition;

@@ -58,8 +58,6 @@
         `${kind}.glb`,
         gameScene,
         (result) => {
-          result.meshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
-
           for (let i = 0; i < result.animationGroups.length; i++) {
             result.animationGroups[i].reset().stop();
           }

@@ -4,7 +4,7 @@
   import { onDestroy } from 'svelte';
   import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
   import { disposeArray } from '../../../utils';
-  import { AnimationKey, createParticleSystem } from './player.utils';
+  import { AnimationKey, createLinkedLabel, createParticleSystem } from './player.utils';
   import Character from '../Character/Character.svelte';
   import { playerInfos, targetInfos } from '../../../stores';
 
@@ -26,6 +26,7 @@
   let skeletons: BABYLON.Skeleton[] = [];
   let animationGroups: BABYLON.AnimationGroup[] = [];
   let particleSystem: BABYLON.ParticleSystem | undefined;
+  let label: GUI.TextBlock | undefined;
 
   function instantiateModels() {
     const entries = assetContainer?.instantiateModelsToScene((sourceName) => {
@@ -34,6 +35,7 @@
 
     skeletons = entries?.skeletons ?? [];
     rootMeshes = (entries?.rootNodes ?? []) as BABYLON.Mesh[];
+    rootMeshes[0].scaling = new BABYLON.Vector3(0.3, 0.3, -0.3);
     animationGroups = entries?.animationGroups ?? [];
     animationGroups[AnimationKey.Walk].speedRatio = 2;
     shadowGenerator?.addShadowCaster(rootMeshes[0] as BABYLON.AbstractMesh);
@@ -68,6 +70,16 @@
       particleSystem.minLifeTime = currentAttack.timeToHit;
       particleSystem.maxLifeTime = currentAttack.timeToHit;
       particleSystem.manualEmitCount = 3;
+    }
+  }
+
+  function createPlayerLabel() {
+    console.log('createPlayerLabel');
+    if (rootMeshes[0] && gui) {
+      label?.dispose();
+      label = createLinkedLabel(`${name} • ${level}`, kind, rootMeshes[0]);
+      console.log(label);
+      gui.addControl(label);
     }
   }
 
@@ -111,6 +123,16 @@
     }
   }
 
+  $: name = player.name;
+  $: level = player.level;
+  $: kind = player.kind;
+  $: isRootMeshReady = Boolean(rootMeshes[0]);
+  $: {
+    if (isRootMeshReady && gui && name && level && kind) {
+      createPlayerLabel();
+    }
+  }
+
   onDestroy(() => {
     const particleSystems = (particleSystem?.subEmitters ?? []).map(
       (s) => (s as BABYLON.SubEmitter).particleSystem,
@@ -120,6 +142,7 @@
     disposeArray(animationGroups);
     disposeArray(rootMeshes);
     disposeArray(skeletons);
+    label?.dispose();
   });
 </script>
 

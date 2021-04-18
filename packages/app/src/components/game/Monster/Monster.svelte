@@ -13,6 +13,8 @@
   export let gui: GUI.AdvancedDynamicTexture | undefined;
   export let shadowGenerator: BABYLON.CascadedShadowGenerator | undefined;
 
+  const monsterScalingFactor = 0.3;
+
   const animationKeys = monsterAnimationKeys[(monster.kind as unknown) as MonsterKind];
   const characterAnimationKeys = {
     attack: animationKeys.Attack,
@@ -33,6 +35,12 @@
 
     skeletons = entries?.skeletons ?? [];
     rootMeshes = (entries?.rootNodes ?? []) as BABYLON.Mesh[];
+    rootMeshes[0].scaling = new BABYLON.Vector3(
+      monster.scaling.x * monsterScalingFactor,
+      monster.scaling.y * monsterScalingFactor,
+      monster.scaling.z * -1 * monsterScalingFactor,
+    );
+    console.log(rootMeshes[0].scaling);
     animationGroups = entries?.animationGroups ?? [];
     animationGroups[animationKeys.Walk].speedRatio = 1.7;
     shadowGenerator?.addShadowCaster(rootMeshes[0] as BABYLON.AbstractMesh);

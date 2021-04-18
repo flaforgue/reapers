@@ -3,13 +3,7 @@ import * as http from 'http';
 import express from 'express';
 import { registerPlayerHandlers, registerSystemHandlers } from './handlers';
 import config from './config';
-import {
-  GameEvents,
-  plainToClass,
-  CharacterDTO,
-  GameDTO,
-  WorldDTO,
-} from '@reapers/game-shared';
+import { GameEvents, plainToClass, CharacterDTO, WorldDTO } from '@reapers/game-shared';
 import Game from './core/game';
 
 const port = config.port;

@@ -18,7 +18,7 @@ export default class Character extends Positionable {
   public readonly attackTimeToCast: number = 0.1;
   public readonly speedFactor: VariableValue;
 
-  public isAttacking: boolean = false;
+  public isAttacking = false;
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
 
@@ -31,62 +31,64 @@ export default class Character extends Positionable {
   private _currentAttacks: Attack[] = [];
   private _isDestroyed = false;
   private _speed = config.game.moveStep;
-  private _low_speed = this._speed * Math.SQRT1_2;
+  private _lowSpeed: number;
 
   public constructor(
     name: string,
     level: number,
-    mesh: BABYLON.Mesh,
+    mesh: BABYLON.InstancedMesh,
     position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
     rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
+    scaling: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
   ) {
-    super(mesh, name, position, rotation);
+    super(mesh, name, position, rotation, scaling);
 
     this.level = level;
     this.life = this._createLifeBoudedValue();
     this.attackDamageAmount = this._createAttackDamageAmount();
+    this._lowSpeed = this._speed * Math.SQRT1_2;
     this.speedFactor = new VariableValue(1, (newCurrent: number) => {
       this._speed = config.game.moveStep * newCurrent;
-      this._low_speed = this._speed * Math.SQRT1_2;
+      this._lowSpeed = this._speed * Math.SQRT1_2;
     });
   }
 
-  public get isAlive() {
+  public get isAlive(): boolean {
     return this._isAlive;
   }
 
-  public get kind() {
+  public get kind(): CharacterKind {
     return this._kind;
   }
 
-  public get currentAttack() {
+  public get currentAttack(): Attack {
     return this._currentAttacks[this._currentAttacks.length - 1] ?? null;
   }
 
-  public get isDestroyed() {
+  public get isDestroyed(): boolean {
     return this._isDestroyed;
   }
 
-  public get canMove() {
+  public get canMove(): boolean {
     return this._isAlive && !this.isAttacking;
   }
 
-  public get currentSpeed() {
+  public get currentSpeed(): number {
     return this.sideMoveDirection === SideMoveDirection.None ||
       this.frontMoveDirection === FrontMoveDirection.None
       ? this._speed
-      : this._low_speed;
+      : this._lowSpeed;
   }
 
-  protected _createLifeBoudedValue() {
+  protected _createLifeBoudedValue(): BoundedValue {
     return new BoundedValue();
   }
 
-  protected _createAttackDamageAmount() {
+  protected _createAttackDamageAmount(): number {
     return 0;
   }
 
-  public update() {
+  public update(): void {
     if (this._shouldMoveWithCollisions) {
       this._moveWithCollisions();
     } else {
@@ -102,7 +104,7 @@ export default class Character extends Positionable {
     }
   }
 
-  private _moveWithCollisions() {
+  private _moveWithCollisions(): void {
     // front move
     const move = new BABYLON.Vector3(
       this.frontMoveDirection * Math.sin(this.rotation.y) * -1,
@@ -119,7 +121,7 @@ export default class Character extends Positionable {
     );
   }
 
-  private _moveWithoutCollisions() {
+  private _moveWithoutCollisions(): void {
     this._mesh.movePOV(
       this.sideMoveDirection * this.currentSpeed,
       0,
@@ -127,7 +129,7 @@ export default class Character extends Positionable {
     );
   }
 
-  public attackIfInRange(target: Character) {
+  public attackIfInRange(target: Character): void {
     const distanceToTarget = this.getDistanceTo(target.position);
 
     if (distanceToTarget <= this.attackRange) {
@@ -135,7 +137,7 @@ export default class Character extends Positionable {
     }
   }
 
-  protected _attack(target: Character, distanceToTarget: number) {
+  protected _attack(target: Character, distanceToTarget: number): void {
     this._lookAtY(target.position);
     this.frontMoveDirection = FrontMoveDirection.None;
     this.sideMoveDirection = SideMoveDirection.None;
@@ -149,7 +151,7 @@ export default class Character extends Positionable {
     );
   }
 
-  public receiveAttack(attack: Attack) {
+  public receiveAttack(attack: Attack): void {
     this.life.remove(attack.damageAmount);
 
     if (this._isAlive && this.life.value <= 0) {
@@ -157,18 +159,18 @@ export default class Character extends Positionable {
     }
   }
 
-  public dieAsync() {
+  public dieAsync(): void {
     this._isAlive = false;
     this._currentAttacks = [];
 
     setTimeout(() => this._die(), 2000);
   }
 
-  protected _die() {
+  protected _die(): void {
     console.warn('No _die implementation', this.kind);
   }
 
-  public destroy() {
+  public destroy(): void {
     super.destroy();
 
     this._isAlive = false;

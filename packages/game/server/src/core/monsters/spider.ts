@@ -11,29 +11,31 @@ export default class Spider extends Monster {
   protected readonly _kind: CharacterKind = CharacterKind.Spider;
 
   public constructor(
-    scene: BABYLON.Scene,
+    baseMesh: BABYLON.Mesh,
     level: number,
     generator: MonsterGenerator,
     position?: BABYLON.Vector3,
     rotation?: BABYLON.Vector3,
+    scaling?: BABYLON.Vector3,
   ) {
     super(
       CharacterKind.Spider,
       level,
-      new BABYLON.Mesh('', scene),
+      baseMesh.createInstance(''),
       generator,
       position,
       rotation,
+      scaling,
     );
 
     this.speedFactor.current = 2;
   }
 
-  protected _createLifeBoudedValue() {
+  protected _createLifeBoudedValue(): BoundedValue {
     return new BoundedValue(0, 100 + 5 * this.level);
   }
 
-  protected _createAttackDamageAmount() {
+  protected _createAttackDamageAmount(): number {
     return 11 + this.level;
   }
 }

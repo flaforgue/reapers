@@ -1,6 +1,9 @@
 import * as BABYLON from 'babylonjs';
 
-function getRandomVector3(origin: BABYLON.Vector3, distances: BABYLON.Vector3) {
+function getRandomVector3(
+  origin: BABYLON.Vector3,
+  distances: BABYLON.Vector3,
+): BABYLON.Vector3 {
   return new BABYLON.Vector3(
     Math.floor(Math.random() * distances.x * 2 - distances.x) + origin.x,
     Math.floor(Math.random() * distances.y * 2 - distances.y) + origin.y,
@@ -8,12 +11,20 @@ function getRandomVector3(origin: BABYLON.Vector3, distances: BABYLON.Vector3) {
   );
 }
 
-export function getRandomPosition(origin: BABYLON.Vector3, distance: number) {
+export function getRandomPosition(
+  origin: BABYLON.Vector3,
+  distance: number,
+): BABYLON.Vector3 {
   return getRandomVector3(origin, new BABYLON.Vector3(distance, 0, distance));
 }
 
-export function getRandomRotation(origin: BABYLON.Vector3, distance: number) {
-  return getRandomVector3(origin, new BABYLON.Vector3(0, distance, 0));
+export function optimizeMotionlessMesh(mesh: BABYLON.Mesh | BABYLON.InstancedMesh): void {
+  mesh.freezeWorldMatrix();
+  mesh.doNotSyncBoundingInfo = true;
+
+  if (mesh instanceof BABYLON.Mesh) {
+    mesh.freezeNormals();
+  }
 }
 
 // export function getRotationYTo(from: BABYLON.Vector3, to: BABYLON.Vector3) {

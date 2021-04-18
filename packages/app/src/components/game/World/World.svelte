@@ -19,36 +19,40 @@
   let sound: BABYLON.Sound | undefined;
   let skyBox: BABYLON.Mesh | undefined;
 
-  function createTrees() {
-    const instanceCount = world.trees.length;
-    const matricesData = new Float32Array(16 * instanceCount);
+  function createPawns() {
+    const instanceCount = world.pawns.length;
+    const matricesDatas: Record<PawnKind, Float32Array> = {
+      [PawnKind.PineTree]: new Float32Array(16 * instanceCount),
+    };
 
-    for (let i = 0; i < world.trees.length; i++) {
+    for (let i = 0; i < world.pawns.length; i++) {
       BABYLON.Matrix.Compose(
         new BABYLON.Vector3(
-          world.trees[i].scaling.x,
-          world.trees[i].scaling.y,
-          world.trees[i].scaling.z,
+          world.pawns[i].scaling.x,
+          world.pawns[i].scaling.y,
+          world.pawns[i].scaling.z,
         ),
         new BABYLON.Vector3(
-          world.trees[i].rotation.x,
-          world.trees[i].rotation.y,
-          world.trees[i].rotation.z,
+          world.pawns[i].rotation.x,
+          world.pawns[i].rotation.y,
+          world.pawns[i].rotation.z,
         ).toQuaternion(),
         new BABYLON.Vector3(
-          world.trees[i].position.x,
-          world.trees[i].position.y,
-          world.trees[i].position.z,
+          world.pawns[i].position.x,
+          world.pawns[i].position.y,
+          world.pawns[i].position.z,
         ),
-      ).copyToArray(matricesData, i * 16);
+      ).copyToArray(matricesDatas[world.pawns[i].kind], i * 16);
     }
 
-    (basePawnMeshes[PawnKind.PineTree] as BABYLON.Mesh).thinInstanceSetBuffer(
-      'matrix',
-      matricesData,
-      16,
-      true,
-    );
+    for (const pawnKind in PawnKind) {
+      (basePawnMeshes[pawnKind as PawnKind] as BABYLON.Mesh).thinInstanceSetBuffer(
+        'matrix',
+        matricesDatas[pawnKind as PawnKind],
+        16,
+        true,
+      );
+    }
   }
 
   $: ({ width, depth } = world);
@@ -70,11 +74,11 @@
     }
   }
 
-  $: isPineTreeBaseMeshReady = Boolean(basePawnMeshes[PawnKind.PineTree]);
-  $: nbTrees = world.trees.length;
+  $: arePawnBaseMeshReady = !Object.values(basePawnMeshes).some((v) => !v);
+  $: nbPawns = world.pawns.length;
   $: {
-    if (isPineTreeBaseMeshReady && nbTrees) {
-      createTrees();
+    if (arePawnBaseMeshReady && nbPawns) {
+      createPawns();
     }
   }
 

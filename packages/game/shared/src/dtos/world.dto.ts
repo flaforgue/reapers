@@ -12,5 +12,5 @@ export default class WorldDTO extends PositionableDTO {
 
   @Expose()
   @Type(() => PawnDTO)
-  public trees: PawnDTO[] = [];
+  public pawns: PawnDTO[] = [];
 }

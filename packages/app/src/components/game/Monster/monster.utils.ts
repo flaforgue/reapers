@@ -22,7 +22,7 @@ export const monsterAnimationKeys: Record<MonsterKind, AnimationKeyType> = {
   [CharacterKind.Frog]: FrogAnimationKey,
 };
 
-export function createParticleSystem(scene: BABYLON.Scene) {
+export function createParticleSystem(scene: BABYLON.Scene): BABYLON.ParticleSystem {
   const ps = new BABYLON.ParticleSystem('particles', 1000, scene);
   const particleColor = new BABYLON.Color4(0.85, 0.2, 0.2, 1);
 

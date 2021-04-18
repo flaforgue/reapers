@@ -1,6 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 
-export function createLight(scene: BABYLON.Scene) {
+export function createLight(scene: BABYLON.Scene): BABYLON.DirectionalLight {
   const light = new BABYLON.DirectionalLight(
     'directionalLight',
     new BABYLON.Vector3(0, -10, 0),
@@ -11,14 +11,18 @@ export function createLight(scene: BABYLON.Scene) {
   return light;
 }
 
-export function createSound(scene: BABYLON.Scene) {
+export function createSound(scene: BABYLON.Scene): BABYLON.Sound {
   return new BABYLON.Sound('cello', '/sounds/battle.wav', scene, null, {
     loop: true,
     autoplay: false,
   });
 }
 
-export function createSkyBox(scene: BABYLON.Scene, width: number, depth: number) {
+export function createSkyBox(
+  scene: BABYLON.Scene,
+  width: number,
+  depth: number,
+): BABYLON.Mesh {
   const skybox = BABYLON.MeshBuilder.CreateBox(
     'skyBox',
     {
@@ -44,7 +48,11 @@ export function createSkyBox(scene: BABYLON.Scene, width: number, depth: number)
   return skybox;
 }
 
-export function createGround(width: number, depth: number, scene: BABYLON.Scene) {
+export function createGround(
+  width: number,
+  depth: number,
+  scene: BABYLON.Scene,
+): BABYLON.Mesh {
   const ground = BABYLON.MeshBuilder.CreateGround(
     'ground',
     { width, height: depth },

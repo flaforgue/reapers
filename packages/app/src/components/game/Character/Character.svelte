@@ -5,7 +5,6 @@
   import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
   import { targetInfos } from '../../../stores';
   import {
-    createLinkedLabel,
     createHighlightMesh,
     createAttackLabel,
     animateAttackLabel,
@@ -23,7 +22,6 @@
     console.warn('props attack uses default empty value');
   };
 
-  let label: GUI.TextBlock | undefined;
   let highlightMesh: BABYLON.Mesh | undefined;
   let currentAnimation: BABYLON.AnimationGroup | undefined;
 
@@ -73,14 +71,6 @@
       $targetInfos = character;
     } else {
       $targetInfos = null;
-    }
-  }
-
-  function createCharacterLabel() {
-    if (rootMesh && gui) {
-      label?.dispose();
-      label = createLinkedLabel(`${name} • ${level}`, kind, rootMesh);
-      gui.addControl(label);
     }
   }
 
@@ -212,12 +202,6 @@
   $: name = character.name;
   $: level = character.level;
   $: kind = character.kind;
-  $: {
-    if (isRootMeshReady && gui && name && level && kind) {
-      createCharacterLabel();
-    }
-  }
-
   $: isTarget = $targetInfos?.id === character.id;
   $: isAlive = character.isAlive;
   $: lifeMin = character.life.min;
@@ -262,7 +246,6 @@
   }
 
   onDestroy(() => {
-    label?.dispose();
     highlightMesh?.dispose();
   });
 </script>

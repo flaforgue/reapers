@@ -6,13 +6,13 @@ import Vector3DTO from './vector3.dto';
 @Exclude()
 export default class AttackDTO extends IdentifiableDTO {
   @Expose()
-  targetId: string = '';
+  public targetId = '';
 
   @Expose()
-  targetKind: CharacterKind = CharacterKind.Player;
+  public targetKind: CharacterKind = CharacterKind.Player;
 
   @Expose()
-  isTargetAlive: boolean = true;
+  public isTargetAlive = true;
 
   @Expose()
   @Type(() => Vector3DTO)
@@ -23,11 +23,11 @@ export default class AttackDTO extends IdentifiableDTO {
   };
 
   @Expose()
-  timeToHit: number = 0;
+  public timeToHit = 0;
 
   @Expose()
-  timeToCast: number = 0;
+  public timeToCast = 0;
 
   @Expose()
-  damageAmount: number = 0;
+  public damageAmount = 0;
 }

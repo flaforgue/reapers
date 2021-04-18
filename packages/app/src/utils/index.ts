@@ -1,10 +1,23 @@
 import * as BABYLON from '@babylonjs/core';
 
-export function disposeArray(arr: BABYLON.IDisposable[]) {
+export function disposeArray(arr: BABYLON.IDisposable[]): void {
   arr.map((item) => item.dispose());
 }
 
-function worldToScreen(worldPosition: BABYLON.Vector3, scene: BABYLON.Scene) {
+type ScreenPosition = {
+  x: number;
+  y: number;
+};
+
+type ScreenPositionData = ScreenPosition & {
+  screenWidth: number;
+  screenHeight: number;
+};
+
+function worldToScreen(
+  worldPosition: BABYLON.Vector3,
+  scene: BABYLON.Scene,
+): ScreenPositionData {
   const engine = scene.getEngine();
   const camera = scene.activeCamera as BABYLON.ArcRotateCamera;
   const screenWidth = engine.getRenderWidth();
@@ -24,11 +37,14 @@ function worldToScreen(worldPosition: BABYLON.Vector3, scene: BABYLON.Scene) {
   };
 }
 
-export function worldToGUI(worldPosition: BABYLON.Vector3, scene: BABYLON.Scene) {
+export function worldToGUI(
+  worldPosition: BABYLON.Vector3,
+  scene: BABYLON.Scene,
+): ScreenPosition {
   const screenPosition = worldToScreen(worldPosition, scene);
 
   return {
-    x: (screenPosition.x - screenPosition.screenWidth / 2).toFixed(1),
-    y: (screenPosition.y - screenPosition.screenHeight / 2).toFixed(1),
+    x: Number((screenPosition.x - screenPosition.screenWidth / 2).toFixed(1)),
+    y: Number((screenPosition.y - screenPosition.screenHeight / 2).toFixed(1)),
   };
 }

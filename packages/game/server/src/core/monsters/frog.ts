@@ -11,29 +11,31 @@ export default class Frog extends Monster {
   protected readonly _kind: CharacterKind = CharacterKind.Frog;
 
   public constructor(
-    scene: BABYLON.Scene,
+    baseMesh: BABYLON.Mesh,
     level: number,
     generator: MonsterGenerator,
     position?: BABYLON.Vector3,
     rotation?: BABYLON.Vector3,
+    scaling?: BABYLON.Vector3,
   ) {
     super(
       CharacterKind.Frog,
       level,
-      new BABYLON.Mesh('', scene),
+      baseMesh.createInstance(''),
       generator,
       position,
       rotation,
+      scaling,
     );
 
     this.speedFactor.current = 1.5;
   }
 
-  protected _createLifeBoudedValue() {
+  protected _createLifeBoudedValue(): BoundedValue {
     return new BoundedValue(0, 100 + 8 * this.level);
   }
 
-  protected _createAttackDamageAmount() {
+  protected _createAttackDamageAmount(): number {
     return 8 + this.level;
   }
 }

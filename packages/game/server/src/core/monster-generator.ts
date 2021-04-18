@@ -1,7 +1,7 @@
 import * as BABYLON from 'babylonjs';
 import Monster from './monsters/monster';
 import ActionScheduler from './shared/action-scheduler';
-import { getRandomPosition, getRandomRotation } from '../utils';
+import { getRandomPosition, optimizeMotionlessMesh } from '../utils';
 import Positionable from './positionable';
 
 type MonsterGeneratorConfig = {
@@ -13,11 +13,12 @@ type MonsterGeneratorConfig = {
 };
 
 type MonsterConstructor<T extends Monster = Monster> = new (
-  scene: BABYLON.Scene,
+  baseMesh: BABYLON.Mesh,
   level: number,
   generator: MonsterGenerator,
   position: BABYLON.Vector3,
   rotation: BABYLON.Vector3,
+  scaling: BABYLON.Vector3,
 ) => T;
 
 const defaultConfig = {
@@ -35,43 +36,44 @@ export default class MonsterGenerator extends Positionable {
   public nbMonsters = 0;
 
   public constructor(
-    scene: BABYLON.Scene,
+    baseMesh: BABYLON.Mesh,
     instanceClass: MonsterConstructor,
     position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
     config: Partial<MonsterGeneratorConfig> = {},
   ) {
-    super(new BABYLON.Mesh('', scene), 'MonsterGenerator', position);
+    super(baseMesh.createInstance(''), 'MonsterGenerator', position);
 
-    this._mesh.freezeWorldMatrix();
-    (this._mesh as BABYLON.Mesh).freezeNormals();
-    this._mesh.doNotSyncBoundingInfo = true;
+    optimizeMotionlessMesh(this._mesh);
+
     this._config = {
       ...defaultConfig,
       ...config,
     };
     this._instanceClass = instanceClass;
-    this._createMonsterScheduler = new ActionScheduler(
-      () => this.createMonster(),
+    this._createMonsterScheduler = new ActionScheduler<Monster>(
+      () => this.createMonster(baseMesh),
       this._config.interval,
     );
   }
 
-  public update() {
+  public update(): Monster | void {
     if (this.nbMonsters < this._config.nbMaxInstances) {
       return this._createMonsterScheduler.update();
     }
   }
 
-  public createMonster() {
-    const levelRange = this._config.levelMax - this._config.levelMin;
+  public createMonster(baseMesh: BABYLON.Mesh): Monster {
     this.nbMonsters++;
 
-    return new this._instanceClass(
-      this._mesh._scene,
-      Math.round(Math.random() * levelRange) + this._config.levelMin,
-      this,
-      getRandomPosition(this.position, this._config.radius),
-      getRandomRotation(this.rotation, this._config.radius),
+    const level = Math.round(
+      BABYLON.Scalar.RandomRange(this._config.levelMin, this._config.levelMax),
     );
+    const position = getRandomPosition(this.position, this._config.radius);
+    const rotation = new BABYLON.Vector3(0, BABYLON.Scalar.RandomRange(0, Math.PI), 0);
+    const scaling = new BABYLON.Vector3().setAll(
+      1 + 0.1 * ((1.5 * level) / this._config.levelMin),
+    );
+
+    return new this._instanceClass(baseMesh, level, this, position, rotation, scaling);
   }
 }

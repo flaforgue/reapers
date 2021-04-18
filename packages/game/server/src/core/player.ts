@@ -24,12 +24,13 @@ export default class Player extends Character {
 
   public constructor(
     socket: SocketIO.Socket,
-    scene: BABYLON.Scene,
+    baseMesh: BABYLON.Mesh,
     name: string,
     position?: BABYLON.Vector3,
     rotation?: BABYLON.Vector3,
+    scaling?: BABYLON.Vector3,
   ) {
-    super(name, 1, new BABYLON.Mesh('', scene), position, rotation);
+    super(name, 1, baseMesh.createInstance(''), position, rotation, scaling);
 
     this._mesh.checkCollisions = true;
     this._mesh.ellipsoid = new BABYLON.Vector3(0.25, 1, 0.25);
@@ -42,17 +43,17 @@ export default class Player extends Character {
     return new BoundedValue(0, 100 + 10 * this.level);
   }
 
-  public update() {
+  public update(): void {
     if (this.isAlive) {
       super.update();
     }
   }
 
-  public emitGameState(gameDto: GameDTO) {
+  public emitGameState(gameDto: GameDTO): void {
     this._socket.volatile.emit(GameEvents.Game.Updated, gameDto);
   }
 
-  protected _die() {
+  protected _die(): void {
     this.speedFactor.reset();
     this.isAttacking = false;
     this.frontMoveDirection = FrontMoveDirection.None;

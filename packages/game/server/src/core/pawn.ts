@@ -1,11 +1,10 @@
 import * as BABYLON from 'babylonjs';
 import { PawnKind } from '@reapers/game-shared';
-import Identifiable from './identifiable';
+import { optimizeMotionlessMesh } from '../utils';
+import Positionable from './positionable';
 
-export default class Pawn extends Identifiable {
+export default class Pawn extends Positionable {
   protected readonly _kind: PawnKind = PawnKind.PineTree;
-
-  private readonly _instance: BABYLON.InstancedMesh;
 
   public constructor(
     baseMesh: BABYLON.Mesh,
@@ -13,37 +12,13 @@ export default class Pawn extends Identifiable {
     rotation: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
     scaling: BABYLON.Vector3 = new BABYLON.Vector3(1, 1, 1),
   ) {
-    super();
+    super(baseMesh.createInstance(''), 'Pawn', position, rotation, scaling);
 
-    this._instance = baseMesh.createInstance('');
-    this._instance.checkCollisions = true;
-    this._instance.position = position;
-    this._instance.rotation = rotation;
-    this._instance.scaling = scaling;
-
-    this._instance.isPickable = false;
-    this._instance.alwaysSelectAsActiveMesh = true;
-    this._instance.freezeWorldMatrix();
-    this._instance.doNotSyncBoundingInfo = true;
+    this._mesh.checkCollisions = true;
+    optimizeMotionlessMesh(this._mesh);
   }
 
-  public get kind() {
+  public get kind(): PawnKind {
     return this._kind;
-  }
-
-  public get position() {
-    return this._instance.position;
-  }
-
-  public get rotation() {
-    return this._instance.rotation;
-  }
-
-  public get scaling() {
-    return this._instance.scaling;
-  }
-
-  destroy() {
-    this._instance.dispose();
   }
 }

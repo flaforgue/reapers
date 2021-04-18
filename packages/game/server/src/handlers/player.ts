@@ -3,15 +3,15 @@ import { GameEvents, SideMoveDirection, FrontMoveDirection } from '@reapers/game
 import Game from '../core/game';
 import Player from '../core/player';
 
-function isValidFrontMoveDirection(direction: unknown) {
+function isValidFrontMoveDirection(direction: unknown): boolean {
   return Boolean(FrontMoveDirection[Number(direction)]);
 }
 
-function isValidSideMoveDirection(direction: unknown) {
+function isValidSideMoveDirection(direction: unknown): boolean {
   return Boolean(SideMoveDirection[Number(direction)]);
 }
 
-export default (socket: Socket, game: Game, player: Player) => {
+export default (socket: Socket, game: Game, player: Player): void => {
   socket.on(
     GameEvents.Player.FrontMoveDirectionUpdated,
     (direction: FrontMoveDirection) => {

@@ -1,7 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
 
-export function showAxis(size: number, scene: BABYLON.Scene) {
+export function showAxis(size: number, scene: BABYLON.Scene): void {
   const axisX = BABYLON.Mesh.CreateLines(
     'axisX',
     [
@@ -41,7 +41,7 @@ export function showAxis(size: number, scene: BABYLON.Scene) {
   axisZ.color = new BABYLON.Color3(0, 0, 1);
 }
 
-export function createEngine(canvas: HTMLCanvasElement) {
+export function createEngine(canvas: HTMLCanvasElement): BABYLON.Engine {
   return new BABYLON.Engine(canvas, false, {
     doNotHandleContextLost: true,
     useHighPrecisionFloats: false,
@@ -49,7 +49,7 @@ export function createEngine(canvas: HTMLCanvasElement) {
   });
 }
 
-export function createScene(engine: BABYLON.Engine) {
+export function createScene(engine: BABYLON.Engine): BABYLON.Scene {
   const scene = new BABYLON.Scene(engine, {
     useGeometryUniqueIdsMap: true,
     useMaterialMeshMap: true,
@@ -62,7 +62,7 @@ export function createScene(engine: BABYLON.Engine) {
   return scene;
 }
 
-export function createCamera(scene: BABYLON.Scene) {
+export function createCamera(scene: BABYLON.Scene): BABYLON.ArcRotateCamera {
   const camera = new BABYLON.ArcRotateCamera(
     'playerCamera',
     Math.PI / 2,
@@ -80,18 +80,19 @@ export function createCamera(scene: BABYLON.Scene) {
   camera.lowerBetaLimit = Math.PI / 5;
   camera.panningSensibility = 0;
   camera.allowUpsideDown = false;
+  // camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
 
   return camera;
 }
 
-export function createGUI() {
+export function createGUI(): GUI.AdvancedDynamicTexture {
   const gui = GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI');
   gui.useInvalidateRectOptimization = true;
 
   return gui;
 }
 
-export function createBaseActiveMesh(scene: BABYLON.Scene) {
+export function createBaseActiveMesh(scene: BABYLON.Scene): BABYLON.Mesh {
   const activeMesh = BABYLON.MeshBuilder.CreateDisc('activeMesh', {
     radius: 1,
   });
@@ -116,7 +117,9 @@ export function createBaseActiveMesh(scene: BABYLON.Scene) {
   return activeMesh;
 }
 
-export function createShadowGenerator(light: BABYLON.DirectionalLight) {
+export function createShadowGenerator(
+  light: BABYLON.DirectionalLight,
+): BABYLON.CascadedShadowGenerator {
   const shadowGenerator = new BABYLON.CascadedShadowGenerator(1024, light);
 
   shadowGenerator.shadowMaxZ = 50;

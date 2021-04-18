@@ -9,13 +9,18 @@ import Frog from './monsters/frog';
 import Identifiable from './identifiable';
 import MonsterGenerator from './monster-generator';
 import Monster from './monsters/monster';
+import Character from './character';
 
+type GameBaseMeshes = {
+  empty: BABYLON.Mesh;
+};
 export default class Game extends Identifiable {
   private readonly _namespace: SocketIO.Namespace;
   private readonly _world: World;
   private readonly _engine: BABYLON.Engine;
   private readonly _scene: BABYLON.Scene;
   private readonly _charactersByIds: Record<string, Player | Monster> = {};
+  private readonly _baseMeshes: GameBaseMeshes;
 
   private _isRunning = false;
   private _nbPlayers = 0;
@@ -42,14 +47,15 @@ export default class Game extends Identifiable {
     // Required even for BABYLON.NullEngine
     new BABYLON.ArcRotateCamera('Camera', 0, 0, 1, BABYLON.Vector3.Zero(), this._scene);
 
+    this._baseMeshes = this._createBaseMeshes();
     this._world = new World(this._scene, 200, 200);
     this._monsterGenerators = [
-      new MonsterGenerator(this._scene, Spider, new BABYLON.Vector3(5, 0, 0), {
+      new MonsterGenerator(this._baseMeshes.empty, Spider, new BABYLON.Vector3(5, 0, 0), {
         radius: 10,
         interval: 0,
         nbMaxInstances: 10,
       }),
-      new MonsterGenerator(this._scene, Frog, new BABYLON.Vector3(0, 0, 5), {
+      new MonsterGenerator(this._baseMeshes.empty, Frog, new BABYLON.Vector3(0, 0, 5), {
         radius: 10,
         interval: 0,
         nbMaxInstances: 10,
@@ -73,19 +79,19 @@ export default class Game extends Identifiable {
     });
   }
 
-  public get characters() {
+  public get characters(): Character[] {
     return Object.values(this._charactersByIds);
   }
 
-  public get world() {
+  public get world(): World {
     return this._world;
   }
 
-  public get isFull() {
+  public get isFull(): boolean {
     return this._nbPlayers >= config.game.nbMaxPlayers;
   }
 
-  private _update() {
+  private _update(): void {
     const gameDto = plainToClass(GameDTO, this, {
       excludeExtraneousValues: true,
       strategy: 'excludeAll',
@@ -113,7 +119,13 @@ export default class Game extends Identifiable {
     }
   }
 
-  public stopGameLoop() {
+  private _createBaseMeshes(): GameBaseMeshes {
+    return {
+      empty: new BABYLON.Mesh('baseMesh.empty', this._scene),
+    };
+  }
+
+  public stopGameLoop(): void {
     if (this._isRunning) {
       this._isRunning = false;
       this._namespace.emit(GameEvents.Game.Stopped);
@@ -124,14 +136,14 @@ export default class Game extends Identifiable {
     return this._charactersByIds[id];
   }
 
-  public addPlayer(socket: SocketIO.Socket, name: string) {
+  public addPlayer(socket: SocketIO.Socket, name: string): Player {
     if (this.isFull) {
       throw new Error('Game is full');
     }
 
     const player = new Player(
       socket,
-      this._scene,
+      this._baseMeshes.empty,
       name,
       config.game.playerInitialPosition.clone(),
     );
@@ -145,7 +157,7 @@ export default class Game extends Identifiable {
     return player;
   }
 
-  public removePlayer(player: Player) {
+  public removePlayer(player: Player): void {
     player.destroy();
     this._nbPlayers--;
 

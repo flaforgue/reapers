@@ -1,4 +1,8 @@
 import * as BABYLON from '@babylonjs/core';
+import * as GUI from '@babylonjs/gui';
+import { CharacterKind } from '@reapers/game-client';
+import charactersConfig from '../../../configs/characters.config';
+import { worldToGUI } from '../../../utils';
 
 export enum AnimationKey {
   Defeat = 0,
@@ -19,7 +23,7 @@ function createMainParticleSystem(
   particleTexture: BABYLON.Texture,
   particleColor: BABYLON.Color4,
   attackLinearSpeed: number,
-) {
+): BABYLON.ParticleSystem {
   const ps = new BABYLON.ParticleSystem('particles', 1000, scene);
 
   ps.createPointEmitter(BABYLON.Vector3.Forward(), BABYLON.Vector3.Forward());
@@ -41,7 +45,7 @@ function createBaseSubParticleSystem(
   scene: BABYLON.Scene,
   particleTexture: BABYLON.Texture,
   particleColor: BABYLON.Color4,
-) {
+): BABYLON.ParticleSystem {
   const ps = new BABYLON.ParticleSystem('particles', 1000, scene);
 
   ps.particleTexture = particleTexture;
@@ -60,7 +64,7 @@ function createImpactParticleSystem(
   scene: BABYLON.Scene,
   particleTexture: BABYLON.Texture,
   particleColor: BABYLON.Color4,
-) {
+): BABYLON.ParticleSystem {
   const ps = createBaseSubParticleSystem(scene, particleTexture, particleColor);
 
   ps.targetStopDuration = 0.03;
@@ -80,7 +84,7 @@ function createTrailParticleSystem(
   scene: BABYLON.Scene,
   particleTexture: BABYLON.Texture,
   particleColor: BABYLON.Color4,
-) {
+): BABYLON.ParticleSystem {
   const ps = createBaseSubParticleSystem(scene, particleTexture, particleColor);
 
   ps.createSphereEmitter(0.1);
@@ -93,7 +97,10 @@ function createTrailParticleSystem(
   return ps;
 }
 
-export function createParticleSystem(scene: BABYLON.Scene, attackLinearSpeed: number) {
+export function createParticleSystem(
+  scene: BABYLON.Scene,
+  attackLinearSpeed: number,
+): BABYLON.ParticleSystem {
   const particleTexture = new BABYLON.Texture('/textures/flare.png', scene);
   const particleColor = new BABYLON.Color4(0.2, 0.2, 0.85, 1);
 
@@ -125,4 +132,35 @@ export function createParticleSystem(scene: BABYLON.Scene, attackLinearSpeed: nu
   mainParticleSystem.start();
 
   return mainParticleSystem;
+}
+
+export function createLinkedLabel(
+  value: string,
+  kind: CharacterKind,
+  parent: BABYLON.Mesh,
+): GUI.TextBlock {
+  const scene = parent.getScene();
+  const height = charactersConfig[kind].labelHeight;
+  const label = new GUI.TextBlock('label', value);
+
+  label.color = '#ccc';
+  label.fontSize = 16;
+
+  function updateLabelPosition(): void {
+    const guiPosition = worldToGUI(
+      parent.position.add(new BABYLON.Vector3(0, height, 0)),
+      scene,
+    );
+
+    label.left = guiPosition.x;
+    label.top = guiPosition.y;
+  }
+
+  updateLabelPosition();
+  scene.registerAfterRender(updateLabelPosition);
+  label.onDisposeObservable.add(function () {
+    scene.unregisterAfterRender(updateLabelPosition);
+  });
+
+  return label;
 }

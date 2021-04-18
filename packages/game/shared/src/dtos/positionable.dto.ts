@@ -22,4 +22,12 @@ export default class PositionableDTO extends IdentifiableDTO {
     y: 0,
     z: 0,
   };
+
+  @Expose()
+  @Type(() => Vector3DTO)
+  public scaling: Vector3DTO = {
+    x: 0,
+    y: 0,
+    z: 0,
+  };
 }

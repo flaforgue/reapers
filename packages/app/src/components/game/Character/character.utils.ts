@@ -1,50 +1,14 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
 import { AttackDTO, CharacterKind } from '@reapers/game-client';
+import charactersConfig from '../../../configs/characters.config';
 import { worldToGUI } from '../../../utils';
-
-const labelPositions: Record<CharacterKind, number> = {
-  [CharacterKind.Player]: 1.4,
-  [CharacterKind.Frog]: 1,
-  [CharacterKind.Spider]: 1,
-};
 
 const activeMeshRadius: Record<CharacterKind, number> = {
   [CharacterKind.Player]: 1.5,
   [CharacterKind.Frog]: 2.5,
   [CharacterKind.Spider]: 3.5,
 };
-
-export function createLinkedLabel(
-  value: string,
-  kind: CharacterKind,
-  parent: BABYLON.Mesh,
-) {
-  const scene = parent.getScene();
-  const height = labelPositions[kind];
-  const label = new GUI.TextBlock('label', value);
-
-  label.color = '#ccc';
-  label.fontSize = 16;
-
-  function updateLabelPosition() {
-    const guiPosition = worldToGUI(
-      parent.position.add(new BABYLON.Vector3(0, height, 0)),
-      scene,
-    );
-
-    label.left = guiPosition.x;
-    label.top = guiPosition.y;
-  }
-
-  updateLabelPosition();
-  scene.registerAfterRender(updateLabelPosition);
-  label.onDisposeObservable.add(function () {
-    scene.unregisterAfterRender(updateLabelPosition);
-  });
-
-  return label;
-}
 
 function createFreeLabel(
   labelOptions: {
@@ -54,8 +18,8 @@ function createFreeLabel(
   kind: CharacterKind,
   position: BABYLON.Vector3,
   scene: BABYLON.Scene,
-) {
-  const height = labelPositions[kind];
+): GUI.TextBlock {
+  const height = charactersConfig[kind].labelHeight;
   const label = new GUI.TextBlock('label', labelOptions.value);
 
   label.color = labelOptions?.color ?? '#fff';
@@ -67,9 +31,12 @@ function createFreeLabel(
     offsetY: 0,
   };
 
-  function updateLabelPosition() {
+  function updateLabelPosition(): void {
     const guiPosition = worldToGUI(
-      position.add(new BABYLON.Vector3(0, height + label.metadata.offsetY, 0)),
+      position.add(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        new BABYLON.Vector3(0, height + (label.metadata.offsetY as number), 0),
+      ),
       scene,
     );
 
@@ -91,7 +58,7 @@ export function createAttackLabel(
   attack: AttackDTO,
   color: string,
   scene: BABYLON.Scene,
-) {
+): GUI.TextBlock {
   const label = createFreeLabel(
     {
       value: attack.damageAmount.toString(),
@@ -113,7 +80,7 @@ export function createHighlightMesh(
   baseMesh: BABYLON.Mesh,
   parent: BABYLON.Mesh,
   kind: CharacterKind,
-) {
+): BABYLON.Mesh {
   const activeMesh = baseMesh.clone('Clone of activeMesh', parent);
 
   activeMesh.setEnabled(true);
@@ -145,8 +112,8 @@ export function createHighlightMesh(
 }
 
 // Enforced types are required to animate a GUI Element
-export function animateAttackLabel(label: GUI.TextBlock, scene: BABYLON.Scene) {
-  ((label as unknown) as BABYLON.Node).getScene = () => scene;
+export function animateAttackLabel(label: GUI.TextBlock, scene: BABYLON.Scene): void {
+  ((label as unknown) as BABYLON.Node).getScene = (): BABYLON.Scene => scene;
 
   BABYLON.Animation.CreateAndStartAnimation(
     'attackLabel',
