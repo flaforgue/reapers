@@ -5,6 +5,7 @@
   import {
     useGame,
     game,
+    world,
     activePlayerId,
     CharacterKind,
     PawnKind,
@@ -172,7 +173,7 @@
 <div class="Game">
   <canvas bind:this={gameCanvas} />
   <World
-    world={$game.world}
+    world={$world}
     scene={gameScene}
     {basePawnMeshes}
     on:lightChanged={handleLightChanged}

@@ -18,6 +18,7 @@ import {
 
 const activePlayerId = writable<string>('');
 const game = writable<GameDTO>(new GameDTO());
+const world = writable<WorldDTO>(new WorldDTO());
 
 let socket: SocketIOClient.Socket | undefined;
 
@@ -53,8 +54,8 @@ function useGame(serverUrl: string) {
       activePlayerId.set(player.id);
     });
 
-    socket.on(GameEvents.Game.Created, (gameDTO: GameDTO) => {
-      game.set(gameDTO);
+    socket.on(GameEvents.Game.Created, (worldDTO: WorldDTO) => {
+      world.set(worldDTO);
     });
 
     socket.on(GameEvents.Game.Updated, (gameDTO: GameDTO) => {
@@ -75,6 +76,7 @@ function useGame(serverUrl: string) {
 export {
   activePlayerId,
   game,
+  world,
   useGame,
   CharacterKind,
   MonsterKind,

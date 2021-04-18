@@ -10,7 +10,7 @@ export default class WorldDTO extends PositionableDTO {
   @Expose()
   public depth = 0;
 
-  @Expose({ groups: ['full'] })
+  @Expose()
   @Type(() => PawnDTO)
   public trees: PawnDTO[] = [];
 }
