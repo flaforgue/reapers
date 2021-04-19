@@ -44,7 +44,6 @@ export default class World extends Identifiable {
           this._mesh.optimize(100);
           this._mesh.isPickable = false;
           this._mesh.alwaysSelectAsActiveMesh = true;
-          this._mesh.checkCollisions = true;
           this._isReady = true;
           this._createTrees();
 

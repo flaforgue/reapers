@@ -84,6 +84,16 @@ export default class Monster extends Character {
     super.update();
   }
 
+  // Monsters move without collisions
+  protected _move(): void {
+    this._mesh.movePOV(
+      this.sideMoveDirection * this.currentSpeed,
+      0,
+      this.frontMoveDirection * this.currentSpeed,
+    );
+    this._stickToGround();
+  }
+
   private _isAtDestination(): boolean {
     return this.getDistanceTo(this._destination) <= this.attackRange;
   }

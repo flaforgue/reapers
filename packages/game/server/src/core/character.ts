@@ -92,7 +92,7 @@ export default class Character extends Positionable {
   }
 
   public update(): void {
-    this._moveWithCollisions();
+    this._move();
 
     for (let i = 0; i < this._currentAttacks.length; i++) {
       if (this._currentAttacks[i].isDestroyed) {
@@ -103,11 +103,11 @@ export default class Character extends Positionable {
     }
   }
 
-  private _moveWithCollisions(): void {
+  protected _move(): void {
     // front move
     const move = new BABYLON.Vector3(
       this.frontMoveDirection * Math.sin(this.rotation.y) * -1,
-      this.isOnGround() ? 0 : config.game.gravity,
+      0,
       this.frontMoveDirection * Math.cos(this.rotation.y) * -1,
     );
 
@@ -118,6 +118,7 @@ export default class Character extends Positionable {
     this._mesh.moveWithCollisions(
       move.multiply(new BABYLON.Vector3().setAll(this.currentSpeed)),
     );
+    this._stickToGround();
   }
 
   public attackIfInRange(target: Character): void {
@@ -161,11 +162,8 @@ export default class Character extends Positionable {
     console.warn('No _die implementation', this.kind);
   }
 
-  public isOnGround(tolerance = 0.1): boolean {
-    return (
-      Math.abs(this.position.y - this._world.getHeightAtCoordinates(this.position)) <=
-      tolerance
-    );
+  protected _stickToGround(): void {
+    this.position.y = this._world.getHeightAtCoordinates(this.position);
   }
 
   public destroy(): void {

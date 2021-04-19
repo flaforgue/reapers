@@ -34,7 +34,6 @@ export default class Player extends Character {
     super(world, name, 1, baseMesh.createInstance(''), position, rotation, scaling);
 
     this._initialPosition = position.clone();
-    this._mesh.checkCollisions = true;
     this._mesh.ellipsoid = new BABYLON.Vector3(0.25, 1, 0.25);
     this._mesh.ellipsoidOffset = new BABYLON.Vector3(0, 1, 0);
     this.speedFactor.current = 1;
