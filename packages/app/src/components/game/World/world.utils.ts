@@ -74,7 +74,9 @@ export function createGround(
 
         const groundMat = new BABYLON.StandardMaterial('groundMat', scene);
         groundMat.diffuseTexture = texture;
+        groundMat.specularColor = new BABYLON.Color3(0, 0, 0);
         ground.material = groundMat;
+        ground.material.freeze();
         ground.receiveShadows = true;
       },
     },
