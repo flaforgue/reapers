@@ -72,21 +72,20 @@
     }
   }
 
-  let destinationMesh: BABYLON.Mesh | undefined;
-  $: destination = monster.destination;
-  $: destX = destination?.x ?? 0;
-  $: destY = destination?.y ?? 0;
-  $: destZ = destination?.z ?? 0;
-  $: {
-    if (destX || destY || destZ) {
-      destinationMesh?.dispose();
-      destinationMesh = BABYLON.MeshBuilder.CreateBox('destination', {
-        size: 0.3,
-      });
-      destinationMesh.position = new BABYLON.Vector3(destX, destY, destZ);
-      console.log(destinationMesh.position);
-    }
-  }
+  // let destinationMesh: BABYLON.Mesh | undefined;
+  // $: destination = monster.destination;
+  // $: destX = destination?.x ?? 0;
+  // $: destY = destination?.y ?? 0;
+  // $: destZ = destination?.z ?? 0;
+  // $: {
+  //   if (destX || destY || destZ) {
+  //     destinationMesh?.dispose();
+  //     destinationMesh = BABYLON.MeshBuilder.CreateBox('destination', {
+  //       size: 0.3,
+  //     });
+  //     destinationMesh.position = new BABYLON.Vector3(destX, destY, destZ);
+  //   }
+  // }
 
   onDestroy(() => {
     const particleSystems = (particleSystem?.subEmitters ?? []).map(
