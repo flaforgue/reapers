@@ -58,7 +58,7 @@
       } else if (rangeParticleSystem && !rangeParticleSystem.isAlive()) {
         rangeParticleSystem.emitter = new BABYLON.Vector3(
           player.position.x,
-          0.5,
+          player.position.y + 0.5,
           player.position.z,
         );
         rangeParticleSystem.manualEmitCount = 100;
