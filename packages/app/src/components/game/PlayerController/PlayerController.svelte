@@ -43,26 +43,30 @@
   }
 
   function localCastSpell() {
-    if (player?.canMove && $targetInfos?.position && player) {
-      const distanceToTarget = BABYLON.Vector3.Distance(
-        new BABYLON.Vector3(player.position.x, player.position.y, player.position.z),
-        new BABYLON.Vector3(
-          $targetInfos.position.x,
-          $targetInfos.position.y,
-          $targetInfos.position.z,
-        ),
-      );
+    if (!player?.canMove || !player) {
+      return;
+    }
 
-      if (distanceToTarget <= player.attackRange) {
-        castSpell($targetInfos.id);
-      } else if (rangeParticleSystem && !rangeParticleSystem.isAlive()) {
-        rangeParticleSystem.emitter = new BABYLON.Vector3(
-          player.position.x,
-          player.position.y + 0.5,
-          player.position.z,
-        );
-        rangeParticleSystem.manualEmitCount = 100;
-      }
+    const distanceToTarget = $targetInfos?.position
+      ? BABYLON.Vector3.Distance(
+          new BABYLON.Vector3(player.position.x, player.position.y, player.position.z),
+          new BABYLON.Vector3(
+            $targetInfos.position.x,
+            $targetInfos.position.y,
+            $targetInfos.position.z,
+          ),
+        )
+      : player.attackRange + 1; // if no target, consider out of range
+
+    if (distanceToTarget <= player.attackRange) {
+      return castSpell($targetInfos?.id as string);
+    } else if (rangeParticleSystem && !rangeParticleSystem.isAlive()) {
+      rangeParticleSystem.emitter = new BABYLON.Vector3(
+        player.position.x,
+        player.position.y + 1,
+        player.position.z,
+      );
+      rangeParticleSystem.manualEmitCount = 100;
     }
   }
 
