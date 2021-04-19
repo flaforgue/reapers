@@ -161,10 +161,10 @@ export default class Character extends Positionable {
     console.warn('No _die implementation', this.kind);
   }
 
-  public isOnGround(precision = 0.05): boolean {
+  public isOnGround(tolerance = 0.1): boolean {
     return (
       Math.abs(this.position.y - this._world.getHeightAtCoordinates(this.position)) <=
-      precision
+      tolerance
     );
   }
 
