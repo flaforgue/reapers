@@ -12,7 +12,7 @@ import BoundedValue from './shared/bounded-value';
 import World from './world';
 
 export default class Player extends Character {
-  public readonly attackRange = 10;
+  public readonly attackRange = 8;
   public readonly attackDamageAmount: number = 10;
   public readonly attackLinearSpeed: number = 30;
   public readonly attackTimeToCast: number = 0.45;
