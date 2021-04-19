@@ -3,7 +3,6 @@ import 'reflect-metadata';
 import { plainToClass } from 'class-transformer';
 import {
   AttackDTO,
-  MonsterDTO,
   BoundedValueDTO,
   CharacterDTO,
   GameDTO,
@@ -26,7 +25,6 @@ export {
   AttackDTO,
   BoundedValueDTO,
   CharacterDTO,
-  MonsterDTO,
   GameDTO,
   GameEvents,
   FrontMoveDirection,

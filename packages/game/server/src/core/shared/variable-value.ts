@@ -7,7 +7,7 @@ export default class VariableValue {
 
   public constructor(
     initial = 0,
-    sideEffectHandler: VariableValueSideEffectHandler = () => {},
+    sideEffectHandler: VariableValueSideEffectHandler = (): void => undefined,
   ) {
     this._initial = initial;
     this._onValueChanged = sideEffectHandler;
@@ -16,11 +16,11 @@ export default class VariableValue {
     this._onValueChanged(this._current);
   }
 
-  public get initial() {
+  public get initial(): number {
     return this._initial;
   }
 
-  public get current() {
+  public get current(): number {
     return this._current;
   }
 
@@ -29,15 +29,15 @@ export default class VariableValue {
     this._onValueChanged(this._current);
   }
 
-  public multiply(value: number) {
+  public multiply(value: number): void {
     this.current = this._current * value;
   }
 
-  public divide(value: number) {
+  public divide(value: number): void {
     this.current = this._current / value;
   }
 
-  public reset() {
+  public reset(): void {
     this.current = this._initial;
   }
 }

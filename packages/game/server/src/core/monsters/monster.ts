@@ -5,6 +5,7 @@ import { getRandomPosition } from '../../utils';
 import { FrontMoveDirection } from '@reapers/game-shared';
 import Attack from '../shared/attack';
 import MonsterGenerator from '../monster-generator';
+import World from '../world';
 
 const walkingArea = 5;
 const maxDistanceFromInitialPosition = 50;
@@ -14,7 +15,6 @@ export default class Monster extends Character {
 
   private readonly _initialPosition: BABYLON.Vector3;
   private readonly _randomMoveScheduler: ActionScheduler;
-  private readonly _updateDestinationFromTargetScheduler: ActionScheduler;
   private readonly _generator: MonsterGenerator;
 
   private _destination: BABYLON.Vector3;
@@ -22,6 +22,7 @@ export default class Monster extends Character {
   private _isGoingBackToInitialPosition = false;
 
   public constructor(
+    world: World,
     name: string,
     level: number,
     mesh: BABYLON.InstancedMesh,
@@ -30,7 +31,7 @@ export default class Monster extends Character {
     rotation?: BABYLON.Vector3,
     scaling?: BABYLON.Vector3,
   ) {
-    super(name, level, mesh, position, rotation, scaling);
+    super(world, name, level, mesh, position, rotation, scaling);
 
     this._generator = generator;
     this._initialPosition = this.position.clone();
@@ -38,21 +39,14 @@ export default class Monster extends Character {
     this._mesh.ellipsoidOffset = new BABYLON.Vector3(0, this._mesh.ellipsoid.y, 0);
 
     this._randomMoveScheduler = new ActionScheduler(() => {
-      this.destination = getRandomPosition(this._initialPosition, walkingArea);
+      this._destination = this._world.createGroundVectorFrom(
+        getRandomPosition(this._initialPosition, walkingArea),
+      );
     }, 5);
-    this._updateDestinationFromTargetScheduler = new ActionScheduler(() => {
-      if (this._target?.isAlive) {
-        this.destination = this._target.position;
-      }
-    }, 0.5);
   }
 
   public get destination(): BABYLON.Vector3 {
     return this._destination;
-  }
-
-  public set destination(dest: BABYLON.Vector3) {
-    this._destination = new BABYLON.Vector3(dest.x, this._initialPosition.y, dest.z);
   }
 
   public update(): void {
@@ -65,8 +59,6 @@ export default class Monster extends Character {
 
     if (this._target) {
       if (this._target.isAlive) {
-        this._updateDestinationFromTargetScheduler.update();
-
         if (this._isAtDestination() && this.canMove) {
           this._attack(this._target, this.attackRange);
         }
@@ -85,7 +77,7 @@ export default class Monster extends Character {
     }
 
     if (!this._isAtDestination() && this.canMove) {
-      this._lookAtY(this.destination);
+      this._lookAtY(this._destination);
       this.frontMoveDirection = FrontMoveDirection.Forward;
     }
 
@@ -93,7 +85,7 @@ export default class Monster extends Character {
   }
 
   private _isAtDestination(): boolean {
-    return this.getDistanceTo(this.destination) <= this.attackRange;
+    return this.getDistanceTo(this._destination) <= this.attackRange;
   }
 
   public receiveAttack(attack: Attack): void {
@@ -101,7 +93,7 @@ export default class Monster extends Character {
 
     if (!this._isGoingBackToInitialPosition) {
       this._target = attack.parent;
-      this.destination = attack.parent.position;
+      this._destination = attack.parent.position;
     }
   }
 
@@ -113,7 +105,7 @@ export default class Monster extends Character {
   private _goBackToInitialPosition(): void {
     if (!this._isGoingBackToInitialPosition) {
       this._target = null;
-      this._destination = this._initialPosition;
+      this._destination = this._initialPosition.clone();
       this.speedFactor.multiply(2);
       this._isGoingBackToInitialPosition = true;
     }

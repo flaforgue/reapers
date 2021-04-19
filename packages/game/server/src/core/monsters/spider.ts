@@ -2,6 +2,7 @@ import { CharacterKind } from '@reapers/game-shared';
 import * as BABYLON from 'babylonjs';
 import MonsterGenerator from '../monster-generator';
 import BoundedValue from '../shared/bounded-value';
+import World from '../world';
 import Monster from './monster';
 
 export default class Spider extends Monster {
@@ -11,6 +12,7 @@ export default class Spider extends Monster {
   protected readonly _kind: CharacterKind = CharacterKind.Spider;
 
   public constructor(
+    world: World,
     baseMesh: BABYLON.Mesh,
     level: number,
     generator: MonsterGenerator,
@@ -19,6 +21,7 @@ export default class Spider extends Monster {
     scaling?: BABYLON.Vector3,
   ) {
     super(
+      world,
       CharacterKind.Spider,
       level,
       baseMesh.createInstance(''),

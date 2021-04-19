@@ -2,6 +2,7 @@ import { Exclude, Expose, Type } from 'class-transformer';
 import { FrontMoveDirection, SideMoveDirection, CharacterKind } from '../types';
 import AttackDTO from './common/attack.dto';
 import BoundedValueDTO from './common/bounded-value.dto';
+import Vector3DTO from './common/vector3.dto';
 import PositionableDTO from './positionable.dto';
 
 @Exclude()
@@ -43,4 +44,12 @@ export default class CharacterDTO extends PositionableDTO {
 
   @Expose()
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
+
+  @Expose()
+  @Type(() => Vector3DTO)
+  public destination: Vector3DTO = {
+    x: 0,
+    y: 0,
+    z: 0,
+  };
 }

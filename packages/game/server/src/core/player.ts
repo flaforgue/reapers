@@ -9,6 +9,7 @@ import {
 } from '@reapers/game-shared';
 import Character from './character';
 import BoundedValue from './shared/bounded-value';
+import World from './world';
 
 export default class Player extends Character {
   public readonly attackRange = 10;
@@ -23,15 +24,16 @@ export default class Player extends Character {
 
   public constructor(
     socket: SocketIO.Socket,
+    world: World,
     baseMesh: BABYLON.Mesh,
     name: string,
     position: BABYLON.Vector3,
     rotation?: BABYLON.Vector3,
     scaling?: BABYLON.Vector3,
   ) {
-    super(name, 1, baseMesh.createInstance(''), position, rotation, scaling);
+    super(world, name, 1, baseMesh.createInstance(''), position, rotation, scaling);
 
-    this._initialPosition = position;
+    this._initialPosition = position.clone();
     this._mesh.checkCollisions = true;
     this._mesh.ellipsoid = new BABYLON.Vector3(0.25, 1, 0.25);
     this._mesh.ellipsoidOffset = new BABYLON.Vector3(0, 1, 0);

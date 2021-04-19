@@ -2,9 +2,9 @@ import * as BABYLON from 'babylonjs';
 import Identifiable from './identifiable';
 
 export default class Positionable extends Identifiable {
-  protected readonly _mesh: BABYLON.Mesh | BABYLON.InstancedMesh;
-
   public readonly name: string;
+
+  protected readonly _mesh: BABYLON.Mesh | BABYLON.InstancedMesh;
 
   public constructor(
     mesh: BABYLON.Mesh | BABYLON.InstancedMesh,

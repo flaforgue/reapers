@@ -98,22 +98,12 @@ export default class World extends Identifiable {
     }
   }
 
-  public createGroundVectorFrom(vector: BABYLON.Vector3): BABYLON.Vector3 {
-    // console.log(
-    //   'createGroundVectorFrom',
-    //   vector.toString(),
-    //   new BABYLON.Vector3(
-    //     vector.x,
-    //     this._mesh.getHeightAtCoordinates(vector.x, vector.z),
-    //     vector.z,
-    //   ).toString(),
-    // );
+  public getHeightAtCoordinates(vector: BABYLON.Vector3): number {
+    return this._mesh.getHeightAtCoordinates(vector.x, vector.z);
+  }
 
-    return new BABYLON.Vector3(
-      vector.x,
-      this._mesh.getHeightAtCoordinates(vector.x, vector.z),
-      vector.z,
-    );
+  public createGroundVectorFrom(vector: BABYLON.Vector3): BABYLON.Vector3 {
+    return new BABYLON.Vector3(vector.x, this.getHeightAtCoordinates(vector), vector.z);
   }
 
   public destroy(): void {

@@ -9,6 +9,7 @@ import Positionable from './positionable';
 import BoundedValue from './shared/bounded-value';
 import Attack from './shared/attack';
 import VariableValue from './shared/variable-value';
+import World from './world';
 export default class Character extends Positionable {
   public readonly level: number;
   public readonly life: BoundedValue;
@@ -22,8 +23,9 @@ export default class Character extends Positionable {
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
 
-  protected readonly _attackDuration: number = 0.75; // in seconds
+  protected readonly _world: World;
   protected readonly _kind: CharacterKind = CharacterKind.Player;
+  protected readonly _attackDuration: number = 0.75; // in seconds
 
   protected _isAlive = true;
 
@@ -33,6 +35,7 @@ export default class Character extends Positionable {
   private _lowSpeed: number;
 
   public constructor(
+    world: World,
     name: string,
     level: number,
     mesh: BABYLON.InstancedMesh,
@@ -42,6 +45,7 @@ export default class Character extends Positionable {
   ) {
     super(mesh, name, position, rotation, scaling);
 
+    this._world = world;
     this.level = level;
     this.life = this._createLifeBoudedValue();
     this.attackDamageAmount = this._createAttackDamageAmount();
@@ -103,7 +107,7 @@ export default class Character extends Positionable {
     // front move
     const move = new BABYLON.Vector3(
       this.frontMoveDirection * Math.sin(this.rotation.y) * -1,
-      config.game.gravity,
+      this.isOnGround() ? 0 : config.game.gravity,
       this.frontMoveDirection * Math.cos(this.rotation.y) * -1,
     );
 
@@ -155,6 +159,13 @@ export default class Character extends Positionable {
 
   protected _die(): void {
     console.warn('No _die implementation', this.kind);
+  }
+
+  public isOnGround(precision = 0.05): boolean {
+    return (
+      Math.abs(this.position.y - this._world.getHeightAtCoordinates(this.position)) <=
+      precision
+    );
   }
 
   public destroy(): void {

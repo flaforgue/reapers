@@ -1,6 +1,8 @@
+import * as BABYLON from 'babylonjs';
 import ActionScheduler from './action-scheduler';
 import Identifiable from '../identifiable';
 import Character from '../character';
+import { CharacterKind } from '@reapers/game-shared';
 
 export default class Attack extends Identifiable {
   public readonly damageAmount: number;
@@ -40,27 +42,27 @@ export default class Attack extends Identifiable {
     }, this.timeToCast + this.timeToHit);
   }
 
-  public get targetId() {
+  public get targetId(): string {
     return this._target.id;
   }
 
-  public get targetPosition() {
+  public get targetPosition(): BABYLON.Vector3 {
     return this._target.position;
   }
 
-  public get targetKind() {
+  public get targetKind(): CharacterKind {
     return this._target.kind;
   }
 
-  public get isTargetAlive() {
+  public get isTargetAlive(): boolean {
     return this._target.isAlive;
   }
 
-  public get isDestroyed() {
+  public get isDestroyed(): boolean {
     return this._isDestroyed;
   }
 
-  public update() {
+  public update(): void {
     this._attackCastedScheduler.update();
     this._attackHitScheduler.update();
   }

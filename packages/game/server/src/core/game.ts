@@ -156,6 +156,7 @@ export default class Game extends Identifiable {
 
     const player = new Player(
       socket,
+      this._world,
       this._baseMeshes.empty,
       name,
       this._world.createGroundVectorFrom(config.game.playerInitialPosition),

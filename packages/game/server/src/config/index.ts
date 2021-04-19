@@ -11,7 +11,7 @@ export default {
     nbMaxPlayers: 100,
     fps,
     moveStep: 0.07,
-    gravity: -2,
+    gravity: -3,
     playerInitialPosition: BABYLON.Vector3.Zero(),
   },
 };

@@ -14,6 +14,7 @@ type MonsterGeneratorConfig = {
 };
 
 type MonsterConstructor<T extends Monster = Monster> = new (
+  world: World,
   baseMesh: BABYLON.Mesh,
   level: number,
   generator: MonsterGenerator,
@@ -45,7 +46,6 @@ export default class MonsterGenerator extends Positionable {
     config: Partial<MonsterGeneratorConfig> = {},
   ) {
     super(baseMesh.createInstance(''), 'MonsterGenerator', position);
-
     this._world = world;
 
     optimizeMotionlessMesh(this._mesh);
@@ -80,6 +80,7 @@ export default class MonsterGenerator extends Positionable {
     );
 
     return new this._instanceClass(
+      this._world,
       baseMesh,
       level,
       this,
