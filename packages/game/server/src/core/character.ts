@@ -23,7 +23,6 @@ export default class Character extends Positionable {
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
 
   protected readonly _attackDuration: number = 0.75; // in seconds
-  protected readonly _shouldMoveWithCollisions: boolean = false;
   protected readonly _kind: CharacterKind = CharacterKind.Player;
 
   protected _isAlive = true;
@@ -89,11 +88,7 @@ export default class Character extends Positionable {
   }
 
   public update(): void {
-    if (this._shouldMoveWithCollisions) {
-      this._moveWithCollisions();
-    } else {
-      this._moveWithoutCollisions();
-    }
+    this._moveWithCollisions();
 
     for (let i = 0; i < this._currentAttacks.length; i++) {
       if (this._currentAttacks[i].isDestroyed) {
@@ -118,14 +113,6 @@ export default class Character extends Positionable {
 
     this._mesh.moveWithCollisions(
       move.multiply(new BABYLON.Vector3().setAll(this.currentSpeed)),
-    );
-  }
-
-  private _moveWithoutCollisions(): void {
-    this._mesh.movePOV(
-      this.sideMoveDirection * this.currentSpeed,
-      0,
-      this.frontMoveDirection * this.currentSpeed,
     );
   }
 

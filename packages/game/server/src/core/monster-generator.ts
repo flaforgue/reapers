@@ -3,6 +3,7 @@ import Monster from './monsters/monster';
 import ActionScheduler from './shared/action-scheduler';
 import { getRandomPosition, optimizeMotionlessMesh } from '../utils';
 import Positionable from './positionable';
+import World from './world';
 
 type MonsterGeneratorConfig = {
   radius: number;
@@ -29,6 +30,7 @@ const defaultConfig = {
   levelMax: 5,
 };
 export default class MonsterGenerator extends Positionable {
+  private readonly _world: World;
   private readonly _createMonsterScheduler: ActionScheduler;
   private readonly _config: MonsterGeneratorConfig;
   private readonly _instanceClass: MonsterConstructor;
@@ -36,12 +38,15 @@ export default class MonsterGenerator extends Positionable {
   public nbMonsters = 0;
 
   public constructor(
+    world: World,
     baseMesh: BABYLON.Mesh,
     instanceClass: MonsterConstructor,
     position: BABYLON.Vector3 = BABYLON.Vector3.Zero(),
     config: Partial<MonsterGeneratorConfig> = {},
   ) {
     super(baseMesh.createInstance(''), 'MonsterGenerator', position);
+
+    this._world = world;
 
     optimizeMotionlessMesh(this._mesh);
 
@@ -57,7 +62,7 @@ export default class MonsterGenerator extends Positionable {
   }
 
   public update(): Monster | void {
-    if (this.nbMonsters < this._config.nbMaxInstances) {
+    if (this.nbMonsters < this._config.nbMaxInstances && this._world.isReady) {
       return this._createMonsterScheduler.update();
     }
   }
@@ -74,6 +79,13 @@ export default class MonsterGenerator extends Positionable {
       1 + 0.1 * ((1.5 * level) / this._config.levelMin),
     );
 
-    return new this._instanceClass(baseMesh, level, this, position, rotation, scaling);
+    return new this._instanceClass(
+      baseMesh,
+      level,
+      this,
+      this._world.createGroundVectorFrom(position),
+      rotation,
+      scaling,
+    );
   }
 }

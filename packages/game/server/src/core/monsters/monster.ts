@@ -35,6 +35,7 @@ export default class Monster extends Character {
     this._generator = generator;
     this._initialPosition = this.position.clone();
     this._destination = this._initialPosition.clone();
+    this._mesh.ellipsoidOffset = new BABYLON.Vector3(0, this._mesh.ellipsoid.y, 0);
 
     this._randomMoveScheduler = new ActionScheduler(() => {
       this.destination = getRandomPosition(this._initialPosition, walkingArea);

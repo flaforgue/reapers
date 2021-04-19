@@ -1,31 +1,64 @@
-import { PawnKind } from '@reapers/game-shared';
 import * as BABYLON from 'babylonjs';
-import { optimizeMotionlessMesh } from '../utils';
+import { PawnKind } from '@reapers/game-shared';
+import { createGroundFromHeightMap, optimizeMotionlessMesh } from '../utils';
+import Identifiable from './identifiable';
 import Pawn from './pawn';
-import Positionable from './positionable';
 
 type WorldBaseMeshes = Record<PawnKind, BABYLON.Mesh>;
-export default class World extends Positionable {
+export default class World extends Identifiable {
   public readonly width: number;
   public readonly depth: number;
+  public readonly heightMapName: string;
   public readonly pawns: Pawn[] = [];
 
+  private readonly _mesh: BABYLON.GroundMesh;
   private readonly _baseMeshes: WorldBaseMeshes;
 
-  public constructor(scene: BABYLON.Scene, width: number, depth: number) {
-    super(
-      BABYLON.MeshBuilder.CreateGround('World', { width, height: depth }, scene),
-      'World',
-    );
+  private _isReady = false;
 
-    optimizeMotionlessMesh(this._mesh);
-    this._mesh.checkCollisions = true;
+  public constructor(
+    scene: BABYLON.Scene,
+    heightMapName: string,
+    width: number,
+    depth: number,
+    onReadyFromConstructor?: () => void,
+  ) {
+    super();
 
     this.depth = depth;
     this.width = width;
+    this.heightMapName = heightMapName;
     this._baseMeshes = this._createBaseMeshes(scene);
+    this._mesh = createGroundFromHeightMap(
+      'ground',
+      `http://localhost:4001/public/${heightMapName}`,
+      {
+        width,
+        height: depth,
+        subdivisions: 100,
+        minHeight: 0,
+        maxHeight: 10,
+        updatable: false,
+        onReady: (): void => {
+          optimizeMotionlessMesh(this._mesh);
+          this._mesh.optimize(100);
+          this._mesh.isPickable = false;
+          this._mesh.alwaysSelectAsActiveMesh = true;
+          this._mesh.checkCollisions = true;
+          this._isReady = true;
+          this._createTrees();
 
-    this._createTrees();
+          if (onReadyFromConstructor) {
+            onReadyFromConstructor();
+          }
+        },
+      },
+      scene,
+    );
+  }
+
+  public get isReady(): boolean {
+    return this._isReady;
   }
 
   private _createBaseMeshes(scene: BABYLON.Scene): WorldBaseMeshes {
@@ -51,10 +84,12 @@ export default class World extends Positionable {
       this.pawns.push(
         new Pawn(
           this._baseMeshes[PawnKind.PineTree],
-          new BABYLON.Vector3(
-            BABYLON.Scalar.RandomRange((-1 * this.width) / 2, this.width / 2),
-            0,
-            BABYLON.Scalar.RandomRange((-1 * this.depth) / 2, this.depth / 2),
+          this.createGroundVectorFrom(
+            new BABYLON.Vector3(
+              BABYLON.Scalar.RandomRange((-1 * this.width) / 2, this.width / 2),
+              0,
+              BABYLON.Scalar.RandomRange((-1 * this.depth) / 2, this.depth / 2),
+            ),
           ),
           new BABYLON.Vector3(0, BABYLON.Scalar.RandomRange(0, Math.PI), 0),
           new BABYLON.Vector3().setAll(BABYLON.Scalar.RandomRange(1, 3)),
@@ -63,9 +98,26 @@ export default class World extends Positionable {
     }
   }
 
-  public destroy(): void {
-    super.destroy();
+  public createGroundVectorFrom(vector: BABYLON.Vector3): BABYLON.Vector3 {
+    // console.log(
+    //   'createGroundVectorFrom',
+    //   vector.toString(),
+    //   new BABYLON.Vector3(
+    //     vector.x,
+    //     this._mesh.getHeightAtCoordinates(vector.x, vector.z),
+    //     vector.z,
+    //   ).toString(),
+    // );
 
+    return new BABYLON.Vector3(
+      vector.x,
+      this._mesh.getHeightAtCoordinates(vector.x, vector.z),
+      vector.z,
+    );
+  }
+
+  public destroy(): void {
+    this._mesh.dispose();
     Object.values(this._baseMeshes).map((m) => m.dispose());
   }
 }

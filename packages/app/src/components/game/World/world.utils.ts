@@ -53,22 +53,33 @@ export function createGround(
   depth: number,
   scene: BABYLON.Scene,
 ): BABYLON.Mesh {
-  const ground = BABYLON.MeshBuilder.CreateGround(
+  const ground = BABYLON.MeshBuilder.CreateGroundFromHeightMap(
     'ground',
-    { width, height: depth },
+    '/textures/heightMap.png',
+    {
+      width,
+      height: depth,
+      subdivisions: 100,
+      minHeight: 0,
+      maxHeight: 10,
+      updatable: false,
+      onReady: function (): void {
+        ground.optimize(100);
+        ground.freezeWorldMatrix();
+        ground.freezeNormals();
+
+        const texture = new BABYLON.Texture('/textures/grass.jpeg', scene);
+        texture.uScale = 50;
+        texture.vScale = 50;
+
+        const groundMat = new BABYLON.StandardMaterial('groundMat', scene);
+        groundMat.diffuseTexture = texture;
+        ground.material = groundMat;
+        ground.receiveShadows = true;
+      },
+    },
     scene,
   );
-
-  const texture = new BABYLON.Texture('/textures/grass.jpeg', scene);
-  texture.uScale = 20;
-  texture.vScale = 20;
-
-  const groundMat = new BABYLON.StandardMaterial('groundMat', scene);
-  groundMat.diffuseTexture = texture;
-  ground.material = groundMat;
-  ground.receiveShadows = true;
-  ground.freezeWorldMatrix();
-  ground.freezeNormals();
 
   return ground;
 }

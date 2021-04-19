@@ -1,10 +1,15 @@
-import SocketIO from 'socket.io';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import * as xhr2 from 'xhr2';
 import * as http from 'http';
+import SocketIO from 'socket.io';
 import express from 'express';
 import { registerPlayerHandlers, registerSystemHandlers } from './handlers';
 import config from './config';
 import { GameEvents, plainToClass, CharacterDTO, WorldDTO } from '@reapers/game-shared';
 import Game from './core/game';
+
+global.XMLHttpRequest = xhr2.XMLHttpRequest;
 
 const port = config.port;
 const app = express();
@@ -17,6 +22,8 @@ const io = new SocketIO.Server(httpServer, {
 });
 
 const game = new Game(io.sockets);
+
+app.use('/public', express.static('public'));
 
 io.on(GameEvents.System.Connection, (socket: SocketIO.Socket) => {
   if (io.sockets.sockets.size < config.game.nbMaxPlayers && !game.isFull) {

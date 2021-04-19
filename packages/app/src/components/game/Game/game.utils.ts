@@ -75,12 +75,11 @@ export function createCamera(scene: BABYLON.Scene): BABYLON.ArcRotateCamera {
 
   camera.lowerRadiusLimit = 4;
   camera.radius = 8;
-  camera.upperRadiusLimit = 14;
+  camera.upperRadiusLimit = 140;
   camera.upperBetaLimit = Math.PI / 2.5;
   camera.lowerBetaLimit = Math.PI / 5;
   camera.panningSensibility = 0;
   camera.allowUpsideDown = false;
-  // camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
 
   return camera;
 }

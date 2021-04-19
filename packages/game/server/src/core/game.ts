@@ -48,19 +48,32 @@ export default class Game extends Identifiable {
     new BABYLON.ArcRotateCamera('Camera', 0, 0, 1, BABYLON.Vector3.Zero(), this._scene);
 
     this._baseMeshes = this._createBaseMeshes();
-    this._world = new World(this._scene, 200, 200);
-    this._monsterGenerators = [
-      new MonsterGenerator(this._baseMeshes.empty, Spider, new BABYLON.Vector3(5, 0, 0), {
-        radius: 10,
-        interval: 0,
-        nbMaxInstances: 10,
-      }),
-      new MonsterGenerator(this._baseMeshes.empty, Frog, new BABYLON.Vector3(0, 0, 5), {
-        radius: 10,
-        interval: 0,
-        nbMaxInstances: 10,
-      }),
-    ];
+    this._world = new World(this._scene, 'heightMap.png', 200, 200, (): void => {
+      this._monsterGenerators = [
+        new MonsterGenerator(
+          this._world,
+          this._baseMeshes.empty,
+          Spider,
+          this._world.createGroundVectorFrom(new BABYLON.Vector3(5, 0, 0)),
+          {
+            radius: 10,
+            interval: 0,
+            nbMaxInstances: 10,
+          },
+        ),
+        new MonsterGenerator(
+          this._world,
+          this._baseMeshes.empty,
+          Frog,
+          this._world.createGroundVectorFrom(new BABYLON.Vector3(0, 0, 5)),
+          {
+            radius: 10,
+            interval: 0,
+            nbMaxInstances: 10,
+          },
+        ),
+      ];
+    });
 
     this._scene.executeWhenReady(() => {
       this._isRunning = true;
@@ -145,7 +158,7 @@ export default class Game extends Identifiable {
       socket,
       this._baseMeshes.empty,
       name,
-      config.game.playerInitialPosition.clone(),
+      this._world.createGroundVectorFrom(config.game.playerInitialPosition),
     );
     this._nbPlayers++;
     this._charactersByIds[player.id] = player;
