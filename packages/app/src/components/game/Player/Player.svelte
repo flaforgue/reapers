@@ -59,13 +59,13 @@
 
       attackParticleSystem.emitter = new BABYLON.Vector3(
         player.position.x,
-        player.position.y,
+        player.position.y + 0.5,
         player.position.z,
-      ).add(new BABYLON.Vector3(0, 0.25, 0));
+      );
 
       const directionToTarget = new BABYLON.Vector3(
         targetPosition.x,
-        targetPosition.y,
+        targetPosition.y + 0.25,
         targetPosition.z,
       )
         .subtract(attackParticleSystem.emitter)
