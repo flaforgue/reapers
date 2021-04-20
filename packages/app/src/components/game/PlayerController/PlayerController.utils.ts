@@ -10,12 +10,14 @@ export function isSideMoveDirection(value: string): boolean {
 }
 
 export function createHighlightMesh(scene: BABYLON.Scene): BABYLON.Mesh {
-  const highlightMesh = BABYLON.MeshBuilder.CreateDisc('highlightMesh', {
-    radius: 1,
+  const highlightMesh = BABYLON.MeshBuilder.CreatePolyhedron('highlightMesh', {
+    type: 1,
+    sizeX: 0.5,
+    sizeY: 0.8,
+    sizeZ: 0.5,
   });
 
   highlightMesh.setEnabled(false);
-  highlightMesh.rotate(BABYLON.Axis.X, Math.PI / 2);
   highlightMesh.animations.push(
     new BABYLON.Animation(
       'scalingAnimation',
@@ -25,14 +27,48 @@ export function createHighlightMesh(scene: BABYLON.Scene): BABYLON.Mesh {
       BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
     ),
   );
-
-  highlightMesh.material = new BABYLON.StandardMaterial('highlightMeshMat', scene);
-  highlightMesh.material.alpha = 0.5;
-  (highlightMesh.material as BABYLON.StandardMaterial).diffuseColor = new BABYLON.Color3(
-    1,
-    0.3,
-    0.1,
+  highlightMesh.animations[0].setKeys([
+    {
+      frame: 0,
+      value: new BABYLON.Vector3().setAll(0),
+    },
+    {
+      frame: 10,
+      value: new BABYLON.Vector3().setAll(1),
+    },
+    {
+      frame: 20,
+      value: new BABYLON.Vector3().setAll(0.7),
+    },
+    {
+      frame: 30,
+      value: new BABYLON.Vector3().setAll(1),
+    },
+  ]);
+  highlightMesh.animations.push(
+    new BABYLON.Animation(
+      'rotationAnimation',
+      'rotation',
+      100,
+      BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+      BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE,
+    ),
   );
+  highlightMesh.animations[1].setKeys([
+    {
+      frame: 0,
+      value: new BABYLON.Vector3(0, 0, 0),
+    },
+    {
+      frame: 400,
+      value: new BABYLON.Vector3(0, 2 * Math.PI, 0),
+    },
+  ]);
+
+  const material = new BABYLON.StandardMaterial('highlightMeshMat', scene);
+  material.diffuseColor = new BABYLON.Color3(1, 0.3, 0.1);
+  material.alpha = 0.7;
+  highlightMesh.material = material;
 
   return highlightMesh;
 }

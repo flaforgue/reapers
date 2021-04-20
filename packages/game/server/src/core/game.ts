@@ -58,7 +58,7 @@ export default class Game extends Identifiable {
           {
             radius: 10,
             interval: 0,
-            nbMaxInstances: 10,
+            nbMaxInstances: 12,
           },
         ),
         new MonsterGenerator(
@@ -69,7 +69,7 @@ export default class Game extends Identifiable {
           {
             radius: 10,
             interval: 0,
-            nbMaxInstances: 10,
+            nbMaxInstances: 12,
           },
         ),
       ];

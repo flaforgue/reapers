@@ -5,7 +5,6 @@
     SideMoveDirection,
     FrontMoveDirection,
     CharacterDTO,
-    CharacterKind,
   } from '@reapers/game-client';
   import { targetInfos } from '../../../stores';
   import { Key } from '../../../configs/keycodes.config';
@@ -15,6 +14,7 @@
     isFrontMoveDirection,
     isSideMoveDirection,
   } from './PlayerController.utils';
+  import charactersConfig from '../../../configs/characters.config';
 
   export let updateFrontMoveDirection: (direction: FrontMoveDirection) => void;
   export let updateSideMoveDirection: (direction: SideMoveDirection) => void;
@@ -23,12 +23,6 @@
   export let player: CharacterDTO | undefined;
   export let camera: BABYLON.ArcRotateCamera | undefined;
   export let scene: BABYLON.Scene | undefined;
-
-  const activeMeshRadius: Record<CharacterKind, number> = {
-    [CharacterKind.Player]: 1.5,
-    [CharacterKind.Frog]: 2.5,
-    [CharacterKind.Spider]: 3.5,
-  };
 
   let rangeParticleSystem: BABYLON.ParticleSystem | undefined;
   let highlightMesh: BABYLON.Mesh | undefined;
@@ -131,31 +125,11 @@
       highlightMesh.setEnabled(Boolean($targetInfos?.id));
       highlightMesh.setParent($targetInfos?.transformNode ?? null);
 
-      if ($targetInfos) {
+      if ($targetInfos && id) {
         highlightMesh.position.x = 0;
-        highlightMesh.position.y = 0.001;
+        highlightMesh.position.y = charactersConfig[$targetInfos.kind].labelHeight + 3;
         highlightMesh.position.z = 0;
-        highlightMesh.animations[0].setKeys([
-          {
-            frame: 0,
-            value: new BABYLON.Vector3().setAll(0),
-          },
-          {
-            frame: 10,
-            value: new BABYLON.Vector3().setAll(activeMeshRadius[$targetInfos.kind]),
-          },
-          {
-            frame: 20,
-            value: new BABYLON.Vector3().setAll(
-              activeMeshRadius[$targetInfos.kind] * 0.7,
-            ),
-          },
-          {
-            frame: 30,
-            value: new BABYLON.Vector3().setAll(activeMeshRadius[$targetInfos.kind]),
-          },
-        ]);
-        scene?.beginAnimation(highlightMesh, 0, 100);
+        scene?.beginAnimation(highlightMesh, 0, 100, true);
       }
     }
   }

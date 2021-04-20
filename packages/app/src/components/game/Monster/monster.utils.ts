@@ -34,12 +34,8 @@ export function createParticleSystem(scene: BABYLON.Scene): BABYLON.ParticleSyst
   ps.addSizeGradient(1, 2);
   ps.createSphereEmitter(0.4, 1);
   ps.maxEmitPower = 0;
-  // ps.updateSpeed = 0.005;
   ps.minLifeTime = 0.1;
   ps.maxLifeTime = 0.1;
-
-  // ps.addDragGradient(0, 0);
-  // ps.addDragGradient(1, 1);
   ps.manualEmitCount = 0;
   ps.start();
 

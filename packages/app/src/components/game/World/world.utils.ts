@@ -3,10 +3,10 @@ import * as BABYLON from '@babylonjs/core';
 export function createLight(scene: BABYLON.Scene): BABYLON.DirectionalLight {
   const light = new BABYLON.DirectionalLight(
     'directionalLight',
-    new BABYLON.Vector3(0, -10, 0),
+    new BABYLON.Vector3(0.2, -1, 0),
     scene,
   );
-  light.position = new BABYLON.Vector3(0, 10, 0);
+  light.position = new BABYLON.Vector3(20, 40, 20);
 
   return light;
 }
