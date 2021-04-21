@@ -27,6 +27,7 @@ export default class Character extends Positionable {
   protected readonly _kind: CharacterKind = CharacterKind.Player;
   protected readonly _attackDuration: number = 0.75; // in seconds
 
+  protected _target: Character | null = null;
   protected _isAlive = true;
 
   private _currentAttacks: Attack[] = [];
@@ -83,6 +84,10 @@ export default class Character extends Positionable {
       : this._lowSpeed;
   }
 
+  public get target(): Character | null {
+    return this._target;
+  }
+
   protected _createLifeBoudedValue(): BoundedValue {
     return new BoundedValue();
   }
@@ -129,16 +134,29 @@ export default class Character extends Positionable {
     }
   }
 
-  protected _attack(target: Character, distanceToTarget: number): void {
-    this._lookAtY(target.position);
+  protected _attack(attackTarget: Character, distanceToTarget: number): void {
+    this._lookAtY(attackTarget.position);
     this.frontMoveDirection = FrontMoveDirection.None;
     this.sideMoveDirection = SideMoveDirection.None;
     this.isAttacking = true;
+
+    let timeToHit = this.attackLinearSpeed
+      ? distanceToTarget / this.attackLinearSpeed
+      : 0;
+
+    if (attackTarget.isMonster() && attackTarget?.target?.id === this.id) {
+      // reduce timeToHit if monster is moving closer to attacker
+      timeToHit = Math.max(
+        0,
+        timeToHit - attackTarget.currentSpeed * (timeToHit + this.attackTimeToCast),
+      );
+    }
+
     this._currentAttacks.push(
-      new Attack(this, target, {
+      new Attack(this, attackTarget, {
         damageAmount: this.attackDamageAmount,
         timeToCast: this.attackTimeToCast,
-        timeToHit: this.attackLinearSpeed ? distanceToTarget / this.attackLinearSpeed : 0,
+        timeToHit,
       }),
     );
   }
@@ -149,6 +167,10 @@ export default class Character extends Positionable {
     if (this._isAlive && this.life.value <= 0) {
       this.dieAsync();
     }
+  }
+
+  public isMonster(): boolean {
+    return this.kind !== CharacterKind.Player;
   }
 
   public dieAsync(): void {
