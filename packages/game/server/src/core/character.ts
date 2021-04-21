@@ -3,6 +3,7 @@ import {
   FrontMoveDirection,
   SideMoveDirection,
   CharacterKind,
+  AttackState,
 } from '@reapers/game-shared';
 import config from '../config';
 import Positionable from './positionable';
@@ -29,8 +30,8 @@ export default class Character extends Positionable {
 
   protected _target: Character | null = null;
   protected _isAlive = true;
+  protected _currentAttacks: Attack[] = [];
 
-  private _currentAttacks: Attack[] = [];
   private _isDestroyed = false;
   private _speed = config.game.moveStep;
   private _lowSpeed: number;
@@ -104,6 +105,9 @@ export default class Character extends Positionable {
         this._currentAttacks.splice(i, 1);
       } else {
         this._currentAttacks[i].update();
+        if (this._currentAttacks[i].state === AttackState.Loading) {
+          this._lookAtY(this._currentAttacks[i].targetPosition);
+        }
       }
     }
   }
@@ -134,31 +138,11 @@ export default class Character extends Positionable {
     }
   }
 
-  protected _attack(attackTarget: Character, distanceToTarget: number): void {
+  // meant to be overridden
+  protected _attack(attackTarget: Character, _distanceToTarget: number): void {
     this._lookAtY(attackTarget.position);
     this.frontMoveDirection = FrontMoveDirection.None;
     this.sideMoveDirection = SideMoveDirection.None;
-    this.isAttacking = true;
-
-    let timeToHit = this.attackLinearSpeed
-      ? distanceToTarget / this.attackLinearSpeed
-      : 0;
-
-    if (attackTarget.isMonster() && attackTarget?.target?.id === this.id) {
-      // reduce timeToHit if monster is moving closer to attacker
-      timeToHit = Math.max(
-        0,
-        timeToHit - attackTarget.currentSpeed * (timeToHit + this.attackTimeToCast),
-      );
-    }
-
-    this._currentAttacks.push(
-      new Attack(this, attackTarget, {
-        damageAmount: this.attackDamageAmount,
-        timeToCast: this.attackTimeToCast,
-        timeToHit,
-      }),
-    );
   }
 
   public receiveAttack(attack: Attack): void {

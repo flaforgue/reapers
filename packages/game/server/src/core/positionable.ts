@@ -41,10 +41,7 @@ export default class Positionable extends Identifiable {
   }
 
   protected _lookAtY(position: BABYLON.Vector3): void {
-    this._mesh.lookAt(
-      new BABYLON.Vector3(position.x, this.position.y, position.z),
-      Math.PI,
-    );
+    this._mesh.lookAt(position, Math.PI);
   }
 
   public getDistanceTo(position: BABYLON.Vector3): number {

@@ -11,7 +11,8 @@ enum PlayerEvent {
   FrontMoveDirectionUpdated = 'PlayerEvent.FrontMoveDirectionUpdated',
   SideMoveDirectionUpdated = 'PlayerEvent.SideMoveDirectionUpdated',
   RotationUpdated = 'PlayerEvent.RotationUpdated',
-  SpellCasted = 'PlayerEvent.SpellCasted',
+  AttackLoaded = 'PlayerEvent.AttackLoaded',
+  AttackPerformed = 'PlayerEvent.AttackPerformed',
 }
 
 enum GameEvent {
@@ -36,6 +37,12 @@ export enum SideMoveDirection {
   None = 0,
   Right = 1,
   Left = -1,
+}
+
+export enum AttackState {
+  Loading = 'Loading',
+  Casting = 'Casting',
+  Hitting = 'Hitting',
 }
 
 export enum CharacterKind {

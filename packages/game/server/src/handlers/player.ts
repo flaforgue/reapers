@@ -36,13 +36,19 @@ export default (socket: Socket, game: Game, player: Player): void => {
     }
   });
 
-  socket.on(GameEvents.Player.SpellCasted, (id: string) => {
+  socket.on(GameEvents.Player.AttackLoaded, (id: string) => {
     if (player.canMove) {
       const target = game.getCharacterById(id);
 
       if (target) {
         player.attackIfInRange(target);
       }
+    }
+  });
+
+  socket.on(GameEvents.Player.AttackPerformed, () => {
+    if (player.isAttacking) {
+      player.performAttack();
     }
   });
 };

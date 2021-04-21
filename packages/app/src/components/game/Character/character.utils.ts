@@ -2,7 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
 import { AttackDTO, CharacterKind } from '@reapers/game-client';
 import charactersConfig from '../../../configs/characters.config';
-import { worldToGUI } from '../../../utils';
+import { createVector3, worldToGUI } from '../../../utils';
 
 function createFreeLabel(
   labelOptions: {
@@ -59,21 +59,12 @@ export function createAttackLabel(
       color,
     },
     attack.targetKind,
-    new BABYLON.Vector3(
-      attack.targetPosition.x,
-      attack.targetPosition.y,
-      attack.targetPosition.z,
-    ),
+    createVector3(attack.targetPosition),
     scene,
   );
 
-  return label;
-}
-
-// Enforced types are required to animate a GUI Element
-export function animateAttackLabel(label: GUI.TextBlock, scene: BABYLON.Scene): void {
+  // Enforced types are required to animate a GUI Element
   ((label as unknown) as BABYLON.Node).getScene = (): BABYLON.Scene => scene;
-
   BABYLON.Animation.CreateAndStartAnimation(
     'attackLabel',
     (label as unknown) as BABYLON.Node,
@@ -104,4 +95,6 @@ export function animateAttackLabel(label: GUI.TextBlock, scene: BABYLON.Scene): 
     1,
     BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
   );
+
+  return label;
 }

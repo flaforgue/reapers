@@ -2,7 +2,7 @@ import * as BABYLON from 'babylonjs';
 import Character from '../character';
 import ActionScheduler from '../shared/action-scheduler';
 import { getRandomPosition } from '../../utils';
-import { FrontMoveDirection } from '@reapers/game-shared';
+import { FrontMoveDirection, SideMoveDirection } from '@reapers/game-shared';
 import Attack from '../shared/attack';
 import MonsterGenerator from '../monster-generator';
 import World from '../world';
@@ -91,6 +91,18 @@ export default class Monster extends Character {
       this.frontMoveDirection * this.currentSpeed,
     );
     this._stickToGround();
+  }
+
+  protected _attack(attackTarget: Character, distanceToTarget: number): void {
+    super._attack(attackTarget, distanceToTarget);
+
+    this._currentAttacks.push(
+      new Attack(this, attackTarget, {
+        damageAmount: this.attackDamageAmount,
+        timeToCast: this.attackTimeToCast,
+        timeToHit: this.attackLinearSpeed ? distanceToTarget / this.attackLinearSpeed : 0,
+      }),
+    );
   }
 
   private _isAtDestination(): boolean {

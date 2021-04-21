@@ -1,10 +1,13 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import { CharacterKind } from '../..';
+import { AttackState, CharacterKind } from '../..';
 import IdentifiableDTO from '../identifiable.dto';
 import Vector3DTO from './vector3.dto';
 
 @Exclude()
 export default class AttackDTO extends IdentifiableDTO {
+  @Expose()
+  public state = AttackState.Casting;
+
   @Expose()
   public targetId = '';
 

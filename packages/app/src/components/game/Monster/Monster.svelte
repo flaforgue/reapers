@@ -20,6 +20,7 @@
     idle: animationKeys.Idle,
     walk: animationKeys.Walk,
     death: animationKeys.Death,
+    loadAttack: undefined,
   };
 
   let rootMeshes: BABYLON.Mesh[] = [];
@@ -44,21 +45,20 @@
     shadowGenerator?.addShadowCaster(rootMeshes[0] as BABYLON.AbstractMesh);
   }
 
-  function attack(currentAttack: AttackDTO) {
+  function handleAttack(details: CustomEvent<AttackDTO>) {
     const scene = rootMeshes[0]?.getScene();
+    const attack = details.detail;
 
-    if (currentAttack && scene && monster?.position) {
-      const targetPosition = currentAttack.targetPosition;
-
+    if (attack && scene && monster?.position) {
       if (!particleSystem) {
         particleSystem = createParticleSystem(scene);
       }
 
       particleSystem.emitter = new BABYLON.Vector3(
-        currentAttack.targetPosition.x,
-        currentAttack.targetPosition.y,
-        currentAttack.targetPosition.z,
-      ).add(new BABYLON.Vector3(0, 0.25, 0));
+        attack.targetPosition.x,
+        attack.targetPosition.y + 0.25,
+        attack.targetPosition.z,
+      );
 
       particleSystem.manualEmitCount = 1;
     }
@@ -103,7 +103,7 @@
   rootMesh={rootMeshes[0]}
   character={monster}
   {animationGroups}
-  {attack}
+  on:attack={handleAttack}
   {characterAnimationKeys}
   {gui}
 />

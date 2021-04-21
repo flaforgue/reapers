@@ -1,20 +1,32 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
-  import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
+  import {
+    activePlayerId,
+    AttackDTO,
+    AttackState,
+    CharacterDTO,
+  } from '@reapers/game-client';
+  import { createEventDispatcher } from 'svelte';
   import { targetInfos } from '../../../stores';
-  import { createAttackLabel, animateAttackLabel } from './character.utils';
+  import { createAttackLabel } from './character.utils';
 
   type CharacterAnimationKey = 'attack' | 'death' | 'idle' | 'walk';
+  type NullableCharacterAnimationKey = 'loadAttack';
+  type CharacterEvents = {
+    attack: AttackDTO;
+    loadAttack: AttackDTO;
+    death: undefined;
+  };
 
   export let character: CharacterDTO = new CharacterDTO();
   export let gui: GUI.AdvancedDynamicTexture | undefined;
   export let rootMesh: BABYLON.Mesh | undefined;
   export let animationGroups: BABYLON.AnimationGroup[] = [];
-  export let characterAnimationKeys: Record<CharacterAnimationKey, number>;
-  export let attack: (attack: AttackDTO) => void = () => {
-    console.warn('props attack uses default empty value');
-  };
+  export let characterAnimationKeys: Record<CharacterAnimationKey, number> &
+    Record<NullableCharacterAnimationKey, number | undefined>;
+
+  const dispatch = createEventDispatcher<CharacterEvents>();
 
   let currentAnimation: BABYLON.AnimationGroup | undefined;
 
@@ -113,43 +125,46 @@
     );
   }
 
-  function createCurrentAttackLabelAsync(currentAttackClone: AttackDTO) {
-    const isPlayerAttackParent = character.id === $activePlayerId;
-    const isPlayerAttackTarget = currentAttackClone.targetId === $activePlayerId;
+  function createCurrentAttackLabel() {
+    if (character.currentAttack) {
+      const isPlayerAttackParent = character.id === $activePlayerId;
+      const isPlayerAttackTarget = character.currentAttack.targetId === $activePlayerId;
 
-    if ((isPlayerAttackParent || isPlayerAttackTarget) && rootMesh && gui) {
-      const color = isPlayerAttackParent ? '#fff' : '#f63';
-      const attackLabel = createAttackLabel(
-        currentAttackClone,
-        color,
-        rootMesh.getScene(),
-      );
+      if ((isPlayerAttackParent || isPlayerAttackTarget) && rootMesh && gui) {
+        const color = isPlayerAttackParent ? '#fff' : '#f63';
+        const attackLabel = createAttackLabel(
+          character.currentAttack,
+          color,
+          rootMesh.getScene(),
+        );
 
-      setTimeout(() => {
-        if (character.isAlive && currentAttackClone.isTargetAlive && gui && rootMesh) {
-          gui.addControl(attackLabel);
-          animateAttackLabel(attackLabel, rootMesh.getScene());
-        }
+        gui.addControl(attackLabel);
 
         setTimeout(() => {
           attackLabel?.dispose();
         }, 500);
-        // :todo + 0.2 is arbitrary (maybe the particle maxLife is not sync with real time)
-      }, (currentAttackClone.timeToCast + currentAttackClone.timeToHit + 0.2) * 1000);
+      }
     }
   }
 
-  function attackAsync() {
+  function handleAttackLoading() {
     if (character.currentAttack) {
-      const currentAttackClone = Object.assign({}, character.currentAttack);
+      if (characterAnimationKeys.loadAttack !== undefined) {
+        switchAnimation(characterAnimationKeys.loadAttack);
+      }
 
-      createCurrentAttackLabelAsync(currentAttackClone);
+      dispatch('loadAttack', character.currentAttack);
+    }
+  }
 
-      setTimeout(() => {
-        if (character.isAlive && currentAttackClone.isTargetAlive) {
-          attack(currentAttackClone);
-        }
-      }, character.currentAttack.timeToCast * 1000);
+  function handleAttackCasting() {
+    switchAnimation(characterAnimationKeys.attack);
+  }
+
+  function handleAttackHitting() {
+    if (character.isAlive && character.currentAttack?.isTargetAlive) {
+      dispatch('attack', character.currentAttack);
+      setTimeout(createCurrentAttackLabel, character.currentAttack.timeToHit * 1000);
     }
   }
 
@@ -219,16 +234,27 @@
   $: {
     if (!isAlive) {
       switchAnimation(characterAnimationKeys.death);
+      dispatch('death');
     } else {
       switchAnimation(characterAnimationKeys.idle);
     }
   }
 
   $: currentAttackId = character?.currentAttack?.id;
+  $: currentAttackState = character?.currentAttack?.state;
   $: {
-    if (currentAttackId) {
-      switchAnimation(characterAnimationKeys.attack);
-      attackAsync();
+    if (currentAttackId && currentAttackState) {
+      switch (currentAttackState) {
+        case AttackState.Loading:
+          handleAttackLoading();
+          break;
+        case AttackState.Casting:
+          handleAttackCasting();
+          break;
+        case AttackState.Hitting:
+          handleAttackHitting();
+          break;
+      }
     }
   }
 </script>

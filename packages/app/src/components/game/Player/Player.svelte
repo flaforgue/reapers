@@ -3,11 +3,12 @@
   import * as GUI from '@babylonjs/gui';
   import { onDestroy } from 'svelte';
   import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
-  import { disposeArray } from '../../../utils';
+  import { createVector3, disposeArray } from '../../../utils';
   import {
     AnimationKey,
     createLinkedLabel,
     createAttackParticleSystem,
+    createLoadingAttackParticleSystem,
   } from './player.utils';
   import Character from '../Character/Character.svelte';
   import { playerInfos, targetInfos } from '../../../stores';
@@ -23,12 +24,14 @@
     idle: AnimationKey.Idle,
     walk: AnimationKey.Walk,
     death: AnimationKey.Defeat,
+    loadAttack: AnimationKey.Shoot,
   };
 
   let rootMeshes: BABYLON.Mesh[] = [];
   let skeletons: BABYLON.Skeleton[] = [];
   let animationGroups: BABYLON.AnimationGroup[] = [];
   let attackParticleSystem: BABYLON.ParticleSystem | undefined;
+  let loadingAttackParticleSystem: BABYLON.ParticleSystem | undefined;
   let label: GUI.TextBlock | undefined;
 
   function instantiateModels() {
@@ -44,12 +47,17 @@
     shadowGenerator?.addShadowCaster(rootMeshes[0] as BABYLON.AbstractMesh);
   }
 
-  function attack(currentAttack: AttackDTO) {
+  function getAttackOriginPosition() {
+    return createVector3(player.position).add(rootMeshes[0].calcMovePOV(0, 0.5, 0.5));
+  }
+
+  function handleAttack(details: CustomEvent<AttackDTO>) {
     const scene = rootMeshes[0]?.getScene();
+    const attack = details.detail;
 
-    if (currentAttack && scene && player?.position) {
-      const targetPosition = currentAttack.targetPosition;
+    loadingAttackParticleSystem?.stop();
 
+    if (attack && scene && player?.position) {
       if (!attackParticleSystem) {
         attackParticleSystem = createAttackParticleSystem(
           scene,
@@ -57,26 +65,40 @@
         );
       }
 
-      attackParticleSystem.emitter = new BABYLON.Vector3(
-        player.position.x,
-        player.position.y + 0.5,
-        player.position.z,
-      );
+      attackParticleSystem.emitter = getAttackOriginPosition();
 
       const directionToTarget = new BABYLON.Vector3(
-        targetPosition.x,
-        targetPosition.y + 0.25,
-        targetPosition.z,
+        attack.targetPosition.x,
+        attack.targetPosition.y + 0.25,
+        attack.targetPosition.z,
       )
         .subtract(attackParticleSystem.emitter)
         .normalize();
 
       attackParticleSystem.direction1 = directionToTarget;
       attackParticleSystem.direction2 = directionToTarget;
-      attackParticleSystem.minLifeTime = currentAttack.timeToHit;
-      attackParticleSystem.maxLifeTime = currentAttack.timeToHit;
+      attackParticleSystem.minLifeTime = attack.timeToHit;
+      attackParticleSystem.maxLifeTime = attack.timeToHit;
       attackParticleSystem.manualEmitCount = 3;
     }
+  }
+
+  function handleLoadAttack(details: CustomEvent<AttackDTO>) {
+    const scene = rootMeshes[0]?.getScene();
+    const attack = details.detail;
+
+    if (attack && scene && player?.position) {
+      if (!loadingAttackParticleSystem) {
+        loadingAttackParticleSystem = createLoadingAttackParticleSystem(scene);
+      }
+
+      loadingAttackParticleSystem.emitter = getAttackOriginPosition();
+      loadingAttackParticleSystem.start();
+    }
+  }
+
+  function handleDeath() {
+    loadingAttackParticleSystem?.stop();
   }
 
   function createPlayerLabel() {
@@ -143,6 +165,7 @@
     );
     disposeArray(particleSystems);
     attackParticleSystem?.dispose();
+    loadingAttackParticleSystem?.dispose();
     disposeArray(animationGroups);
     disposeArray(rootMeshes);
     disposeArray(skeletons);
@@ -154,7 +177,9 @@
   rootMesh={rootMeshes[0]}
   character={player}
   {animationGroups}
-  {attack}
+  on:attack={handleAttack}
+  on:loadAttack={handleLoadAttack}
+  on:death={handleDeath}
   {characterAnimationKeys}
   {gui}
 />

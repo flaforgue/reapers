@@ -3,7 +3,7 @@ import '@babylonjs/inspector';
 import App from './App.svelte';
 
 const app = new App({
-  target: (document as Document).body as HTMLElement,
+  target: document.body,
 });
 
 export default app;

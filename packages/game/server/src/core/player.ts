@@ -10,6 +10,7 @@ import {
 import Character from './character';
 import BoundedValue from './shared/bounded-value';
 import World from './world';
+import Attack from './shared/attack';
 
 export default class Player extends Character {
   public readonly attackRange = 8;
@@ -52,6 +53,25 @@ export default class Player extends Character {
 
   public emitGameState(gameDto: GameDTO): void {
     this._socket.volatile.emit(GameEvents.Game.Updated, gameDto);
+  }
+
+  protected _attack(attackTarget: Character, distanceToTarget: number): void {
+    super._attack(attackTarget, distanceToTarget);
+
+    this._currentAttacks.push(
+      new Attack(this, attackTarget, {
+        damageAmount: this.attackDamageAmount,
+        maxLoadingTime: 3,
+        timeToCast: this.attackTimeToCast,
+        timeToHit: this.attackLinearSpeed ? distanceToTarget / this.attackLinearSpeed : 0,
+      }),
+    );
+  }
+
+  public performAttack(): void {
+    if (this._currentAttacks.length) {
+      this._currentAttacks[this._currentAttacks.length - 1].stopLoading();
+    }
   }
 
   protected _die(): void {

@@ -16,19 +16,22 @@ import {
   GameEvents,
   FrontMoveDirection,
   SideMoveDirection,
+  AttackState,
 } from './types';
 
 export {
+  // types
   PawnKind,
   CharacterKind,
   MonsterKind,
+  AttackState,
+  FrontMoveDirection,
+  SideMoveDirection,
+  GameEvents,
   AttackDTO,
   BoundedValueDTO,
   CharacterDTO,
   GameDTO,
-  GameEvents,
-  FrontMoveDirection,
-  SideMoveDirection,
   WorldDTO,
   PawnDTO,
   plainToClass,

@@ -9,6 +9,8 @@
     activePlayerId,
     CharacterKind,
     PawnKind,
+    FrontMoveDirection,
+    SideMoveDirection,
   } from '@reapers/game-client';
   import { FocusElement, focusElement, playerName, targetInfos } from '../../../stores';
   import serversConfig from '../../../configs/servers.config';
@@ -96,7 +98,8 @@
     updateSideMoveDirection,
     updateFrontMoveDirection,
     updateRotation,
-    castSpell,
+    loadAttack,
+    performAttack,
   } = useGame(serversConfig.game.url);
 
   onMount(() => {
@@ -163,6 +166,22 @@
     shadowGenerator = createShadowGenerator(details.detail);
     shadowGenerator.addShadowCaster(basePawnMeshes[PawnKind.PineTree] as BABYLON.Mesh);
   }
+
+  function handleFrontMoveDirectionChange(details: CustomEvent<FrontMoveDirection>) {
+    return updateFrontMoveDirection(details.detail);
+  }
+  function handleSideMoveDirectionChange(details: CustomEvent<SideMoveDirection>) {
+    return updateSideMoveDirection(details.detail);
+  }
+  function handleRotationChange(details: CustomEvent<number>) {
+    return updateRotation(details.detail);
+  }
+  function handleLoadAttack(details: CustomEvent<string>) {
+    return loadAttack(details.detail);
+  }
+  function handlePerformAttack() {
+    return performAttack();
+  }
 </script>
 
 <div class="Game">
@@ -188,10 +207,11 @@
           scene={gameScene}
           player={character}
           camera={gameCamera}
-          {updateFrontMoveDirection}
-          {updateSideMoveDirection}
-          {updateRotation}
-          {castSpell}
+          on:frontMoveDirectionChange={handleFrontMoveDirectionChange}
+          on:sideMoveDirectionChange={handleSideMoveDirectionChange}
+          on:rotationChange={handleRotationChange}
+          on:loadAttack={handleLoadAttack}
+          on:performAttack={handlePerformAttack}
         />
       {/if}
     {:else}

@@ -19,4 +19,8 @@ export default class ActionScheduler<T = void> {
       return this._actionHandler();
     }
   }
+
+  public forceAction(): void {
+    this._progress = this._secondsToComplete;
+  }
 }

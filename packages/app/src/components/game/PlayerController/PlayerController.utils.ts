@@ -68,6 +68,7 @@ export function createHighlightMesh(scene: BABYLON.Scene): BABYLON.Mesh {
   const color = new BABYLON.Color3(1, 0.3, 0.1);
   const material = new BABYLON.StandardMaterial('highlightMeshMat', scene);
   material.diffuseColor = color;
+  material.emissiveColor = color;
   material.alpha = 0.7;
   highlightMesh.material = material;
   new BABYLON.HighlightLayer('hl1', scene).addMesh(highlightMesh, color);

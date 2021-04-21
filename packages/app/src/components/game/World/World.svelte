@@ -3,6 +3,7 @@
   import { createEventDispatcher, onDestroy } from 'svelte';
   import { PawnKind, WorldDTO } from '@reapers/game-client';
   import { createGround, createLight, createSkyBox, createSound } from './world.utils';
+  import { createVector3 } from '../../../utils';
 
   type WorldEvents = {
     lightChanged: BABYLON.DirectionalLight;
@@ -27,21 +28,9 @@
 
     for (let i = 0; i < world.pawns.length; i++) {
       BABYLON.Matrix.Compose(
-        new BABYLON.Vector3(
-          world.pawns[i].scaling.x,
-          world.pawns[i].scaling.y,
-          world.pawns[i].scaling.z,
-        ),
-        new BABYLON.Vector3(
-          world.pawns[i].rotation.x,
-          world.pawns[i].rotation.y,
-          world.pawns[i].rotation.z,
-        ).toQuaternion(),
-        new BABYLON.Vector3(
-          world.pawns[i].position.x,
-          world.pawns[i].position.y,
-          world.pawns[i].position.z,
-        ),
+        createVector3(world.pawns[i].scaling),
+        createVector3(world.pawns[i].rotation).toQuaternion(),
+        createVector3(world.pawns[i].position),
       ).copyToArray(matricesDatas[world.pawns[i].kind], i * 16);
     }
 

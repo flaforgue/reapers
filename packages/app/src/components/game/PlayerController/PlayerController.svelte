@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as BABYLON from '@babylonjs/core';
-  import { onDestroy } from 'svelte';
+  import { createEventDispatcher, onDestroy } from 'svelte';
   import {
     SideMoveDirection,
     FrontMoveDirection,
@@ -15,14 +15,21 @@
     isSideMoveDirection,
   } from './PlayerController.utils';
   import charactersConfig from '../../../configs/characters.config';
+  import { createVector3 } from '../../../utils';
 
-  export let updateFrontMoveDirection: (direction: FrontMoveDirection) => void;
-  export let updateSideMoveDirection: (direction: SideMoveDirection) => void;
-  export let updateRotation: (rotY: number) => void;
-  export let castSpell: (targetId: string) => void;
+  type PlayerControllerEvents = {
+    frontMoveDirectionChange: FrontMoveDirection;
+    sideMoveDirectionChange: SideMoveDirection;
+    rotationChange: number;
+    loadAttack: string;
+    performAttack: undefined;
+  };
+
   export let player: CharacterDTO | undefined;
   export let camera: BABYLON.ArcRotateCamera | undefined;
   export let scene: BABYLON.Scene | undefined;
+
+  const dispatch = createEventDispatcher<PlayerControllerEvents>();
 
   let rangeParticleSystem: BABYLON.ParticleSystem | undefined;
   let highlightMesh: BABYLON.Mesh | undefined;
@@ -32,28 +39,24 @@
 
   function localUpdateRotation(rotY: number) {
     if (player?.canMove) {
-      updateRotation(rotY);
+      dispatch('rotationChange', rotY);
     }
   }
 
-  function localCastSpell() {
-    if (!player?.canMove || !player) {
+  function localLoadAttack() {
+    if (!player?.canMove) {
       return;
     }
 
     const distanceToTarget = $targetInfos?.position
       ? BABYLON.Vector3.Distance(
-          new BABYLON.Vector3(player.position.x, player.position.y, player.position.z),
-          new BABYLON.Vector3(
-            $targetInfos.position.x,
-            $targetInfos.position.y,
-            $targetInfos.position.z,
-          ),
+          createVector3(player.position),
+          createVector3($targetInfos.position),
         )
       : player.attackRange + 1; // if no target, consider out of range
 
     if (distanceToTarget <= player.attackRange) {
-      return castSpell($targetInfos?.id as string);
+      return dispatch('loadAttack', $targetInfos?.id as string);
     } else if (rangeParticleSystem && !rangeParticleSystem.isAlive()) {
       rangeParticleSystem.emitter = new BABYLON.Vector3(
         player.position.x,
@@ -64,32 +67,42 @@
     }
   }
 
+  function localPerformAttack() {
+    if (player?.isAttacking) {
+      dispatch('performAttack');
+    }
+  }
+
   function keyboardEventHandler({ type, event }: BABYLON.KeyboardInfo) {
-    if (player?.canMove && type === BABYLON.KeyboardEventTypes.KEYDOWN) {
-      switch (event.key) {
-        case Key.z:
-          updateFrontMoveDirection(FrontMoveDirection.Forward);
-          break;
-        case Key.s:
-          updateFrontMoveDirection(FrontMoveDirection.Backward);
-          break;
-        case Key.a:
-          updateSideMoveDirection(SideMoveDirection.Left);
-          break;
-        case Key.e:
-          updateSideMoveDirection(SideMoveDirection.Right);
-          break;
-        case Key.Space:
-          localCastSpell();
-          break;
-        default:
-          break;
+    if (type === BABYLON.KeyboardEventTypes.KEYDOWN) {
+      if (player?.canMove) {
+        switch (event.key) {
+          case Key.z:
+            dispatch('frontMoveDirectionChange', FrontMoveDirection.Forward);
+            break;
+          case Key.s:
+            dispatch('frontMoveDirectionChange', FrontMoveDirection.Backward);
+            break;
+          case Key.a:
+            dispatch('sideMoveDirectionChange', SideMoveDirection.Left);
+            break;
+          case Key.e:
+            dispatch('sideMoveDirectionChange', SideMoveDirection.Right);
+            break;
+          case Key.Space:
+            localLoadAttack();
+            break;
+          default:
+            break;
+        }
       }
-    } else {
+    } else if (player) {
       if (isFrontMoveDirection(event.key)) {
-        updateFrontMoveDirection(FrontMoveDirection.None);
+        dispatch('frontMoveDirectionChange', FrontMoveDirection.None);
       } else if (isSideMoveDirection(event.key)) {
-        updateSideMoveDirection(SideMoveDirection.None);
+        dispatch('sideMoveDirectionChange', SideMoveDirection.None);
+      } else if (event.key === Key.Space) {
+        localPerformAttack();
       }
     }
   }

@@ -81,7 +81,7 @@ export default class Game extends Identifiable {
       this._engine.runRenderLoop(() => {
         try {
           if (this._isRunning) {
-            console.log(this._engine.getFps().toFixed());
+            // console.log(this._engine.getFps().toFixed());
             this._update();
             this._scene.render(false, true);
           }

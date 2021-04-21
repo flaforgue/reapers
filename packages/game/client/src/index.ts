@@ -4,16 +4,17 @@
 import socketIOClient from 'socket.io-client';
 import { writable } from 'svelte/store';
 import {
+  AttackState,
   CharacterKind,
   MonsterKind,
   PawnKind,
+  FrontMoveDirection,
+  SideMoveDirection,
+  GameEvents,
   AttackDTO,
   BoundedValueDTO,
   CharacterDTO,
   GameDTO,
-  GameEvents,
-  FrontMoveDirection,
-  SideMoveDirection,
   WorldDTO,
   PawnDTO,
 } from '@reapers/game-shared';
@@ -24,7 +25,8 @@ type UseGameResult = {
   updateFrontMoveDirection: (direction: FrontMoveDirection) => void;
   updateSideMoveDirection: (direction: SideMoveDirection) => void;
   updateRotation: (rotationY: number) => void;
-  castSpell: (targetId: string) => void;
+  loadAttack: (targetId: string) => void;
+  performAttack: () => void;
 };
 
 const activePlayerId = writable<string>('');
@@ -54,8 +56,12 @@ function useGame(serverUrl: string): UseGameResult {
     socket.emit(GameEvents.Player.RotationUpdated, rotationY);
   }
 
-  function castSpell(targetId: string): void {
-    socket.emit(GameEvents.Player.SpellCasted, targetId);
+  function loadAttack(targetId: string): void {
+    socket.emit(GameEvents.Player.AttackLoaded, targetId);
+  }
+
+  function performAttack(): void {
+    socket.emit(GameEvents.Player.AttackPerformed);
   }
 
   socket.on(GameEvents.Player.Created, (player: CharacterDTO) => {
@@ -76,7 +82,8 @@ function useGame(serverUrl: string): UseGameResult {
     updateFrontMoveDirection,
     updateSideMoveDirection,
     updateRotation,
-    castSpell,
+    loadAttack,
+    performAttack,
   };
 }
 
@@ -85,16 +92,17 @@ export {
   game,
   world,
   useGame,
+  AttackState,
   CharacterKind,
   MonsterKind,
   PawnKind,
+  FrontMoveDirection,
+  SideMoveDirection,
+  GameEvents,
   AttackDTO,
   BoundedValueDTO,
   CharacterDTO,
   GameDTO,
   WorldDTO,
   PawnDTO,
-  GameEvents,
-  FrontMoveDirection,
-  SideMoveDirection,
 };
