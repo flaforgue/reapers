@@ -98,7 +98,7 @@ export default class Monster extends Character {
 
     this._currentAttacks.push(
       new Attack(this, attackTarget, {
-        damageAmount: this.attackDamageAmount,
+        damageAmount: this.attackDamageAmount * BABYLON.Scalar.RandomRange(0.8, 1.2),
         timeToCast: this.attackTimeToCast,
         timeToHit: this.attackLinearSpeed ? distanceToTarget / this.attackLinearSpeed : 0,
       }),
