@@ -24,7 +24,7 @@ export default class Attack extends Identifiable {
   private readonly _schedulers: Record<AttackState, ActionScheduler>;
   private readonly _damageCoefScheduler: ActionScheduler | undefined;
 
-  private _damageCoef = 1;
+  private _damageCoef: number;
   private _damageAmount: number;
   private _state: AttackState;
   private _isDestroyed = false;
@@ -36,8 +36,11 @@ export default class Attack extends Identifiable {
     this.parent.isAttacking = true;
     this.timeToHit = attackConfig.timeToHit;
     this.timeToCast = attackConfig.timeToCast;
-    this.maxLoadingTime = attackConfig.maxLoadingTime ?? 0;
     this.maxDamageCoef = attackConfig.maxDamageCoef ?? 1;
+    this.maxLoadingTime = attackConfig.maxLoadingTime ?? 0;
+    this._damageCoef = attackConfig.maxLoadingTime
+      ? Math.round(BABYLON.Scalar.RandomRange(1, this.maxDamageCoef / 2))
+      : 1;
     this._target = target;
     this._state = this.maxLoadingTime ? AttackState.Loading : AttackState.Casting;
     this._damageAmount = attackConfig.damageAmount;
