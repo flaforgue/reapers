@@ -18,7 +18,6 @@ export default class Monster extends Character {
   private readonly _generator: MonsterGenerator;
 
   private _destination: BABYLON.Vector3;
-  private _target: Character | null = null;
   private _isGoingBackToInitialPosition = false;
 
   public constructor(
