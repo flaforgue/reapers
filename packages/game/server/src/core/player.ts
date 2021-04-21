@@ -14,7 +14,7 @@ import Attack from './shared/attack';
 
 export default class Player extends Character {
   public readonly attackRange = 8;
-  public readonly attackDamageAmount: number = 10;
+  public readonly attackDamageAmount: number = 5;
   public readonly attackLinearSpeed: number = 30;
   public readonly attackTimeToCast: number = 0.45;
 
@@ -61,7 +61,8 @@ export default class Player extends Character {
     this._currentAttacks.push(
       new Attack(this, attackTarget, {
         damageAmount: this.attackDamageAmount,
-        maxLoadingTime: 3,
+        maxLoadingTime: 10,
+        maxDamageCoef: 5,
         timeToCast: this.attackTimeToCast,
         timeToHit: this.attackLinearSpeed ? distanceToTarget / this.attackLinearSpeed : 0,
       }),

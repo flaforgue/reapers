@@ -53,3 +53,12 @@ export function worldToGUI(
 export function createVector3(v: Vector3DTO): BABYLON.Vector3 {
   return new BABYLON.Vector3(v.x, v.y, v.z);
 }
+
+export function setParticleSystemColor(
+  ps: BABYLON.ParticleSystem,
+  newColor: BABYLON.Color4,
+): void {
+  ps.color1 = newColor;
+  ps.color2 = newColor;
+  ps.colorDead = newColor;
+}

@@ -33,4 +33,10 @@ export default class AttackDTO extends IdentifiableDTO {
 
   @Expose()
   public damageAmount = 0;
+
+  @Expose()
+  public damageCoef = 1;
+
+  @Expose()
+  public maxDamageCoef = 1;
 }

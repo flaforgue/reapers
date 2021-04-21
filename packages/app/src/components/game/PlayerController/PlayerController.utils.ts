@@ -1,4 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
+import { setParticleSystemColor } from '../../../utils';
 import { Key } from '../../../configs/keycodes.config';
 
 export function isFrontMoveDirection(value: string): boolean {
@@ -89,6 +90,7 @@ export function createRangeParticleSytem(
   const particleTexture = new BABYLON.Texture('/textures/flare.png', scene);
   const particleColor = new BABYLON.Color4(0.2, 0.2, 0.85, 1);
   const ps = new BABYLON.ParticleSystem('particles', 1000, scene);
+  setParticleSystemColor(ps, particleColor);
   ps.createDirectedCylinderEmitter(
     range,
     0.1,
@@ -97,9 +99,6 @@ export function createRangeParticleSytem(
     BABYLON.Vector3.Up(),
   );
   ps.particleTexture = particleTexture;
-  ps.color1 = particleColor;
-  ps.color2 = particleColor;
-  ps.colorDead = particleColor;
   ps.noiseTexture = noiseTexture;
   ps.noiseStrength = new BABYLON.Vector3(10, 10, 10);
   ps.minEmitPower = 0.1;

@@ -16,6 +16,7 @@
   type CharacterEvents = {
     attack: AttackDTO;
     loadAttack: AttackDTO;
+    castAttack: undefined;
     death: undefined;
   };
 
@@ -159,6 +160,7 @@
 
   function handleAttackCasting() {
     switchAnimation(characterAnimationKeys.attack);
+    dispatch('castAttack');
   }
 
   function handleAttackHitting() {

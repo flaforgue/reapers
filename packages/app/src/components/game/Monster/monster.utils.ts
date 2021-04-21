@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import { CharacterKind, MonsterKind } from '@reapers/game-client';
+import { setParticleSystemColor } from '../../../utils';
 
 enum SpiderAnimationKey {
   Attack = 0,
@@ -26,10 +27,8 @@ export function createParticleSystem(scene: BABYLON.Scene): BABYLON.ParticleSyst
   const ps = new BABYLON.ParticleSystem('particles', 1000, scene);
   const particleColor = new BABYLON.Color4(0.85, 0.2, 0.2, 1);
 
+  setParticleSystemColor(ps, particleColor);
   ps.particleTexture = new BABYLON.Texture('/textures/circle_flare.png', scene);
-  ps.color1 = particleColor;
-  ps.color2 = particleColor;
-  ps.colorDead = particleColor;
   ps.addSizeGradient(0, 0);
   ps.addSizeGradient(1, 2);
   ps.createSphereEmitter(0.4, 1);

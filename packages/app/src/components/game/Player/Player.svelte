@@ -3,12 +3,13 @@
   import * as GUI from '@babylonjs/gui';
   import { onDestroy } from 'svelte';
   import { activePlayerId, AttackDTO, CharacterDTO } from '@reapers/game-client';
-  import { createVector3, disposeArray } from '../../../utils';
+  import { createVector3, disposeArray, setParticleSystemColor } from '../../../utils';
   import {
     AnimationKey,
     createLinkedLabel,
     createAttackParticleSystem,
     createLoadingAttackParticleSystem,
+    getColorFromDamageCoef,
   } from './player.utils';
   import Character from '../Character/Character.svelte';
   import { playerInfos, targetInfos } from '../../../stores';
@@ -51,11 +52,13 @@
     return createVector3(player.position).add(rootMeshes[0].calcMovePOV(0, 0.5, 0.5));
   }
 
+  function handleCastAttack() {
+    loadingAttackParticleSystem?.stop();
+  }
+
   function handleAttack(details: CustomEvent<AttackDTO>) {
     const scene = rootMeshes[0]?.getScene();
     const attack = details.detail;
-
-    loadingAttackParticleSystem?.stop();
 
     if (attack && scene && player?.position) {
       if (!attackParticleSystem) {
@@ -80,6 +83,15 @@
       attackParticleSystem.minLifeTime = attack.timeToHit;
       attackParticleSystem.maxLifeTime = attack.timeToHit;
       attackParticleSystem.manualEmitCount = 3;
+
+      const newColor = getColorFromDamageCoef(attack.damageCoef, attack.maxDamageCoef);
+      setParticleSystemColor(attackParticleSystem, newColor);
+      for (let i = 0; i < attackParticleSystem.subEmitters.length; i++) {
+        setParticleSystemColor(
+          (attackParticleSystem.subEmitters[i] as BABYLON.SubEmitter).particleSystem,
+          newColor,
+        );
+      }
     }
   }
 
@@ -92,6 +104,7 @@
         loadingAttackParticleSystem = createLoadingAttackParticleSystem(scene);
       }
 
+      updateLoadingAttackColor(attack.damageCoef, attack.maxDamageCoef);
       loadingAttackParticleSystem.emitter = getAttackOriginPosition();
       loadingAttackParticleSystem.start();
     }
@@ -106,6 +119,15 @@
       label?.dispose();
       label = createLinkedLabel(`${name} • ${level}`, kind, rootMeshes[0]);
       gui.addControl(label);
+    }
+  }
+
+  function updateLoadingAttackColor(coef: number, maxCoef: number) {
+    if (loadingAttackParticleSystem) {
+      setParticleSystemColor(
+        loadingAttackParticleSystem,
+        getColorFromDamageCoef(coef, maxCoef),
+      );
     }
   }
 
@@ -159,6 +181,14 @@
     }
   }
 
+  $: currentAttackDamageCoef = player.currentAttack?.damageCoef;
+  $: maxAttackDamageCoef = player.currentAttack?.maxDamageCoef;
+  $: {
+    if (currentAttackDamageCoef && maxAttackDamageCoef) {
+      updateLoadingAttackColor(currentAttackDamageCoef, maxAttackDamageCoef);
+    }
+  }
+
   onDestroy(() => {
     const particleSystems = (attackParticleSystem?.subEmitters ?? []).map(
       (s) => (s as BABYLON.SubEmitter).particleSystem,
@@ -179,6 +209,7 @@
   {animationGroups}
   on:attack={handleAttack}
   on:loadAttack={handleLoadAttack}
+  on:castAttack={handleCastAttack}
   on:death={handleDeath}
   {characterAnimationKeys}
   {gui}

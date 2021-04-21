@@ -2,7 +2,7 @@ import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
 import { CharacterKind } from '@reapers/game-client';
 import charactersConfig from '../../../configs/characters.config';
-import { worldToGUI } from '../../../utils';
+import { setParticleSystemColor, worldToGUI } from '../../../utils';
 
 export enum AnimationKey {
   Defeat = 0,
@@ -48,14 +48,12 @@ function createBaseSubParticleSystem(
 ): BABYLON.ParticleSystem {
   const ps = new BABYLON.ParticleSystem('particles', 1000, scene);
 
-  ps.particleTexture = particleTexture;
-  ps.disposeOnStop = true;
-  ps.color1 = particleColor;
-  ps.color2 = particleColor;
-  ps.colorDead = particleColor;
-  ps.emitRate = 500;
+  setParticleSystemColor(ps, particleColor);
   ps.addSizeGradient(0, 0.3);
   ps.addSizeGradient(1, 0);
+  ps.particleTexture = particleTexture;
+  ps.disposeOnStop = true;
+  ps.emitRate = 500;
 
   return ps;
 }
@@ -147,12 +145,12 @@ export function createLoadingAttackParticleSystem(
   ps.color2 = particleColor;
   ps.colorDead = particleColor;
   ps.emitRate = 200;
-  ps.addSizeGradient(0, 0.4);
-  ps.addSizeGradient(1, 0.1);
   ps.minEmitPower = 1;
   ps.maxEmitPower = 2;
-  ps.minLifeTime = 0.1;
-  ps.maxLifeTime = 0.2;
+  ps.minLifeTime = 0.05;
+  ps.maxLifeTime = 0.1;
+  ps.addSizeGradient(0, 0.4);
+  ps.addSizeGradient(1, 0.1);
   ps.addDragGradient(0, 0);
   ps.addDragGradient(1, 1);
   ps.start();
@@ -189,4 +187,12 @@ export function createLinkedLabel(
   });
 
   return label;
+}
+
+export function getColorFromDamageCoef(coef: number, maxCoef: number): BABYLON.Color4 {
+  return new BABYLON.Color4(
+    Math.max(0, coef / maxCoef),
+    0.2,
+    Math.max(0.1, 1 - coef / maxCoef),
+  );
 }
