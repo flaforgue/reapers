@@ -2,7 +2,7 @@ import * as BABYLON from 'babylonjs';
 import Character from '../character';
 import ActionScheduler from '../shared/action-scheduler';
 import { getRandomPosition } from '../../utils';
-import { FrontMoveDirection, SideMoveDirection } from '@reapers/game-shared';
+import { FrontMoveDirection } from '@reapers/game-shared';
 import Attack from '../shared/attack';
 import MonsterGenerator from '../monster-generator';
 import World from '../world';
@@ -11,7 +11,7 @@ const walkingArea = 5;
 const maxDistanceFromInitialPosition = 50;
 
 export default class Monster extends Character {
-  public readonly attackRange = 1;
+  public readonly attackRange = 1.5;
 
   private readonly _initialPosition: BABYLON.Vector3;
   private readonly _randomMoveScheduler: ActionScheduler;
