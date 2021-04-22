@@ -44,6 +44,7 @@
   };
   let gui: GUI.AdvancedDynamicTexture | undefined;
   let shadowGenerator: BABYLON.CascadedShadowGenerator | undefined;
+  let groundMesh: BABYLON.GroundMesh | undefined;
 
   function loadAssets(gameScene: BABYLON.Scene) {
     for (let kind of Object.values(CharacterKind)) {
@@ -147,37 +148,46 @@
     };
   });
 
-  $: {
-    if ($focusElement === FocusElement.Game) {
-      gameCanvas?.focus();
-    } else {
-      gameCanvas?.blur();
-    }
-  }
-
   function handleLightChanged(details: CustomEvent<BABYLON.DirectionalLight>) {
     shadowGenerator?.dispose();
     shadowGenerator = createShadowGenerator(details.detail);
     shadowGenerator.addShadowCaster(basePawnMeshes[PawnKind.PineTree] as BABYLON.Mesh);
   }
 
+  function handleGroundChanged(details: CustomEvent<BABYLON.GroundMesh>) {
+    groundMesh = details.detail;
+  }
+
   function handleFrontMoveDirectionChange(details: CustomEvent<FrontMoveDirection>) {
     return updateFrontMoveDirection(details.detail);
   }
+
   function handleSideMoveDirectionChange(details: CustomEvent<SideMoveDirection>) {
     return updateSideMoveDirection(details.detail);
   }
+
   function handleRotationChange(details: CustomEvent<number>) {
     return updateRotation(details.detail);
   }
+
   function handleLoadAttack(details: CustomEvent<string>) {
     return loadAttack(details.detail);
   }
+
   function handlePerformAttack() {
     return performAttack();
   }
+
   function handleCancelAttack() {
     return cancelAttack();
+  }
+
+  $: {
+    if ($focusElement === FocusElement.Game) {
+      gameCanvas?.focus();
+    } else {
+      gameCanvas?.blur();
+    }
   }
 </script>
 
@@ -188,6 +198,7 @@
     scene={gameScene}
     {basePawnMeshes}
     on:lightChanged={handleLightChanged}
+    on:groundChanged={handleGroundChanged}
   />
 
   {#each $game.characters as character (character.id)}
@@ -204,6 +215,7 @@
           scene={gameScene}
           player={character}
           camera={gameCamera}
+          {groundMesh}
           on:frontMoveDirectionChange={handleFrontMoveDirectionChange}
           on:sideMoveDirectionChange={handleSideMoveDirectionChange}
           on:rotationChange={handleRotationChange}

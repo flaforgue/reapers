@@ -7,6 +7,7 @@
 
   type WorldEvents = {
     lightChanged: BABYLON.DirectionalLight;
+    groundChanged: BABYLON.GroundMesh;
   };
 
   export let scene: BABYLON.Scene | undefined;
@@ -15,7 +16,7 @@
 
   const dispatch = createEventDispatcher<WorldEvents>();
 
-  let ground: BABYLON.Mesh | undefined;
+  let ground: BABYLON.GroundMesh | undefined;
   let light: BABYLON.DirectionalLight | undefined;
   let sound: BABYLON.Sound | undefined;
   let skyBox: BABYLON.Mesh | undefined;
@@ -60,6 +61,7 @@
       light = createLight(scene);
 
       dispatch('lightChanged', light);
+      dispatch('groundChanged', ground);
     }
   }
 

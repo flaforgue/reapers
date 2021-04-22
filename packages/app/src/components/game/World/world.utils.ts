@@ -52,7 +52,7 @@ export function createGround(
   width: number,
   depth: number,
   scene: BABYLON.Scene,
-): BABYLON.Mesh {
+): BABYLON.GroundMesh {
   const ground = BABYLON.MeshBuilder.CreateGroundFromHeightMap(
     'ground',
     '/textures/heightMap.png',

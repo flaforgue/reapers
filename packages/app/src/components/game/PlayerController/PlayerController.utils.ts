@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
-import { setParticleSystemColor } from '../../../utils';
+import { Vector3DTO } from '@reapers/game-client';
+import { createVector3 } from '../../../utils';
 import { Key } from '../../../configs/keycodes.config';
 
 export function isFrontMoveDirection(value: string): boolean {
@@ -18,7 +19,6 @@ export function createHighlightMesh(scene: BABYLON.Scene): BABYLON.Mesh {
     sizeZ: 0.5,
   });
 
-  highlightMesh.setEnabled(false);
   highlightMesh.animations.push(
     new BABYLON.Animation(
       'scalingAnimation',
@@ -70,45 +70,29 @@ export function createHighlightMesh(scene: BABYLON.Scene): BABYLON.Mesh {
   const material = new BABYLON.StandardMaterial('highlightMeshMat', scene);
   material.diffuseColor = color;
   material.emissiveColor = color;
-  material.alpha = 0.7;
+  material.alpha = 0;
   highlightMesh.material = material;
   new BABYLON.HighlightLayer('hl1', scene).addMesh(highlightMesh, color);
 
   return highlightMesh;
 }
 
-export function createRangeParticleSytem(
-  scene: BABYLON.Scene,
+export function createRangeMesh(
+  groundMesh: BABYLON.GroundMesh,
+  position: Vector3DTO,
   range: number,
-): BABYLON.ParticleSystem {
-  const noiseTexture = new BABYLON.NoiseProceduralTexture('perlin', 256, scene);
-  noiseTexture.animationSpeedFactor = 5;
-  noiseTexture.persistence = 2;
-  noiseTexture.brightness = 0.5;
-  noiseTexture.octaves = 2;
+): BABYLON.Mesh {
+  const rangeMesh = BABYLON.MeshBuilder.CreateDecal('rangeMesh', groundMesh, {
+    position: createVector3(position),
+    size: new BABYLON.Vector3().setAll(range),
+  });
+  const scene = rangeMesh.getScene();
+  const material = new BABYLON.StandardMaterial('rangeMeshMat', scene);
+  const texture = new BABYLON.Texture('/textures/whiteCircle.png', scene);
+  texture.hasAlpha = true;
+  material.diffuseTexture = texture;
+  material.zOffset = -2;
+  rangeMesh.material = material;
 
-  const particleTexture = new BABYLON.Texture('/textures/flare.png', scene);
-  const particleColor = new BABYLON.Color4(0.2, 0.2, 0.85, 1);
-  const ps = new BABYLON.ParticleSystem('particles', 1000, scene);
-  setParticleSystemColor(ps, particleColor);
-  ps.createDirectedCylinderEmitter(
-    range,
-    0.1,
-    0,
-    BABYLON.Vector3.Up(),
-    BABYLON.Vector3.Up(),
-  );
-  ps.particleTexture = particleTexture;
-  ps.noiseTexture = noiseTexture;
-  ps.noiseStrength = new BABYLON.Vector3(10, 10, 10);
-  ps.minEmitPower = 0.1;
-  ps.maxEmitPower = 0.5;
-  ps.manualEmitCount = 0;
-  ps.minLifeTime = 0.2;
-  ps.maxLifeTime = 0.4;
-  ps.addSizeGradient(0, 0.3);
-  ps.addSizeGradient(1, 0);
-  ps.start();
-
-  return ps;
+  return rangeMesh;
 }

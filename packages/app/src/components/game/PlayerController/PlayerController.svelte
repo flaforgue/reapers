@@ -10,7 +10,7 @@
   import { Key } from '../../../configs/keycodes.config';
   import {
     createHighlightMesh,
-    createRangeParticleSytem,
+    createRangeMesh,
     isFrontMoveDirection,
     isSideMoveDirection,
   } from './PlayerController.utils';
@@ -29,10 +29,11 @@
   export let player: CharacterDTO | undefined;
   export let camera: BABYLON.ArcRotateCamera | undefined;
   export let scene: BABYLON.Scene | undefined;
+  export let groundMesh: BABYLON.GroundMesh | undefined;
 
   const dispatch = createEventDispatcher<PlayerControllerEvents>();
 
-  let rangeParticleSystem: BABYLON.ParticleSystem | undefined;
+  let rangeMesh: BABYLON.Mesh | undefined;
   let highlightMesh: BABYLON.Mesh | undefined;
   let keyboardEventObserver:
     | BABYLON.Nullable<BABYLON.Observer<BABYLON.KeyboardInfo>>
@@ -58,13 +59,10 @@
 
     if (distanceToTarget <= player.attackRange) {
       return dispatch('loadAttack', $targetInfos?.id as string);
-    } else if (rangeParticleSystem && !rangeParticleSystem.isAlive()) {
-      rangeParticleSystem.emitter = new BABYLON.Vector3(
-        player.position.x,
-        player.position.y,
-        player.position.z,
-      );
-      rangeParticleSystem.manualEmitCount = 100;
+    } else if (groundMesh) {
+      rangeMesh?.dispose();
+      rangeMesh = createRangeMesh(groundMesh, player.position, player.attackRange);
+      setTimeout(() => rangeMesh?.dispose(), 500);
     }
   }
 
@@ -139,7 +137,6 @@
     if (scene && player) {
       keyboardEventObserver = scene?.onKeyboardObservable?.add(keyboardEventHandler);
       highlightMesh = createHighlightMesh(scene);
-      rangeParticleSystem = createRangeParticleSytem(scene, player.attackRange);
     }
   }
 
@@ -178,7 +175,7 @@
 
   onDestroy(() => {
     scene?.onKeyboardObservable?.remove(keyboardEventObserver ?? null);
-    rangeParticleSystem?.dispose();
+    rangeMesh?.dispose();
     highlightMesh?.dispose();
   });
 </script>

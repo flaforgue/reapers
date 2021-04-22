@@ -8,6 +8,7 @@ import {
   GameDTO,
   WorldDTO,
   PawnDTO,
+  Vector3DTO,
 } from './dtos';
 import {
   PawnKind,
@@ -34,5 +35,6 @@ export {
   GameDTO,
   WorldDTO,
   PawnDTO,
+  Vector3DTO,
   plainToClass,
 };

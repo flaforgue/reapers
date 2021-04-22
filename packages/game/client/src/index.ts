@@ -17,6 +17,7 @@ import {
   GameDTO,
   WorldDTO,
   PawnDTO,
+  Vector3DTO,
 } from '@reapers/game-shared';
 
 type UseGameResult = {
@@ -111,4 +112,5 @@ export {
   GameDTO,
   WorldDTO,
   PawnDTO,
+  Vector3DTO,
 };
