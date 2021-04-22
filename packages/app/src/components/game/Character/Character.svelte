@@ -8,7 +8,7 @@
     CharacterDTO,
   } from '@reapers/game-client';
   import { createEventDispatcher } from 'svelte';
-  import { targetInfos } from '../../../stores';
+  import { playerInfos, targetInfos } from '../../../stores';
   import { createAttackLabel } from './character.utils';
 
   type CharacterAnimationKey = 'attack' | 'death' | 'idle' | 'walk';
@@ -91,7 +91,9 @@
         new BABYLON.ExecuteCodeAction(
           { trigger: BABYLON.ActionManager.OnPickTrigger },
           function () {
-            updateGUITargetInfos();
+            if ($playerInfos.canMove) {
+              updateGUITargetInfos();
+            }
           },
         ),
       );

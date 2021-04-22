@@ -159,9 +159,11 @@
   $: lifeMin = player.life.min;
   $: lifeMax = player.life.max;
   $: lifeValue = player.life.value;
+  $: canMove = player.canMove;
   $: {
     // this variable is used to trigger svelte reactivity
-    const reactivityDeps = lifeMin || lifeMax || lifeValue || playerName || playerLevel;
+    const reactivityDeps =
+      lifeMin || lifeMax || lifeValue || playerName || playerLevel || canMove;
 
     if (isActivePlayer && reactivityDeps) {
       updatePlayerInfos();
