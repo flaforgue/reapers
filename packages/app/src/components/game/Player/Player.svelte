@@ -84,6 +84,7 @@
       attackParticleSystem.maxLifeTime = attack.timeToHit;
       attackParticleSystem.manualEmitCount = 3;
 
+      const newEmitRate = (5000 * attack.damageCoef) / attack.maxDamageCoef;
       const newColor = getColorFromDamageCoef(attack.damageCoef, attack.maxDamageCoef);
       setParticleSystemColor(attackParticleSystem, newColor);
       for (let i = 0; i < attackParticleSystem.subEmitters.length; i++) {
@@ -91,6 +92,9 @@
           (attackParticleSystem.subEmitters[i] as BABYLON.SubEmitter).particleSystem,
           newColor,
         );
+        (attackParticleSystem.subEmitters[
+          i
+        ] as BABYLON.SubEmitter).particleSystem.emitRate = newEmitRate;
       }
     }
   }

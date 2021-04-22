@@ -31,9 +31,7 @@ function createMainParticleSystem(
   ps.minEmitPower = attackLinearSpeed;
   ps.maxEmitPower = attackLinearSpeed;
   ps.updateSpeed = 0.01;
-  ps.color1 = particleColor;
-  ps.color2 = particleColor;
-  ps.colorDead = particleColor;
+  setParticleSystemColor(ps, particleColor);
   ps.minSize = 0.4;
   ps.maxSize = 0.4;
   ps.manualEmitCount = 0;
