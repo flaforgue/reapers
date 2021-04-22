@@ -111,7 +111,7 @@
     gui = createGUI();
     loadAssets(gameScene);
 
-    showAxis(1, gameScene);
+    // showAxis(1, gameScene);
     // gameScene.debugLayer.show({
     //   embedMode: true,
     // });

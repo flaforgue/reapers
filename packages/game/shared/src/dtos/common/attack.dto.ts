@@ -12,10 +12,16 @@ export default class AttackDTO extends IdentifiableDTO {
   public targetId = '';
 
   @Expose()
+  public parentId = '';
+
+  @Expose()
   public targetKind: CharacterKind = CharacterKind.Player;
 
   @Expose()
   public isTargetAlive = true;
+
+  @Expose()
+  public isParentAlive = true;
 
   @Expose()
   @Type(() => Vector3DTO)

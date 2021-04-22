@@ -56,7 +56,7 @@
     loadingAttackParticleSystem?.stop();
   }
 
-  function handleAttack(details: CustomEvent<AttackDTO>) {
+  function handleHitAttack(details: CustomEvent<AttackDTO>) {
     const scene = rootMeshes[0]?.getScene();
     const attack = details.detail;
 
@@ -135,6 +135,10 @@
     }
   }
 
+  function handleChangeLoadingAttackCoef(details: CustomEvent<AttackDTO>) {
+    updateLoadingAttackColor(details.detail.damageCoef, details.detail.maxDamageCoef);
+  }
+
   function updatePlayerInfos() {
     $playerInfos = player;
   }
@@ -187,14 +191,6 @@
     }
   }
 
-  $: currentAttackDamageCoef = player.currentAttack?.damageCoef;
-  $: maxAttackDamageCoef = player.currentAttack?.maxDamageCoef;
-  $: {
-    if (currentAttackDamageCoef && maxAttackDamageCoef) {
-      updateLoadingAttackColor(currentAttackDamageCoef, maxAttackDamageCoef);
-    }
-  }
-
   onDestroy(() => {
     const particleSystems = (attackParticleSystem?.subEmitters ?? []).map(
       (s) => (s as BABYLON.SubEmitter).particleSystem,
@@ -213,8 +209,9 @@
   rootMesh={rootMeshes[0]}
   character={player}
   {animationGroups}
-  on:attack={handleAttack}
+  on:hitAttack={handleHitAttack}
   on:loadAttack={handleLoadAttack}
+  on:changeLoadingAttackCoef={handleChangeLoadingAttackCoef}
   on:castAttack={handleCastAttack}
   on:death={handleDeath}
   {characterAnimationKeys}

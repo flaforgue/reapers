@@ -28,7 +28,7 @@ export default class CharacterDTO extends PositionableDTO {
 
   @Expose()
   @Type(() => AttackDTO)
-  public currentAttack: AttackDTO | null = null;
+  public currentAttacks: AttackDTO[] = [];
 
   @Expose()
   public isAttacking = false;

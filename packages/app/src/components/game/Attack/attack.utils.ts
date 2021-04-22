@@ -1,8 +1,8 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
-import { AttackDTO, CharacterKind } from '@reapers/game-client';
+import { CharacterKind, AttackDTO } from '@reapers/game-client';
+import { worldToGUI, createVector3 } from '../../../utils';
 import charactersConfig from '../../../configs/characters.config';
-import { createVector3, worldToGUI } from '../../../utils';
 
 function createFreeLabel(
   labelOptions: {
@@ -48,7 +48,7 @@ function createFreeLabel(
   return label;
 }
 
-export function createAttackLabel(
+export function createLabel(
   attack: AttackDTO,
   color: string,
   scene: BABYLON.Scene,

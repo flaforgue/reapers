@@ -47,7 +47,7 @@ export default (socket: Socket, game: Game, player: Player): void => {
   });
 
   socket.on(GameEvents.Player.AttackPerformed, () => {
-    if (player.isAttacking) {
+    if (player.isLoadingAttack) {
       player.performAttack();
     }
   });

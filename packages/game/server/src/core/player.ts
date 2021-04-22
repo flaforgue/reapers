@@ -1,6 +1,7 @@
 import SocketIO from 'socket.io';
 import * as BABYLON from 'babylonjs';
 import {
+  AttackState,
   CharacterKind,
   FrontMoveDirection,
   GameDTO,
@@ -13,7 +14,7 @@ import World from './world';
 import Attack from './shared/attack';
 
 export default class Player extends Character {
-  public readonly attackRange = 8;
+  public readonly attackRange = 10;
   public readonly attackDamageAmount: number = 5;
   public readonly attackLinearSpeed: number = 30;
   public readonly attackTimeToCast: number = 0.45;
@@ -70,14 +71,11 @@ export default class Player extends Character {
   }
 
   public performAttack(): void {
-    if (this._currentAttacks.length) {
-      this._currentAttacks[this._currentAttacks.length - 1].stopLoading();
-    }
+    this._currentAttacks.find((a) => a.state === AttackState.Loading)?.stopLoading();
   }
 
   protected _die(): void {
     this.speedFactor.reset();
-    this.isAttacking = false;
     this.frontMoveDirection = FrontMoveDirection.None;
     this.sideMoveDirection = SideMoveDirection.None;
     this.life.setToMax();

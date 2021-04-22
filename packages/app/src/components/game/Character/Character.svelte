@@ -1,22 +1,18 @@
 <script>
   import * as BABYLON from '@babylonjs/core';
   import * as GUI from '@babylonjs/gui';
-  import {
-    activePlayerId,
-    AttackDTO,
-    AttackState,
-    CharacterDTO,
-  } from '@reapers/game-client';
+  import { AttackDTO, CharacterDTO } from '@reapers/game-client';
   import { createEventDispatcher } from 'svelte';
+  import Attack from '../Attack/Attack.svelte';
   import { playerInfos, targetInfos } from '../../../stores';
-  import { createAttackLabel } from './character.utils';
 
   type CharacterAnimationKey = 'attack' | 'death' | 'idle' | 'walk';
   type NullableCharacterAnimationKey = 'loadAttack';
   type CharacterEvents = {
-    attack: AttackDTO;
     loadAttack: AttackDTO;
-    castAttack: undefined;
+    changeLoadingAttackCoef: AttackDTO;
+    castAttack: AttackDTO;
+    hitAttack: AttackDTO;
     death: undefined;
   };
 
@@ -30,6 +26,7 @@
   const dispatch = createEventDispatcher<CharacterEvents>();
 
   let currentAnimation: BABYLON.AnimationGroup | undefined;
+  let scene: BABYLON.Scene | undefined;
 
   function updatePosition(x = 0, y = 0, z = 0) {
     if (rootMesh) {
@@ -128,48 +125,23 @@
     );
   }
 
-  function createCurrentAttackLabel() {
-    if (character.currentAttack) {
-      const isPlayerAttackParent = character.id === $activePlayerId;
-      const isPlayerAttackTarget = character.currentAttack.targetId === $activePlayerId;
-
-      if ((isPlayerAttackParent || isPlayerAttackTarget) && rootMesh && gui) {
-        const color = isPlayerAttackParent ? '#fff' : '#f63';
-        const attackLabel = createAttackLabel(
-          character.currentAttack,
-          color,
-          rootMesh.getScene(),
-        );
-
-        gui.addControl(attackLabel);
-
-        setTimeout(() => {
-          attackLabel?.dispose();
-        }, 500);
-      }
+  function copySceneReference() {
+    if (rootMesh) {
+      scene = rootMesh.getScene();
     }
   }
 
-  function handleAttackLoading() {
-    if (character.currentAttack) {
-      if (characterAnimationKeys.loadAttack !== undefined) {
-        switchAnimation(characterAnimationKeys.loadAttack);
-      }
-
-      dispatch('loadAttack', character.currentAttack);
+  function handleLoadAttack(details: CustomEvent<AttackDTO>) {
+    if (characterAnimationKeys.loadAttack !== undefined) {
+      switchAnimation(characterAnimationKeys.loadAttack);
     }
+
+    dispatch('loadAttack', details.detail);
   }
 
-  function handleAttackCasting() {
+  function handleCastAttack(details: CustomEvent<AttackDTO>) {
     switchAnimation(characterAnimationKeys.attack);
-    dispatch('castAttack');
-  }
-
-  function handleAttackHitting() {
-    if (character.isAlive && character.currentAttack?.isTargetAlive) {
-      dispatch('attack', character.currentAttack);
-      setTimeout(createCurrentAttackLabel, character.currentAttack.timeToHit * 1000);
-    }
+    dispatch('castAttack', details.detail);
   }
 
   $: isRootMeshReady = Boolean(rootMesh);
@@ -177,6 +149,7 @@
     if (isRootMeshReady) {
       registerRootMeshActions();
       registerAnimationsEvents();
+      copySceneReference();
     }
   }
 
@@ -243,22 +216,16 @@
       switchAnimation(characterAnimationKeys.idle);
     }
   }
-
-  $: currentAttackId = character?.currentAttack?.id;
-  $: currentAttackState = character?.currentAttack?.state;
-  $: {
-    if (currentAttackId && currentAttackState) {
-      switch (currentAttackState) {
-        case AttackState.Loading:
-          handleAttackLoading();
-          break;
-        case AttackState.Casting:
-          handleAttackCasting();
-          break;
-        case AttackState.Hitting:
-          handleAttackHitting();
-          break;
-      }
-    }
-  }
 </script>
+
+{#each character.currentAttacks as attack (attack.id)}
+  <Attack
+    {attack}
+    {scene}
+    {gui}
+    on:loadAttack={handleLoadAttack}
+    on:castAttack={handleCastAttack}
+    on:changeLoadingAttackCoef
+    on:hitAttack
+  />
+{/each}

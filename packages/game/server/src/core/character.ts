@@ -20,7 +20,6 @@ export default class Character extends Positionable {
   public readonly attackTimeToCast: number = 0.1;
   public readonly speedFactor: VariableValue;
 
-  public isAttacking = false;
   public frontMoveDirection: FrontMoveDirection = FrontMoveDirection.None;
   public sideMoveDirection: SideMoveDirection = SideMoveDirection.None;
 
@@ -66,8 +65,8 @@ export default class Character extends Positionable {
     return this._kind;
   }
 
-  public get currentAttack(): Attack {
-    return this._currentAttacks[this._currentAttacks.length - 1] ?? null;
+  public get currentAttacks(): Attack[] {
+    return this._currentAttacks;
   }
 
   public get isDestroyed(): boolean {
@@ -76,6 +75,20 @@ export default class Character extends Positionable {
 
   public get canMove(): boolean {
     return this._isAlive && !this.isAttacking;
+  }
+
+  public get isAttacking(): boolean {
+    const isAttackingStates = [AttackState.Loading, AttackState.Casting];
+
+    return this._currentAttacks.some((a) => isAttackingStates.indexOf(a.state) !== -1);
+  }
+
+  public get isLoadingAttack(): boolean {
+    return this._currentAttacks.some((a) => a.state === AttackState.Loading);
+  }
+
+  public get isCastingAttack(): boolean {
+    return this._currentAttacks.some((a) => a.state === AttackState.Casting);
   }
 
   public get currentSpeed(): number {
@@ -105,6 +118,7 @@ export default class Character extends Positionable {
         this._currentAttacks.splice(i, 1);
       } else {
         this._currentAttacks[i].update();
+
         if (this._currentAttacks[i].state === AttackState.Loading) {
           this._lookAtY(this._currentAttacks[i].targetPosition);
         }

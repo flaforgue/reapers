@@ -33,7 +33,6 @@ export default class Attack extends Identifiable {
     super();
 
     this.parent = parent;
-    this.parent.isAttacking = true;
     this.timeToHit = attackConfig.timeToHit;
     this.timeToCast = attackConfig.timeToCast;
     this.maxDamageCoef = attackConfig.maxDamageCoef ?? 1;
@@ -50,7 +49,6 @@ export default class Attack extends Identifiable {
       }, this.maxLoadingTime),
       [AttackState.Casting]: new ActionScheduler(() => {
         this._state = AttackState.Hitting;
-        this.parent.isAttacking = false;
       }, this.timeToCast),
       [AttackState.Hitting]: new ActionScheduler(() => {
         this._target.receiveAttack(this);
@@ -65,8 +63,6 @@ export default class Attack extends Identifiable {
         if (this._damageCoef > this.maxDamageCoef) {
           this._damageCoef = 1;
         }
-
-        console.log(this._damageCoef);
       }, loadingRate);
     }
   }
@@ -90,6 +86,10 @@ export default class Attack extends Identifiable {
     return this._target.id;
   }
 
+  public get parentId(): string {
+    return this.parent.id;
+  }
+
   public get targetPosition(): BABYLON.Vector3 {
     return this._target.position;
   }
@@ -100,6 +100,10 @@ export default class Attack extends Identifiable {
 
   public get isTargetAlive(): boolean {
     return this._target.isAlive;
+  }
+
+  public get isParentAlive(): boolean {
+    return this.parent.isAlive;
   }
 
   public get isDestroyed(): boolean {
