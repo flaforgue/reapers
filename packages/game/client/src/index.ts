@@ -27,6 +27,7 @@ type UseGameResult = {
   updateRotation: (rotationY: number) => void;
   loadAttack: (targetId: string) => void;
   performAttack: () => void;
+  cancelAttack: () => void;
 };
 
 const activePlayerId = writable<string>('');
@@ -64,6 +65,10 @@ function useGame(serverUrl: string): UseGameResult {
     socket.emit(GameEvents.Player.AttackPerformed);
   }
 
+  function cancelAttack(): void {
+    socket.emit(GameEvents.Player.AttackCancelled);
+  }
+
   socket.on(GameEvents.Player.Created, (player: CharacterDTO) => {
     activePlayerId.set(player.id);
   });
@@ -84,6 +89,7 @@ function useGame(serverUrl: string): UseGameResult {
     updateRotation,
     loadAttack,
     performAttack,
+    cancelAttack,
   };
 }
 

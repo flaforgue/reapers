@@ -13,6 +13,7 @@
     changeLoadingAttackCoef: AttackDTO;
     castAttack: AttackDTO;
     hitAttack: AttackDTO;
+    cancelAttack: AttackDTO;
     death: undefined;
   };
 
@@ -144,6 +145,11 @@
     dispatch('castAttack', details.detail);
   }
 
+  function handleCancelAttack(details: CustomEvent<AttackDTO>) {
+    switchAnimation(characterAnimationKeys.idle);
+    dispatch('cancelAttack', details.detail);
+  }
+
   $: isRootMeshReady = Boolean(rootMesh);
   $: {
     if (isRootMeshReady) {
@@ -225,6 +231,7 @@
     {gui}
     on:loadAttack={handleLoadAttack}
     on:castAttack={handleCastAttack}
+    on:cancelAttack={handleCancelAttack}
     on:changeLoadingAttackCoef
     on:hitAttack
   />

@@ -45,12 +45,6 @@
   let gui: GUI.AdvancedDynamicTexture | undefined;
   let shadowGenerator: BABYLON.CascadedShadowGenerator | undefined;
 
-  function keyboardEventHandler({ type, event }: BABYLON.KeyboardInfo) {
-    if (type === BABYLON.KeyboardEventTypes.KEYDOWN && event.key === Key.Escape) {
-      $targetInfos = null;
-    }
-  }
-
   function loadAssets(gameScene: BABYLON.Scene) {
     for (let kind of Object.values(CharacterKind)) {
       BABYLON.SceneLoader.LoadAssetContainer(
@@ -100,13 +94,13 @@
     updateRotation,
     loadAttack,
     performAttack,
+    cancelAttack,
   } = useGame(serversConfig.game.url);
 
   onMount(() => {
     joinGame($playerName);
     engine = createEngine(gameCanvas as HTMLCanvasElement);
     gameScene = createScene(engine);
-    gameScene.onKeyboardObservable?.add(keyboardEventHandler);
     gameCamera = createCamera(gameScene);
     gui = createGUI();
     loadAssets(gameScene);
@@ -182,6 +176,9 @@
   function handlePerformAttack() {
     return performAttack();
   }
+  function handleCancelAttack() {
+    return cancelAttack();
+  }
 </script>
 
 <div class="Game">
@@ -212,6 +209,7 @@
           on:rotationChange={handleRotationChange}
           on:loadAttack={handleLoadAttack}
           on:performAttack={handlePerformAttack}
+          on:cancelAttack={handleCancelAttack}
         />
       {/if}
     {:else}

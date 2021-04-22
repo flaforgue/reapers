@@ -56,6 +56,10 @@
     loadingAttackParticleSystem?.stop();
   }
 
+  function handleCancelAttack() {
+    loadingAttackParticleSystem?.stop();
+  }
+
   function handleHitAttack(details: CustomEvent<AttackDTO>) {
     const scene = rootMeshes[0]?.getScene();
     const attack = details.detail;
@@ -213,6 +217,7 @@
   on:loadAttack={handleLoadAttack}
   on:changeLoadingAttackCoef={handleChangeLoadingAttackCoef}
   on:castAttack={handleCastAttack}
+  on:cancelAttack={handleCancelAttack}
   on:death={handleDeath}
   {characterAnimationKeys}
   {gui}

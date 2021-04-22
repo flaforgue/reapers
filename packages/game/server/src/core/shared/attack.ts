@@ -21,13 +21,12 @@ export default class Attack extends Identifiable {
   public readonly maxDamageCoef;
 
   private readonly _target: Character;
-  private readonly _schedulers: Record<AttackState, ActionScheduler>;
+  private readonly _schedulers: Record<AttackState, ActionScheduler | undefined>;
   private readonly _damageCoefScheduler: ActionScheduler | undefined;
 
   private _damageCoef: number;
   private _damageAmount: number;
   private _state: AttackState;
-  private _isDestroyed = false;
 
   public constructor(parent: Character, target: Character, attackConfig: AttackConfig) {
     super();
@@ -52,8 +51,12 @@ export default class Attack extends Identifiable {
       }, this.timeToCast),
       [AttackState.Hitting]: new ActionScheduler(() => {
         this._target.receiveAttack(this);
-        this._isDestroyed = true;
+        this._state = AttackState.Destroyed;
       }, this.timeToHit),
+      [AttackState.Cancelled]: new ActionScheduler(() => {
+        this._state = AttackState.Destroyed;
+      }, 3),
+      [AttackState.Destroyed]: undefined,
     };
 
     if (this.maxLoadingTime > 0) {
@@ -107,18 +110,22 @@ export default class Attack extends Identifiable {
   }
 
   public get isDestroyed(): boolean {
-    return this._isDestroyed;
+    return this._state === AttackState.Destroyed;
   }
 
   public update(): void {
-    this._schedulers[this._state].update();
+    this._schedulers[this._state]?.update();
 
     if (this.state === AttackState.Loading) {
       this._damageCoefScheduler?.update();
     }
   }
 
-  public stopLoading(): void {
-    this._schedulers[AttackState.Loading].forceAction();
+  public perform(): void {
+    this._schedulers[AttackState.Loading]?.forceAction();
+  }
+
+  public cancel(): void {
+    this._state = AttackState.Cancelled;
   }
 }

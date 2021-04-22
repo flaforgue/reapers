@@ -10,6 +10,7 @@
     changeLoadingAttackCoef: AttackDTO;
     castAttack: AttackDTO;
     hitAttack: AttackDTO;
+    cancelAttack: AttackDTO;
   };
 
   export let attack: AttackDTO;
@@ -55,6 +56,10 @@
     }
   }
 
+  function handleCancelAttack() {
+    dispatch('cancelAttack', attack);
+  }
+
   onMount(function () {
     isMounted = true;
   });
@@ -72,6 +77,9 @@
           break;
         case AttackState.Hitting:
           handleHitAttack();
+          break;
+        case AttackState.Cancelled:
+          handleCancelAttack();
           break;
       }
     }

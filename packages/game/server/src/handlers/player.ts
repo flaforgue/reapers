@@ -51,4 +51,10 @@ export default (socket: Socket, game: Game, player: Player): void => {
       player.performAttack();
     }
   });
+
+  socket.on(GameEvents.Player.AttackCancelled, () => {
+    if (player.isLoadingAttack) {
+      player.cancelAttack();
+    }
+  });
 };

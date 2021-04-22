@@ -23,6 +23,7 @@
     rotationChange: number;
     loadAttack: string;
     performAttack: undefined;
+    cancelAttack: undefined;
   };
 
   export let player: CharacterDTO | undefined;
@@ -73,9 +74,18 @@
     }
   }
 
+  function localCancelAttack() {
+    if (player?.isAttacking) {
+      dispatch('cancelAttack');
+    }
+  }
+
   function keyboardEventHandler({ type, event }: BABYLON.KeyboardInfo) {
     if (type === BABYLON.KeyboardEventTypes.KEYDOWN) {
-      if (player?.canMove) {
+      if (event.key === Key.Escape) {
+        $targetInfos = null;
+        localCancelAttack();
+      } else if (player?.canMove) {
         switch (event.key) {
           case Key.z:
             dispatch('frontMoveDirectionChange', FrontMoveDirection.Forward);

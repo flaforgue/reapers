@@ -13,6 +13,7 @@ enum PlayerEvent {
   RotationUpdated = 'PlayerEvent.RotationUpdated',
   AttackLoaded = 'PlayerEvent.AttackLoaded',
   AttackPerformed = 'PlayerEvent.AttackPerformed',
+  AttackCancelled = 'PlayerEvent.AttackCancelled',
 }
 
 enum GameEvent {
@@ -43,6 +44,8 @@ export enum AttackState {
   Loading = 'Loading',
   Casting = 'Casting',
   Hitting = 'Hitting',
+  Cancelled = 'Cancelled',
+  Destroyed = 'Destroyed',
 }
 
 export enum CharacterKind {

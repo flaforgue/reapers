@@ -71,7 +71,11 @@ export default class Player extends Character {
   }
 
   public performAttack(): void {
-    this._currentAttacks.find((a) => a.state === AttackState.Loading)?.stopLoading();
+    this._currentAttacks.find((a) => a.state === AttackState.Loading)?.perform();
+  }
+
+  public cancelAttack(): void {
+    this._currentAttacks.find((a) => a.state === AttackState.Loading)?.cancel();
   }
 
   protected _die(): void {
