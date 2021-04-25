@@ -6,7 +6,8 @@
     "bootstrap": "npx lerna bootstrap",
     "build": "npx lerna run build",
     "clean": "npx lerna clean --yes",
-    "dev": "npx lerna run --parallel dev"
+    "dev": "npx lerna run --parallel dev",
+    "start": "npx lerna run --parallel start"
   },
   "repository": {
     "type": "git",
