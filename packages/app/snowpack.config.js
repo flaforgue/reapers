@@ -24,6 +24,7 @@ module.exports = {
     hmr: false,
     out: 'dist',
     open: 'none',
+    port: 8081,
   },
   buildOptions: {
     sourcemap: true,

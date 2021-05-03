@@ -5,7 +5,7 @@ const fps = 60;
 export default {
   port: process.env.PORT ?? 4001,
   web: {
-    url: 'http://localhost:8080',
+    url: 'http://localhost:8081',
   },
   game: {
     nbMaxPlayers: 100,
